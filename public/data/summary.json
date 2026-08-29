@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-05-19T19:55:43.869678+00:00",
+  "as_of": "2026-05-19T19:55:43.869650+00:00",
+  "totals": {
+    "projects": 2691,
+    "active_projects": 1573,
+    "organizations": 1274,
+    "contributors": 41079
+  },
+  "medians": {
+    "project_age_years": 6.25,
+    "stars": 40,
+    "dds": 0.271,
+    "contributors": 7.0,
+    "total_commits": 301.0
+  },
+  "source": {
+    "projects_rows": 2691,
+    "organizations_rows": 1274
+  }
+}

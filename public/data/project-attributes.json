@@ -1,0 +1,592 @@
+{
+  "generated_at": "2026-05-19T19:55:43.869678+00:00",
+  "top_n_default": 30,
+  "commit_activity": [
+    {
+      "label": "Active (Commits in Last 365 Days)",
+      "count": 1573
+    },
+    {
+      "label": "Inactive (No Commits in Last 365 Days)",
+      "count": 1118
+    }
+  ],
+  "fields": {
+    "code_of_conduct": [
+      {
+        "label": "False",
+        "count": 2147
+      },
+      {
+        "label": "True",
+        "count": 451
+      },
+      {
+        "label": "Unknown",
+        "count": 93
+      }
+    ],
+    "contributing_guide": [
+      {
+        "label": "False",
+        "count": 1761
+      },
+      {
+        "label": "True",
+        "count": 837
+      },
+      {
+        "label": "Unknown",
+        "count": 93
+      }
+    ],
+    "license": [
+      {
+        "label": "mit",
+        "count": 694
+      },
+      {
+        "label": "other",
+        "count": 505
+      },
+      {
+        "label": "gpl-3.0",
+        "count": 359
+      },
+      {
+        "label": "Unknown",
+        "count": 324
+      },
+      {
+        "label": "apache-2.0",
+        "count": 311
+      },
+      {
+        "label": "bsd-3-clause",
+        "count": 168
+      },
+      {
+        "label": "agpl-3.0",
+        "count": 83
+      },
+      {
+        "label": "gpl-2.0",
+        "count": 44
+      },
+      {
+        "label": "cc0-1.0",
+        "count": 38
+      },
+      {
+        "label": "lgpl-3.0",
+        "count": 38
+      },
+      {
+        "label": "cc-by-4.0",
+        "count": 35
+      },
+      {
+        "label": "mpl-2.0",
+        "count": 21
+      },
+      {
+        "label": "bsd-2-clause",
+        "count": 20
+      },
+      {
+        "label": "eupl-1.2",
+        "count": 17
+      },
+      {
+        "label": "cc-by-sa-4.0",
+        "count": 10
+      },
+      {
+        "label": "gpl-3.0+",
+        "count": 8
+      },
+      {
+        "label": "lgpl-2.1",
+        "count": 4
+      },
+      {
+        "label": "unlicense",
+        "count": 4
+      },
+      {
+        "label": "isc",
+        "count": 2
+      },
+      {
+        "label": "epl-2.0",
+        "count": 2
+      },
+      {
+        "label": "bsd-3-clause-clear",
+        "count": 1
+      },
+      {
+        "label": "cc-by-nc-nd-4.0",
+        "count": 1
+      },
+      {
+        "label": "mit-0",
+        "count": 1
+      },
+      {
+        "label": "eupl-1.1",
+        "count": 1
+      }
+    ],
+    "language": [
+      {
+        "label": "Python",
+        "count": 936
+      },
+      {
+        "label": "R",
+        "count": 390
+      },
+      {
+        "label": "Jupyter Notebook",
+        "count": 299
+      },
+      {
+        "label": "Unknown",
+        "count": 228
+      },
+      {
+        "label": "C++",
+        "count": 111
+      },
+      {
+        "label": "HTML",
+        "count": 98
+      },
+      {
+        "label": "Fortran",
+        "count": 92
+      },
+      {
+        "label": "TypeScript",
+        "count": 87
+      },
+      {
+        "label": "JavaScript",
+        "count": 79
+      },
+      {
+        "label": "Julia",
+        "count": 74
+      },
+      {
+        "label": "Java",
+        "count": 43
+      },
+      {
+        "label": "C",
+        "count": 32
+      },
+      {
+        "label": "MATLAB",
+        "count": 24
+      },
+      {
+        "label": "Ruby",
+        "count": 23
+      },
+      {
+        "label": "Go",
+        "count": 16
+      },
+      {
+        "label": "Modelica",
+        "count": 13
+      },
+      {
+        "label": "C#",
+        "count": 13
+      },
+      {
+        "label": "Vue",
+        "count": 12
+      },
+      {
+        "label": "TeX",
+        "count": 12
+      },
+      {
+        "label": "Rust",
+        "count": 12
+      },
+      {
+        "label": "Kotlin",
+        "count": 11
+      },
+      {
+        "label": "PHP",
+        "count": 8
+      },
+      {
+        "label": "Shell",
+        "count": 6
+      },
+      {
+        "label": "Makefile",
+        "count": 6
+      },
+      {
+        "label": "CSS",
+        "count": 5
+      },
+      {
+        "label": "GAMS",
+        "count": 5
+      },
+      {
+        "label": "PLpgSQL",
+        "count": 4
+      },
+      {
+        "label": "Scala",
+        "count": 3
+      },
+      {
+        "label": "Swift",
+        "count": 3
+      },
+      {
+        "label": "SCSS",
+        "count": 3
+      },
+      {
+        "label": "Svelte",
+        "count": 2
+      },
+      {
+        "label": "AGS Script",
+        "count": 2
+      },
+      {
+        "label": "Dockerfile",
+        "count": 2
+      },
+      {
+        "label": "Perl",
+        "count": 2
+      },
+      {
+        "label": "NCL",
+        "count": 2
+      },
+      {
+        "label": "GLSL",
+        "count": 1
+      },
+      {
+        "label": "Mustache",
+        "count": 1
+      },
+      {
+        "label": "CoffeeScript",
+        "count": 1
+      },
+      {
+        "label": "PostScript",
+        "count": 1
+      },
+      {
+        "label": "BitBake",
+        "count": 1
+      },
+      {
+        "label": "Roff",
+        "count": 1
+      },
+      {
+        "label": "Liquid",
+        "count": 1
+      },
+      {
+        "label": "LLVM",
+        "count": 1
+      },
+      {
+        "label": "QML",
+        "count": 1
+      },
+      {
+        "label": "Visual Basic .NET",
+        "count": 1
+      },
+      {
+        "label": "Elm",
+        "count": 1
+      },
+      {
+        "label": "Dart",
+        "count": 1
+      },
+      {
+        "label": "Lua",
+        "count": 1
+      },
+      {
+        "label": "KiCad Layout",
+        "count": 1
+      },
+      {
+        "label": "Fluent",
+        "count": 1
+      },
+      {
+        "label": "Haskell",
+        "count": 1
+      },
+      {
+        "label": "CartoCSS",
+        "count": 1
+      },
+      {
+        "label": "Haml",
+        "count": 1
+      },
+      {
+        "label": "Jinja",
+        "count": 1
+      },
+      {
+        "label": "PureBasic",
+        "count": 1
+      },
+      {
+        "label": "TSQL",
+        "count": 1
+      },
+      {
+        "label": "Smalltalk",
+        "count": 1
+      },
+      {
+        "label": "F#",
+        "count": 1
+      },
+      {
+        "label": "NetLogo",
+        "count": 1
+      },
+      {
+        "label": "Groovy",
+        "count": 1
+      },
+      {
+        "label": "ReScript",
+        "count": 1
+      },
+      {
+        "label": "Cython",
+        "count": 1
+      },
+      {
+        "label": "Propeller Spin",
+        "count": 1
+      },
+      {
+        "label": "Cuda",
+        "count": 1
+      },
+      {
+        "label": "EJS",
+        "count": 1
+      },
+      {
+        "label": "Objective-C",
+        "count": 1
+      },
+      {
+        "label": "Ada",
+        "count": 1
+      },
+      {
+        "label": "Turtle",
+        "count": 1
+      }
+    ],
+    "ecosystems": [
+      {
+        "label": "actions",
+        "count": 4766
+      },
+      {
+        "label": "pypi",
+        "count": 3012
+      },
+      {
+        "label": "Unknown",
+        "count": 2691
+      },
+      {
+        "label": "npm",
+        "count": 1417
+      },
+      {
+        "label": "docker",
+        "count": 1199
+      },
+      {
+        "label": "maven",
+        "count": 526
+      },
+      {
+        "label": "cran",
+        "count": 438
+      },
+      {
+        "label": "nuget",
+        "count": 382
+      },
+      {
+        "label": "conda",
+        "count": 234
+      },
+      {
+        "label": "cargo",
+        "count": 127
+      },
+      {
+        "label": "rubygems",
+        "count": 117
+      },
+      {
+        "label": "packagist",
+        "count": 113
+      },
+      {
+        "label": "julia",
+        "count": 81
+      },
+      {
+        "label": "go",
+        "count": 61
+      },
+      {
+        "label": "bower",
+        "count": 21
+      },
+      {
+        "label": "hackage",
+        "count": 18
+      },
+      {
+        "label": "cpan",
+        "count": 16
+      },
+      {
+        "label": "cocoapods",
+        "count": 14
+      },
+      {
+        "label": "vcpkg",
+        "count": 7
+      },
+      {
+        "label": "swiftpm",
+        "count": 6
+      },
+      {
+        "label": "rpm",
+        "count": 5
+      },
+      {
+        "label": "meteor",
+        "count": 5
+      },
+      {
+        "label": "pub",
+        "count": 4
+      },
+      {
+        "label": "nix",
+        "count": 2
+      },
+      {
+        "label": "homebrew",
+        "count": 2
+      },
+      {
+        "label": "deb",
+        "count": 2
+      },
+      {
+        "label": "clojars",
+        "count": 1
+      }
+    ],
+    "platform": [
+      {
+        "label": "GitHub",
+        "count": 2539
+      },
+      {
+        "label": "Unknown",
+        "count": 93
+      },
+      {
+        "label": "gitlab.com",
+        "count": 42
+      },
+      {
+        "label": "git.rwth-aachen.de",
+        "count": 3
+      },
+      {
+        "label": "git.gfz-potsdam.de",
+        "count": 2
+      },
+      {
+        "label": "code.europa.eu",
+        "count": 2
+      },
+      {
+        "label": "git.geomar.de",
+        "count": 1
+      },
+      {
+        "label": "gitlab.dkrz.de",
+        "count": 1
+      },
+      {
+        "label": "codeberg.org",
+        "count": 1
+      },
+      {
+        "label": "invent.kde.org",
+        "count": 1
+      },
+      {
+        "label": "gricad-gitlab.univ-grenoble-alpes.fr",
+        "count": 1
+      },
+      {
+        "label": "git.ufz.de",
+        "count": 1
+      },
+      {
+        "label": "code.usgs.gov",
+        "count": 1
+      },
+      {
+        "label": "forge.ird.fr",
+        "count": 1
+      },
+      {
+        "label": "git.wur.nl",
+        "count": 1
+      },
+      {
+        "label": "gitlab.dune-project.org",
+        "count": 1
+      }
+    ]
+  }
+}

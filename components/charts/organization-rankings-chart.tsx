@@ -18,6 +18,7 @@ import type {
 } from "@/lib/types";
 
 import { EChart } from "./echart";
+import { useOrganizationFilters } from "./organization-filters";
 
 const TOP_N_CHOICES = [10, 25, 50, 100];
 const ALL = "All Categories";
@@ -58,6 +59,7 @@ export function OrganizationRankingsChart({
   const [topN, setTopN] = useState(25);
   const tokens = useChartTokens();
   const theme = useTheme();
+  const filters = useOrganizationFilters();
 
   const palette = useMemo(
     () => resolveCategoryColors(categories, categoryColors),
@@ -87,13 +89,16 @@ export function OrganizationRankingsChart({
     return payload.records
       .filter(
         (record) =>
-          category === ALL ||
-          record.category_breakdown?.some((item) => item.category === category),
+          (category === ALL ||
+            record.category_breakdown?.some(
+              (item) => item.category === category,
+            )) &&
+          filters.matches(record.location_country, record.form_of_organization),
       )
       .slice()
       .sort((a, b) => scoreIn(b, category) - scoreIn(a, category))
       .slice(0, topN);
-  }, [payload, category, topN]);
+  }, [payload, category, topN, filters]);
 
   const option: EChartsOption = useMemo(() => {
     const ordered = [...top].reverse();
@@ -237,7 +242,9 @@ export function OrganizationRankingsChart({
       ) : top.length === 0 ? (
         <div className="viz-state">
           <p className="viz-state__label">
-            No organizations work in {category}.
+            {filters.active
+              ? "No organizations match the current filters."
+              : `No organizations work in ${category}.`}
           </p>
         </div>
       ) : (

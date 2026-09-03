@@ -10,11 +10,15 @@ import {
 } from "react";
 
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
+import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
 import { pluralize } from "@/lib/format";
 import { useElementSize } from "@/lib/hooks/use-element-size";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 import { useTheme } from "@/lib/hooks/use-theme";
-import type { ProjectsByOrganizationPayload } from "@/lib/types";
+import type {
+  OrganizationsOverviewPayload,
+  ProjectsByOrganizationPayload,
+} from "@/lib/types";
 import { categoryColor } from "@/lib/sunburst/color";
 import { holeFit, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
 import {
@@ -24,6 +28,7 @@ import {
 import { ancestors, flatten } from "@/lib/sunburst/tree";
 import type { SunburstNode } from "@/lib/sunburst/types";
 
+import { useOrganizationFilters } from "../organization-filters";
 import { SunburstNodeTooltip } from "./sunburst-node-tooltip";
 import { SunburstSvg, type SunburstSvgHandle } from "./sunburst-svg";
 
@@ -57,6 +62,24 @@ export function OrganizationSunburst({
   const { ref: frameRef, width } = useElementSize<HTMLDivElement>();
   const reducedMotion = useReducedMotion();
   const theme = useTheme();
+  const filters = useOrganizationFilters();
+  // projects-by-organization carries no country or type, so the facets come
+  // from the overview payload, joined on organization_url — all 276 of these
+  // organizations join. The page already fetches it for its other charts.
+  const { data: overview } =
+    useAnalyticsPayload<OrganizationsOverviewPayload>("organizationsOverview");
+
+  const facetsByUrl = useMemo(() => {
+    const map = new Map<string, { country: string; type: string }>();
+    for (const record of overview?.organizations_by_project_count ?? []) {
+      if (!record.organization_url) continue;
+      map.set(record.organization_url, {
+        country: record.location_country,
+        type: record.form_of_organization,
+      });
+    }
+    return map;
+  }, [overview]);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,8 +112,14 @@ export function OrganizationSunburst({
   );
 
   const limits = useMemo(() => {
-    if (!tree) return { shown: 0, hidden: 0, hiddenProjects: 0 };
-    const result = limitOrganizations(tree, topN);
+    if (!tree) {
+      return { shown: 0, hidden: 0, hiddenProjects: 0, matched: 0 };
+    }
+    const result = limitOrganizations(tree, topN, (org) => {
+      if (!filters.active) return true;
+      const facet = facetsByUrl.get(org.detail?.url ?? "");
+      return filters.matches(facet?.country, facet?.type);
+    });
     // Roll the leaf counts back up after filtering.
     for (const org of tree.children) {
       org.visibleLeaves = org.children.reduce(
@@ -103,7 +132,7 @@ export function OrganizationSunburst({
       0,
     );
     return result;
-  }, [tree, topN]);
+  }, [tree, topN, filters, facetsByUrl]);
 
   const focusNode = useMemo(() => {
     if (!tree) return null;
@@ -338,7 +367,11 @@ export function OrganizationSunburst({
           {caption ? <p className="viz-chart__caption">{caption}</p> : null}
 
           {/* The old chart hard-coded a top-80 cut and said nothing about it. */}
-          {limits.hidden > 0 ? (
+          {limits.matched === 0 ? (
+            <p className="viz-chart__note" role="status">
+              No organizations match the current filters.
+            </p>
+          ) : limits.hidden > 0 ? (
             <p className="viz-chart__note" role="status">
               {pluralize(limits.hidden, "smaller organization")} (
               {pluralize(limits.hiddenProjects, "project")}) are not shown.

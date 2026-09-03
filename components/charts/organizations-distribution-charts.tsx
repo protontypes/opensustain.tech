@@ -4,20 +4,67 @@ import { useMemo, useState } from "react";
 
 import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
 import { formatNumber } from "@/lib/format";
-import type { OrganizationsOverviewPayload } from "@/lib/types";
+import {
+  normalizeType,
+  titleCase,
+  UNKNOWN_CONTINENT,
+} from "@/lib/charts/organization-geography";
+import type {
+  OrganizationProjectCountRecord,
+  OrganizationsOverviewPayload,
+} from "@/lib/types";
 
 import { HorizontalBarChart, type BarDatum } from "./horizontal-bar-chart";
+import { useOrganizationFilters } from "./organization-filters";
 import { TopNField } from "./top-n-field";
-
-/** Title-cases the raw `form_of_organization` values, which are lower-cased. */
-function titleCase(value: string): string {
-  return value.replace(/\b[a-z]/g, (character) => character.toUpperCase());
-}
 
 function useOverview() {
   return useAnalyticsPayload<OrganizationsOverviewPayload>(
     "organizationsOverview",
   );
+}
+
+/**
+ * The organizations left after the page filters, in payload order (descending
+ * by listed projects).
+ *
+ * Every chart here is derived from this list rather than from the payload's
+ * precomputed `countries`, `continent_counts` and `organization_type_counts`.
+ * Those are fixed totals over every organization and cannot answer "academia
+ * only". Recomputing reproduces them exactly when nothing is filtered —
+ * `verifyGeography` checks that on load in development.
+ */
+function useFilteredOrganizations(): {
+  records: OrganizationProjectCountRecord[];
+  data: OrganizationsOverviewPayload | null;
+  error: string | null;
+} {
+  const { data, error } = useOverview();
+  const filters = useOrganizationFilters();
+  const records = useMemo(() => {
+    const all = data?.organizations_by_project_count ?? [];
+    if (!filters.active) return all;
+    return all.filter((record) =>
+      filters.matches(record.location_country, record.form_of_organization),
+    );
+  }, [data, filters]);
+  return { records, data, error };
+}
+
+/** Counts by key, descending, as every chart here wants them. */
+function tally<T>(
+  records: T[],
+  key: (record: T) => string | null,
+): { key: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const record of records) {
+    const value = key(record);
+    if (value === null) continue;
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([k, count]) => ({ key: k, count }))
+    .sort((a, b) => b.count - a.count || a.key.localeCompare(b.key));
 }
 
 function Frame({
@@ -49,10 +96,9 @@ function Frame({
 /* ------------------------------------------------- top organizations */
 
 export function TopOrganizationsChart() {
-  const { data, error } = useOverview();
+  const { records, data, error } = useFilteredOrganizations();
   const [topN, setTopN] = useState(25);
 
-  const records = data?.organizations_by_project_count ?? [];
   const rows: BarDatum[] = useMemo(
     () =>
       records.slice(0, topN).map((record) => ({
@@ -66,6 +112,10 @@ export function TopOrganizationsChart() {
       })),
     [records, topN],
   );
+
+  const single = records.filter(
+    (record) => record.total_listed_projects_in_organization === 1,
+  ).length;
 
   return (
     <Frame error={error} data={data}>
@@ -85,12 +135,15 @@ export function TopOrganizationsChart() {
           valueLabel="Listed projects"
           labelWidth={220}
           clickNote="Click to open the organization"
+          emptyMessage="No organizations match the current filters."
         />
-        {/* 998 of the 1,274 list exactly one project, so the tail is flat. */}
-        <p className="viz-chart__note">
-          {formatNumber(records.filter((r) => r.total_listed_projects_in_organization === 1).length)}{" "}
-          of {formatNumber(records.length)} organizations list a single project.
-        </p>
+        {/* Most organizations list exactly one project, so the tail is flat. */}
+        {records.length > 0 ? (
+          <p className="viz-chart__note">
+            {formatNumber(single)} of {formatNumber(records.length)}{" "}
+            organizations list a single project.
+          </p>
+        ) : null}
       </div>
     </Frame>
   );
@@ -99,24 +152,35 @@ export function TopOrganizationsChart() {
 /* ------------------------------------------------------- by country */
 
 export function TopCountriesChart() {
-  const { data, error } = useOverview();
+  const { records, data, error } = useFilteredOrganizations();
+  const filters = useOrganizationFilters();
   const [topN, setTopN] = useState(25);
 
-  const countries = data?.countries ?? [];
+  const counted = useMemo(() => {
+    const index = filters.index;
+    if (!index) return [];
+    return tally(records, (record) => index.resolve(record.location_country));
+  }, [records, filters.index]);
+
   const rows: BarDatum[] = useMemo(
     () =>
-      [...countries]
-        .sort((a, b) => b.organization_count - a.organization_count)
-        .slice(0, topN)
-        .map((country) => ({
-          key: country.iso_alpha,
-          label: country.country_name,
-          value: country.organization_count,
-          rows: [
-            { label: "Projects", value: formatNumber(country.total_projects) },
-          ],
-        })),
-    [countries, topN],
+      counted.slice(0, topN).map((entry) => ({
+        key: entry.key,
+        label:
+          filters.index?.byIso.get(entry.key)?.country_name ?? entry.key,
+        value: entry.count,
+      })),
+    [counted, topN, filters.index],
+  );
+
+  const nonCountries = useMemo(
+    () =>
+      new Set(
+        [...(filters.index?.byIso.values() ?? [])]
+          .filter((country) => !country.map_eligible)
+          .map((country) => country.iso_alpha),
+      ),
+    [filters.index],
   );
 
   return (
@@ -127,7 +191,7 @@ export function TopCountriesChart() {
             <TopNField
               value={topN}
               onChange={setTopN}
-              max={countries.length}
+              max={counted.length}
               noun="countries"
             />
           </div>
@@ -136,12 +200,16 @@ export function TopCountriesChart() {
           data={rows}
           valueLabel="Organizations"
           labelWidth={180}
+          emptyMessage="No organizations match the current filters."
         />
-        {/* "Global" is a real value in the source, not a country. */}
-        <p className="viz-chart__note">
-          Includes Global and European Union, which organizations record in
-          place of a country.
-        </p>
+        {/* Only worth saying when one of those buckets is actually present —
+            a filter can remove them. */}
+        {rows.some((row) => nonCountries.has(row.key)) ? (
+          <p className="viz-chart__note">
+            Includes Global and European Union, which organizations record in
+            place of a country.
+          </p>
+        ) : null}
       </div>
     </Frame>
   );
@@ -150,16 +218,17 @@ export function TopCountriesChart() {
 /* ----------------------------------------------------- by continent */
 
 export function ContinentsChart() {
-  const { data, error } = useOverview();
-  const rows: BarDatum[] = useMemo(
-    () =>
-      (data?.continent_counts ?? []).map((record) => ({
-        key: record.continent,
-        label: record.continent,
-        value: record.count,
-      })),
-    [data],
-  );
+  const { records, data, error } = useFilteredOrganizations();
+  const filters = useOrganizationFilters();
+
+  const rows: BarDatum[] = useMemo(() => {
+    const index = filters.index;
+    if (!index) return [];
+    return tally(records, (record) => {
+      const iso = index.resolve(record.location_country);
+      return iso ? index.continentOf(iso) : UNKNOWN_CONTINENT;
+    }).map((entry) => ({ key: entry.key, label: entry.key, value: entry.count }));
+  }, [records, filters.index]);
 
   return (
     <Frame error={error} data={data}>
@@ -170,6 +239,7 @@ export function ContinentsChart() {
         rowHeight={44}
         // Six values from 4 to 410: on the log ramp the top three shared a stop.
         scale="linear"
+        emptyMessage="No organizations match the current filters."
       />
     </Frame>
   );
@@ -178,15 +248,17 @@ export function ContinentsChart() {
 /* ---------------------------------------------------------- by type */
 
 export function OrganizationTypesChart() {
-  const { data, error } = useOverview();
+  const { records, data, error } = useFilteredOrganizations();
+
   const rows: BarDatum[] = useMemo(
     () =>
-      (data?.organization_type_counts ?? []).map((record) => ({
-        key: record.form_of_organization,
-        label: titleCase(record.form_of_organization),
-        value: record.count,
-      })),
-    [data],
+      tally(records, (record) => normalizeType(record.form_of_organization) || "unknown")
+        .map((entry) => ({
+          key: entry.key,
+          label: titleCase(entry.key),
+          value: entry.count,
+        })),
+    [records],
   );
 
   return (
@@ -197,6 +269,7 @@ export function OrganizationTypesChart() {
         labelWidth={150}
         rowHeight={44}
         scale="linear"
+        emptyMessage="No organizations match the current filters."
       />
     </Frame>
   );

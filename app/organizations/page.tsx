@@ -1,3 +1,4 @@
+import { OrganizationFiltersProvider } from "@/components/charts/organization-filters";
 import { OrganizationRankingsChart } from "@/components/charts/organization-rankings-chart";
 import {
   ContinentsChart,
@@ -26,6 +27,7 @@ export default async function OrganizationsPage() {
         description="Analyze the geographic distribution, hierarchy, and sustainability impact of organizations contributing to open-source climate tech."
       />
 
+      <OrganizationFiltersProvider>
       <div className="stack">
         <Panel
           title="Organization Rankings"
@@ -94,6 +96,7 @@ export default async function OrganizationsPage() {
           </Panel>
         </div>
       </div>
+      </OrganizationFiltersProvider>
     </main>
   );
 }

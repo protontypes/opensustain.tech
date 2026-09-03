@@ -122,47 +122,6 @@ export function buildSubcategoryTree(
   return root;
 }
 
-export type FacetOption = { value: string; label: string; count: number };
-
-/**
- * Country and organization-type options, matching the two multiselects the
- * Streamlit tab offers (tabs/tab_utils.py:24).
- *
- * Blank values are left out of the lists — 130 of 1,640 listings record no
- * country and 129 no type, and an empty dropdown row is not a choice. Those
- * organizations simply drop out while a filter of that kind is active, which is
- * what `Series.isin` does in the reference.
- */
-export function facetOptions(root: SunburstNode): {
-  countries: FacetOption[];
-  types: FacetOption[];
-} {
-  const countries = new Map<string, number>();
-  const types = new Map<string, number>();
-  for (const sub of root.children) {
-    for (const org of sub.children) {
-      const country = org.detail?.country ?? UNKNOWN;
-      const type = org.detail?.orgType ?? UNKNOWN;
-      if (country) countries.set(country, (countries.get(country) ?? 0) + 1);
-      if (type) types.set(type, (types.get(type) ?? 0) + 1);
-    }
-  }
-  const toOptions = (
-    counts: Map<string, number>,
-    label: (value: string) => string,
-  ): FacetOption[] =>
-    [...counts.entries()]
-      .map(([value, count]) => ({ value, label: label(value), count }))
-      // Alphabetical: a 48-entry dropdown is scanned by name, not by rank. The
-      // count rides along in the label so the weight is still visible.
-      .sort((a, b) => a.label.localeCompare(b.label));
-
-  return {
-    countries: toOptions(countries, (value) => value),
-    types: toOptions(types, titleCase),
-  };
-}
-
 export type SubcategoryFilterResult = {
   /** Sub-categories with at least one organization left. */
   subcategories: number;
@@ -175,18 +134,16 @@ export type SubcategoryFilterResult = {
 };
 
 /**
- * Applies the country and type filters by setting each leaf's `visibleLeaves`,
- * then rolls the counts back up. An empty filter array means "no restriction",
- * as the Streamlit multiselects' empty default does.
+ * Applies the page's filters by setting each leaf's `visibleLeaves`, then rolls
+ * the counts back up.
+ *
+ * @param include decided by the page filter bar, which owns the country and
+ * type controls for every chart on the organizations page.
  */
 export function applySubcategoryFilters(
   root: SunburstNode,
-  countries: string[],
-  types: string[],
+  include: (org: SunburstNode) => boolean,
 ): SubcategoryFilterResult {
-  const countryFilter = countries.length ? new Set(countries) : null;
-  const typeFilter = types.length ? new Set(types) : null;
-
   const distinct = new Set<string>();
   let listings = 0;
   let hidden = 0;
@@ -195,11 +152,7 @@ export function applySubcategoryFilters(
   for (const sub of root.children) {
     let kept = 0;
     for (const org of sub.children) {
-      const country = org.detail?.country ?? UNKNOWN;
-      const type = org.detail?.orgType ?? UNKNOWN;
-      const keep =
-        (!countryFilter || countryFilter.has(country)) &&
-        (!typeFilter || typeFilter.has(type));
+      const keep = include(org);
       org.visibleLeaves = keep ? 1 : 0;
       if (keep) {
         kept += 1;

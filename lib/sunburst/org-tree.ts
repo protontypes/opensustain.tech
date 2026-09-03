@@ -116,17 +116,31 @@ export function buildOrganizationTree(
  *
  * Returns how many were dropped so the UI can say so — the previous chart hard
  * -coded topN=80 against 276 organizations and said nothing.
+ *
+ * @param include organizations the page filters admit. Excluded ones leave the
+ * chart entirely rather than counting toward the top-N or toward the "smaller
+ * organizations not shown" line, which is about size, not about filtering.
  */
 export function limitOrganizations(
   root: SunburstNode,
   topN: number,
-): { shown: number; hidden: number; hiddenProjects: number } {
-  const ordered = [...root.children].sort(
+  include: (org: SunburstNode) => boolean = () => true,
+): { shown: number; hidden: number; hiddenProjects: number; matched: number } {
+  const excluded: SunburstNode[] = [];
+  const eligible: SunburstNode[] = [];
+  for (const org of root.children) {
+    (include(org) ? eligible : excluded).push(org);
+  }
+  for (const org of excluded) {
+    for (const child of org.children) child.visibleLeaves = 0;
+  }
+
+  eligible.sort(
     (a, b) => b.totalLeaves - a.totalLeaves || a.name.localeCompare(b.name),
   );
   let hidden = 0;
   let hiddenProjects = 0;
-  ordered.forEach((org, index) => {
+  eligible.forEach((org, index) => {
     const keep = index < topN;
     for (const child of org.children) child.visibleLeaves = keep ? 1 : 0;
     if (!keep) {
@@ -134,5 +148,10 @@ export function limitOrganizations(
       hiddenProjects += org.totalLeaves;
     }
   });
-  return { shown: ordered.length - hidden, hidden, hiddenProjects };
+  return {
+    shown: eligible.length - hidden,
+    hidden,
+    hiddenProjects,
+    matched: eligible.length,
+  };
 }

@@ -9,7 +9,7 @@ import { MapChart } from "echarts/charts";
 
 import { buildTooltip } from "@/lib/charts/tooltip";
 import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
-import { formatNumber } from "@/lib/format";
+import { formatNumber, pluralize } from "@/lib/format";
 import { useChartTokens } from "@/lib/hooks/use-chart-tokens";
 import { useTheme } from "@/lib/hooks/use-theme";
 import type {
@@ -18,6 +18,7 @@ import type {
 } from "@/lib/types";
 
 import { EChart, registerMap } from "./echart";
+import { useOrganizationFilters } from "./organization-filters";
 
 // Registered here rather than in echart.tsx: that module is imported by every
 // route with a chart, so registering the map there shipped it to all of them.
@@ -65,6 +66,7 @@ export function OrganizationsMap() {
   const [metric, setMetric] = useState<Metric>("total_projects");
   const tokens = useChartTokens();
   const theme = useTheme();
+  const filters = useOrganizationFilters();
 
   // 170 KB of geometry, fetched only when this chart mounts — it is the one
   // thing on the page that needs it, and it is dead weight in the bundle.
@@ -94,13 +96,51 @@ export function OrganizationsMap() {
 
   const { onMap, offMap } = useMemo(() => {
     const countries = data?.countries ?? [];
+    const index = filters.index;
+
+    // Unfiltered, the payload's own totals are used as they are. Filtered, they
+    // cannot answer "academia only", so the per-country counts are recomputed
+    // from the organization list — which reproduces these totals exactly when
+    // no filter is set, as verifyGeography checks in development.
+    const resolved = filters.active && index
+      ? (() => {
+          const orgs = new Map<string, number>();
+          const projects = new Map<string, number>();
+          for (const record of data?.organizations_by_project_count ?? []) {
+            if (
+              !filters.matches(
+                record.location_country,
+                record.form_of_organization,
+              )
+            ) {
+              continue;
+            }
+            const iso = index.resolve(record.location_country);
+            if (!iso) continue;
+            orgs.set(iso, (orgs.get(iso) ?? 0) + 1);
+            projects.set(
+              iso,
+              (projects.get(iso) ?? 0) +
+                record.total_listed_projects_in_organization,
+            );
+          }
+          return countries
+            .map((country) => ({
+              ...country,
+              organization_count: orgs.get(country.iso_alpha) ?? 0,
+              total_projects: projects.get(country.iso_alpha) ?? 0,
+            }))
+            .filter((country) => country.organization_count > 0);
+        })()
+      : countries;
+
     return {
-      onMap: countries.filter((country) => country.map_eligible),
+      onMap: resolved.filter((country) => country.map_eligible),
       // "Global", "European Union" and "Europe" are real values in the source
       // but have no territory to shade.
-      offMap: countries.filter((country) => !country.map_eligible),
+      offMap: resolved.filter((country) => !country.map_eligible),
     };
-  }, [data]);
+  }, [data, filters]);
 
   const option: EChartsOption = useMemo(() => {
     const max = scaleMax(onMap.map((country) => country[metric]));
@@ -205,6 +245,16 @@ export function OrganizationsMap() {
     );
   }
 
+  if (data && mapReady && onMap.length === 0 && offMap.length === 0) {
+    return (
+      <div className="viz-state">
+        <p className="viz-state__label">
+          No organizations match the current filters.
+        </p>
+      </div>
+    );
+  }
+
   if (!data || !mapReady) {
     return (
       <div className="viz-state" aria-busy="true" aria-live="polite">
@@ -254,11 +304,16 @@ export function OrganizationsMap() {
           stated whichever metric is shaded — the sentence reads as nonsense
           otherwise ("321 organizations belong to organizations that…"). */}
       <p className="viz-chart__note">
-        {formatNumber(onMap.length)} countries shaded. A further{" "}
-        {formatNumber(offMapOrganizations)} organizations (
-        {formatNumber(offMapProjects)} projects) record {offMapList} rather than
-        a country, so they have no territory to shade. Scroll to zoom, drag to
-        pan.
+        {pluralize(onMap.length, "country", "countries")} shaded.
+        {offMap.length > 0 ? (
+          <>
+            {" "}
+            A further {pluralize(offMapOrganizations, "organization")} (
+            {pluralize(offMapProjects, "project")}) record {offMapList} rather
+            than a country, so they have no territory to shade.
+          </>
+        ) : null}{" "}
+        Scroll to zoom, drag to pan.
       </p>
     </div>
   );

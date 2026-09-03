@@ -20,11 +20,11 @@ import { holeFit, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
 import {
   applySubcategoryFilters,
   buildSubcategoryTree,
-  facetOptions,
 } from "@/lib/sunburst/subcategory-tree";
 import { ancestors, flatten } from "@/lib/sunburst/tree";
 import type { SunburstNode } from "@/lib/sunburst/types";
 
+import { useOrganizationFilters } from "../organization-filters";
 import { SunburstNodeTooltip } from "./sunburst-node-tooltip";
 import { SunburstSvg, type SunburstSvgHandle } from "./sunburst-svg";
 
@@ -49,8 +49,6 @@ export function SubcategorySunburst({
   const [payload, setPayload] =
     useState<OrganizationsBySubcategoryPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [country, setCountry] = useState("");
-  const [orgType, setOrgType] = useState("");
   const [zoomId, setZoomId] = useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [hover, setHover] = useState<{
@@ -63,6 +61,7 @@ export function SubcategorySunburst({
   const { ref: frameRef, width } = useElementSize<HTMLDivElement>();
   const reducedMotion = useReducedMotion();
   const theme = useTheme();
+  const filters = useOrganizationFilters();
 
   useEffect(() => {
     let cancelled = false;
@@ -95,21 +94,14 @@ export function SubcategorySunburst({
     [tree],
   );
 
-  const facets = useMemo(
-    () => (tree ? facetOptions(tree) : { countries: [], types: [] }),
-    [tree],
-  );
-
   const counts = useMemo(() => {
     if (!tree) {
       return { subcategories: 0, listings: 0, organizations: 0, hidden: 0 };
     }
-    return applySubcategoryFilters(
-      tree,
-      country ? [country] : [],
-      orgType ? [orgType] : [],
+    return applySubcategoryFilters(tree, (node) =>
+      filters.matches(node.detail?.country, node.detail?.orgType),
     );
-  }, [tree, country, orgType]);
+  }, [tree, filters]);
 
   const focusNode = useMemo(() => {
     if (!tree) return null;
@@ -201,7 +193,7 @@ export function SubcategorySunburst({
   }
 
   const zoomed = focusNode.kind !== "root";
-  const filtered = Boolean(country || orgType);
+  const filtered = filters.active;
   const trail = ancestors(focusNode);
   const empty = counts.listings === 0;
   const fit = holeFit(size, focusNode.depth);
@@ -269,45 +261,15 @@ export function SubcategorySunburst({
         </nav>
 
         <div className="viz-toolbar__controls">
-          <label className="viz-field viz-field--select">
-            <span className="viz-field__label">Country</span>
-            <select
-              value={country}
-              onChange={(event) => setCountry(event.target.value)}
-            >
-              <option value="">All countries</option>
-              {facets.countries.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label} ({option.count})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="viz-field viz-field--select">
-            <span className="viz-field__label">Type</span>
-            <select
-              value={orgType}
-              onChange={(event) => setOrgType(event.target.value)}
-            >
-              <option value="">All types</option>
-              {facets.types.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label} ({option.count})
-                </option>
-              ))}
-            </select>
-          </label>
+          {/* Country and type live in the page filter bar, which drives every
+              chart here; only the zoom is local to this one. */}
           <button
             type="button"
             className="viz-button"
-            onClick={() => {
-              setCountry("");
-              setOrgType("");
-              zoomOut();
-            }}
-            disabled={!zoomed && !filtered}
+            onClick={zoomOut}
+            disabled={!zoomed}
           >
-            Reset
+            Reset zoom
           </button>
         </div>
       </div>
@@ -317,7 +279,7 @@ export function SubcategorySunburst({
           {empty ? (
             <div className="viz-state" role="status">
               <p className="viz-state__label">
-                No organizations match this country and type.
+                No organizations match the current filters.
               </p>
             </div>
           ) : (

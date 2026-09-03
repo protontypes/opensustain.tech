@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
-import { formatNumber } from "@/lib/format";
+import { pluralize } from "@/lib/format";
 import { useElementSize } from "@/lib/hooks/use-element-size";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 import { useTheme } from "@/lib/hooks/use-theme";
@@ -17,7 +17,7 @@ import {
 import { ancestors, flatten } from "@/lib/sunburst/tree";
 import type { SunburstNode } from "@/lib/sunburst/types";
 
-import { OrganizationTooltip } from "./organization-tooltip";
+import { SunburstNodeTooltip } from "./sunburst-node-tooltip";
 import { SunburstSvg, type SunburstSvgHandle } from "./sunburst-svg";
 
 const MAX_CHART = 1040;
@@ -283,7 +283,7 @@ export function OrganizationSunburst({
                   <span className="viz-hole__eyebrow">Organization</span>
                   <span className="viz-hole__title">{focusNode.name}</span>
                   <span className="viz-hole__meta">
-                    {formatNumber(focusNode.visibleLeaves)} projects
+                    {pluralize(focusNode.visibleLeaves, "project")}
                   </span>
                   <span className="viz-hole__back">Back</span>
                 </button>
@@ -292,8 +292,8 @@ export function OrganizationSunburst({
                   <span className="viz-hole__eyebrow">Who builds it</span>
                   <span className="viz-hole__title">Projects by Organization</span>
                   <span className="viz-hole__meta">
-                    {formatNumber(limits.shown)} organizations ·{" "}
-                    {formatNumber(focusNode.visibleLeaves)} projects
+                    {pluralize(limits.shown, "organization")} ·{" "}
+                    {pluralize(focusNode.visibleLeaves, "project")}
                   </span>
                   {/* The project ring is not drawn until an organization is
                       opened, so the chart has to say so. */}
@@ -308,14 +308,14 @@ export function OrganizationSunburst({
           {/* The old chart hard-coded a top-80 cut and said nothing about it. */}
           {limits.hidden > 0 ? (
             <p className="viz-chart__note" role="status">
-              {formatNumber(limits.hidden)} smaller organizations (
-              {formatNumber(limits.hiddenProjects)} projects) are not shown.
+              {pluralize(limits.hidden, "smaller organization")} (
+              {pluralize(limits.hiddenProjects, "project")}) are not shown.
             </p>
           ) : null}
         </div>
       </div>
 
-      <OrganizationTooltip node={hover.node} x={hover.x} y={hover.y} />
+      <SunburstNodeTooltip node={hover.node} x={hover.x} y={hover.y} />
     </div>
   );
 }

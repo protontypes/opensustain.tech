@@ -21,3 +21,17 @@ export function formatPercent(value: number): string {
     maximumFractionDigits: 1,
   }).format(value);
 }
+
+/**
+ * "1 organization" / "47 organizations".
+ *
+ * A count of one is common in these charts — a country filter can leave a
+ * single organization in a single sub-category — so the plural has to bend.
+ */
+export function pluralize(
+  count: number,
+  singular: string,
+  plural = `${singular}s`,
+): string {
+  return `${formatNumber(count)} ${count === 1 ? singular : plural}`;
+}

@@ -44,10 +44,13 @@ export function buildOrganizationTree(
       activeLeaves: 0,
       detail: {
         url: org.url,
+        // `subtitle` is completed below, once the dominant category is known.
+        liveCountLabel: "Projects shown",
         stats: [
           { label: "Projects", value: formatNumber(org.value) },
           { label: "Total score", value: formatDecimal(org.total_score, 2) },
         ],
+        hint: "Click to zoom in",
       },
     };
 
@@ -72,6 +75,7 @@ export function buildOrganizationTree(
         detail: {
           url: project.url,
           subtitle: `${project.category} › ${project.sub_category}`,
+          hint: "Click to select · ⌘/Ctrl-click to open the repository",
           stats: [
             {
               label: "Total Score (All Metrics)",
@@ -93,6 +97,9 @@ export function buildOrganizationTree(
       }
     }
     orgNode.category = dominant;
+    orgNode.detail!.subtitle = dominant
+      ? `Organization · mostly ${dominant}`
+      : "Organization";
 
     orgNode.totalLeaves = orgNode.children.length;
     orgNode.activeLeaves = orgNode.totalLeaves;

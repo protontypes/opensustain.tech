@@ -44,8 +44,22 @@ export type SunburstNode = {
    */
   detail?: {
     url?: string;
+    /**
+     * The line under the tooltip title — what this node is, in this chart's
+     * terms ("Organization · mostly Energy Systems").
+     */
     subtitle?: string;
     stats?: { label: string; value: string }[];
+    /** Facets the chart filters on. Empty string means the source recorded none. */
+    country?: string;
+    orgType?: string;
+    /**
+     * Label for a row carrying the node's *live* `visibleLeaves`, which the
+     * static `stats` cannot express because filtering changes it.
+     */
+    liveCountLabel?: string;
+    /** Footer line: what a click here will do. */
+    hint?: string;
   };
   children: SunburstNode[];
   parent: SunburstNode | null;

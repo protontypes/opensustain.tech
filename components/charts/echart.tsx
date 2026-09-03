@@ -25,6 +25,21 @@ echarts.use([
   CanvasRenderer,
 ]);
 
+/**
+ * Registers a GeoJSON map under `name`, once per page load.
+ *
+ * ECharts ships no map data and `registerMap` is global, so this is here rather
+ * than in a chart component that may mount more than once. The map *chart* is
+ * deliberately not registered here: `echarts.use` in this module puts the code
+ * in every route that draws any chart, and pulling MapChart in cost /projects
+ * and /topics 18 KB for a chart neither of them has. organizations-map.tsx
+ * registers it, so it lands only in the route that needs it.
+ */
+export function registerMap(name: string, geoJson: unknown): void {
+  if (echarts.getMap(name)) return;
+  echarts.registerMap(name, geoJson as Parameters<typeof echarts.registerMap>[1]);
+}
+
 /** Replace rather than merge, so removed series and filtered data disappear. */
 const DEFAULT_SET_OPTION: SetOptionOpts = { notMerge: true, lazyUpdate: true };
 

@@ -1127,6 +1127,14 @@ p {
   color: #101620;
 }
 
+/* An export control with nothing beside it sits at the right of its own row. */
+.viz-toolbar--trailing {
+  justify-content: flex-end;
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
 .viz-menu {
   position: relative;
 }

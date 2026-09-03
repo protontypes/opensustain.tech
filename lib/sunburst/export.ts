@@ -1,6 +1,9 @@
+import { toCsvBlob as toCsv, type CsvValue } from "@/lib/charts/export";
 import type { ProjectMetrics, RankingMetricId } from "@/lib/types";
 
 import { METRIC_ORDER, type SunburstNode } from "./types";
+
+export { downloadBlob, exportFilename } from "@/lib/charts/export";
 
 /**
  * Serialises the live SVG with every `var(--…)` resolved to a literal colour,
@@ -105,17 +108,11 @@ export async function toPngBlob(
   }
 }
 
-function csvCell(value: string | number | boolean | null): string {
-  if (value === null || value === undefined) return "";
-  const text = String(value);
-  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-}
-
 export function toCsvBlob(
   leaves: SunburstNode[],
   metricLabels: Record<RankingMetricId, string>,
 ): Blob {
-  const header = [
+  const columns = [
     "name",
     "category",
     "sub_category",
@@ -126,7 +123,7 @@ export function toCsvBlob(
     ...METRIC_ORDER.map((metric) => metricLabels[metric] ?? metric),
   ];
 
-  const rows = leaves.map((leaf) => {
+  const rows: CsvValue[][] = leaves.map((leaf) => {
     const project = leaf.project!;
     const metrics = project.metrics as ProjectMetrics;
     return [
@@ -138,23 +135,17 @@ export function toCsvBlob(
       project.is_active_last_365d,
       project.latest_commit_activity ?? "",
       ...METRIC_ORDER.map((metric) => metrics[metric] ?? ""),
-    ]
-      .map(csvCell)
-      .join(",");
+    ];
   });
 
-  return new Blob([[header.map(csvCell).join(","), ...rows].join("\n")], {
-    type: "text/csv;charset=utf-8",
-  });
+  return toCsv(columns, rows);
 }
 
-export function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
+/** Any tree of SunburstNodes, for the charts that are not the ecosystem. */
+export function nodesToCsvBlob(
+  nodes: SunburstNode[],
+  columns: string[],
+  row: (node: SunburstNode) => CsvValue[],
+): Blob {
+  return toCsv(columns, nodes.map(row));
 }

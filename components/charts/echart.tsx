@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
 import type { EChartsOption, SetOptionOpts } from "echarts";
 import * as echarts from "echarts/core";
@@ -43,12 +43,16 @@ export function registerMap(name: string, geoJson: unknown): void {
 /** Replace rather than merge, so removed series and filtered data disappear. */
 const DEFAULT_SET_OPTION: SetOptionOpts = { notMerge: true, lazyUpdate: true };
 
+export type EChartHandle = echarts.EChartsType;
+
 type EChartProps = {
   option: EChartsOption;
   className?: string;
   height?: number;
   onClick?: (params: Record<string, unknown>) => void;
   setOptionOpts?: SetOptionOpts;
+  /** Filled with the live instance, so the caller can export the canvas. */
+  instanceRef?: RefObject<EChartHandle | null>;
 };
 
 export function EChart({
@@ -57,6 +61,7 @@ export function EChart({
   height = 520,
   onClick,
   setOptionOpts,
+  instanceRef,
 }: EChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<echarts.EChartsType | null>(null);
@@ -74,6 +79,7 @@ export function EChart({
       renderer: "canvas",
     });
     chartRef.current = chart;
+    if (instanceRef) instanceRef.current = chart;
 
     const handler = (params: unknown) => {
       if (typeof params === "object" && params !== null) {
@@ -91,6 +97,7 @@ export function EChart({
       resizeObserver.disconnect();
       chart.dispose();
       chartRef.current = null;
+      if (instanceRef) instanceRef.current = null;
     };
   }, []);
 

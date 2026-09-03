@@ -2,16 +2,16 @@ import { ProjectRankingsChart } from "@/components/charts/project-rankings-chart
 import { ProjectsOverTimeChart } from "@/components/charts/projects-over-time-chart";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { loadFilters, loadProjectAttributes, loadProjectRankings, loadProjectsOverTime } from "@/lib/data";
+import { loadFilters, loadProjectAttributes } from "@/lib/data";
 
 export default async function ProjectsPage() {
-  const [filters, rankings, projectsOverTime, projectAttributes] =
-    await Promise.all([
-      loadFilters(),
-      loadProjectRankings(),
-      loadProjectsOverTime(),
-      loadProjectAttributes(),
-    ]);
+  // The rankings and lifecycle payloads are ~1.7 MB and ~1.4 MB. Loading them
+  // here serialised both into the RSC stream on every navigation; the charts
+  // fetch them from /data instead, where they are cacheable static assets.
+  const [filters, projectAttributes] = await Promise.all([
+    loadFilters(),
+    loadProjectAttributes(),
+  ]);
 
   return (
     <main className="page-shell">
@@ -24,18 +24,18 @@ export default async function ProjectsPage() {
       <div className="stack">
         <Panel
           title="Project Rankings"
-          description="The highest-performing projects ranked by their combined health, activity, and community score."
+          description="Rank every tracked project by any of nine metrics, filtered by category and activity. Click a bar to open its repository."
         >
-          <ProjectRankingsChart records={rankings.records} />
+          <ProjectRankingsChart categories={filters.categories} />
         </Panel>
 
         <Panel
           title="Projects Over Time"
-          description="An overview of project lifecycles, mapped by sub-category and scaled by contributor volume."
+          description="Project age against sub-category, with each bubble sized by the metric you choose and coloured by ecosystem category."
         >
           <ProjectsOverTimeChart
-            records={projectsOverTime.records}
             categoryColors={filters.category_colors}
+            categories={filters.categories}
           />
         </Panel>
 

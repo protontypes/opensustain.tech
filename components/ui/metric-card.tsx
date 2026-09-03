@@ -13,3 +13,13 @@ export function MetricCard({ label, value, hint }: MetricCardProps) {
     </article>
   );
 }
+
+/** Compact secondary statistic, for the medians strip under the headline row. */
+export function MetricStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="metric-stat">
+      <p className="metric-stat__value">{value}</p>
+      <p className="metric-stat__label">{label}</p>
+    </div>
+  );
+}

@@ -1,16 +1,41 @@
 import Link from "next/link";
 
-import { EcosystemSunburstChart } from "@/components/charts/ecosystem-sunburst-chart";
-import { MetricCard } from "@/components/ui/metric-card";
+import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunburst";
+import { MetricCard, MetricStat } from "@/components/ui/metric-card";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { loadEcosystemSunburst, loadFilters, loadProjectRankings, loadSummary } from "@/lib/data";
-import { formatCompactNumber, formatDecimal, formatPercent } from "@/lib/format";
+import { loadFilters, loadProjectRankings, loadSummary } from "@/lib/data";
+import {
+  formatCompactNumber,
+  formatDecimal,
+  formatNumber,
+  formatPercent,
+} from "@/lib/format";
+
+const routeCards = [
+  {
+    href: "/projects",
+    title: "Projects",
+    description:
+      "Detailed insights into project rankings, lifecycle trends, and community attributes.",
+  },
+  {
+    href: "/organizations",
+    title: "Organizations",
+    description:
+      "Analyze the geographic distribution and hierarchy of contributing organizations.",
+  },
+  {
+    href: "/topics",
+    title: "Topics",
+    description:
+      "Explore the most frequent terms and thematic clusters extracted from documentation.",
+  },
+];
 
 export default async function HomePage() {
-  const [summary, ecosystem, filters, projectRankings] = await Promise.all([
+  const [summary, filters, projectRankings] = await Promise.all([
     loadSummary(),
-    loadEcosystemSunburst(),
     loadFilters(),
     loadProjectRankings(),
   ]);
@@ -41,104 +66,121 @@ export default async function HomePage() {
         <MetricCard
           label="Projects"
           value={formatCompactNumber(summary.totals.projects)}
-          hint={`${summary.source.projects_rows} in source`}
+          hint={`${formatNumber(summary.totals.projects)} tracked`}
+        />
+        <MetricCard
+          label="Active"
+          value={formatCompactNumber(summary.totals.active_projects)}
+          hint={`${formatPercent(activeRate)} committed in the past year`}
         />
         <MetricCard
           label="Organizations"
           value={formatCompactNumber(summary.totals.organizations)}
-          hint={`${summary.source.organizations_rows} in source`}
+          hint="Maintaining these projects"
         />
         <MetricCard
           label="Contributors"
           value={formatCompactNumber(summary.totals.contributors)}
-          hint={`${formatPercent(activeRate)} active share`}
+          hint="Across the whole ecosystem"
         />
-        <MetricCard
-          label="Median Age"
-          value={`${formatDecimal(summary.medians.project_age_years, 1)}y`}
-          hint={`Median DDS ${formatDecimal(summary.medians.dds, 3)}`}
-        />
+      </section>
+
+      {/* The medians the Streamlit dashboard shows in its second row. They were
+          in the payload but only surfaced as hint text on unrelated cards. */}
+      <section className="metric-strip" aria-label="Median project statistics">
+        <p className="metric-strip__title">Median project</p>
+        <div className="metric-strip__items">
+          <MetricStat
+            label="Age"
+            value={`${formatDecimal(summary.medians.project_age_years, 1)}y`}
+          />
+          <MetricStat
+            label="Stars"
+            value={formatNumber(summary.medians.stars)}
+          />
+          <MetricStat
+            label="Contributors"
+            value={formatDecimal(summary.medians.contributors, 0)}
+          />
+          <MetricStat
+            label="Commits"
+            value={formatNumber(summary.medians.total_commits)}
+          />
+          <MetricStat
+            label="Dev. Distribution"
+            value={formatDecimal(summary.medians.dds, 3)}
+          />
+        </div>
       </section>
 
       <section className="content-section">
         <div className="stack">
           <Panel
+            className="panel--viz"
             title="Ecosystem Sunburst"
-            description="Interactive visualization of the full open-source sustainability ecosystem, organized by category and sub-category."
+            description="Every project in the open sustainability landscape, nested by category and sub-category. Colour encodes the metric you choose; click a ring to zoom in."
           >
-            <EcosystemSunburstChart payload={ecosystem} />
+            <EcosystemSunburst />
           </Panel>
-  <section className="content-section">
-        <Panel>
-          <SectionHeading
-            eyebrow="Palette"
-            title="Category colors"
-            description="Shared color tokens used across all visualizations for consistency."
-          />
-          <div className="chip-grid">
-            {filters.categories.map((category) => (
-              <span
-                key={category}
-                className="category-chip"
-                style={{
-                  backgroundColor: filters.category_colors[category] ?? "#2563eb",
-                }}
-              >
-                {category}
-              </span>
-            ))}
-          </div>
-        </Panel>
-      </section>
           <Panel
             title="Top Projects"
             description="Ranked by combined health and community score."
           >
-            <ol className="leader-list" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", columnGap: "64px" }}>
+            <ol className="leader-list">
               {topProjects.map((project, index) => (
-                <li key={project.url || project.name} className="leader-list-item" style={{ padding: "16px 0", borderBottom: "1px solid var(--color-border)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px" }}>
-                    <div>
-                      <p className="leader-rank" style={{ color: "var(--color-primary)", fontFamily: "var(--font-heading)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.12em", marginBottom: "4px" }}>{String(index + 1).padStart(2, "0")}</p>
-                      <a href={project.url} target="_blank" rel="noreferrer" className="inline-link" style={{ fontSize: "16px", marginBottom: "4px" }}>
-                        {project.name}
-                      </a>
-                      <p className="leader-meta" style={{ color: "var(--color-text-secondary)", fontSize: "14px" }}>
-                        {project.category} · {project.sub_category}
-                      </p>
-                    </div>
-                    <strong style={{ fontSize: "18px" }}>{formatDecimal(project.total_score_combined, 2)}</strong>
+                <li key={project.url || project.name} className="leader-item">
+                  <div className="leader-item__body">
+                    <p className="leader-item__rank">
+                      {String(index + 1).padStart(2, "0")}
+                    </p>
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-link leader-item__name"
+                    >
+                      {project.name}
+                    </a>
+                    <p className="leader-item__meta">
+                      {project.category} · {project.sub_category}
+                    </p>
+                    {/* stars/contributors were already in the payload and unused */}
+                    <p className="leader-item__stats">
+                      <span>{formatCompactNumber(project.stars)} stars</span>
+                      <span>
+                        {formatNumber(project.contributors)} contributors
+                      </span>
+                    </p>
                   </div>
+                  <strong className="leader-item__score">
+                    {formatDecimal(project.total_score_combined, 2)}
+                  </strong>
                 </li>
               ))}
             </ol>
           </Panel>
 
-          <div style={{ marginTop: "32px" }}>
+          <div>
             <SectionHeading
               eyebrow="Analytics"
               title="Explore Ecosystem"
               description="Deep-dive into specialized dashboards for deeper insights."
             />
-            <div className="three-column-grid" style={{ marginTop: "32px" }}>
-              <Link href="/projects" className="panel" style={{ display: "block", textDecoration: "none" }}>
-                <h3 className="panel-title" style={{ marginBottom: "8px" }}>Projects</h3>
-                <p className="panel-description">Detailed insights into project rankings, lifecycle trends, and community attributes.</p>
-              </Link>
-              <Link href="/organizations" className="panel" style={{ display: "block", textDecoration: "none" }}>
-                <h3 className="panel-title" style={{ marginBottom: "8px" }}>Organizations</h3>
-                <p className="panel-description">Analyze the geographic distribution and hierarchy of contributing organizations.</p>
-              </Link>
-              <Link href="/topics" className="panel" style={{ display: "block", textDecoration: "none" }}>
-                <h3 className="panel-title" style={{ marginBottom: "8px" }}>Topics</h3>
-                <p className="panel-description">Explore the most frequent terms and thematic clusters extracted from documentation.</p>
-              </Link>
+            <div className="route-grid">
+              {routeCards.map((card) => (
+                <Link
+                  key={card.href}
+                  href={card.href}
+                  className="panel route-card"
+                >
+                  <h3 className="panel-title">{card.title}</h3>
+                  <p className="panel-description">{card.description}</p>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
       </section>
-
-    
     </main>
   );
 }

@@ -19,3 +19,13 @@ export const analyticsPayloadFiles: {
 };
 
 export type AnalyticsPayloadKey = keyof typeof analyticsPayloadFiles;
+
+/**
+ * Public URL of a payload under /data.
+ *
+ * Lives here rather than in loaders.ts so client components can import it
+ * without pulling `node:fs` into the browser bundle.
+ */
+export function analyticsPayloadUrl(key: AnalyticsPayloadKey): string {
+  return `/data/${analyticsPayloadFiles[key]}`;
+}

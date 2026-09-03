@@ -4,6 +4,7 @@ import path from "node:path";
 import type { AnalyticsPayloadMap } from "../types/analytics";
 import {
   analyticsPayloadFiles,
+  analyticsPayloadUrl,
   type AnalyticsPayloadKey,
 } from "./contracts";
 
@@ -113,10 +114,6 @@ export function analyticsPayloadPath(
   rootDir = process.cwd(),
 ): string {
   return path.join(dataDir(rootDir), analyticsPayloadFiles[key]);
-}
-
-export function analyticsPayloadUrl(key: AnalyticsPayloadKey): string {
-  return `/data/${analyticsPayloadFiles[key]}`;
 }
 
 export async function loadAnalyticsPayload<K extends AnalyticsPayloadKey>(

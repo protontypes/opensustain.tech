@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 
+import { CommunityBanner } from "@/components/dashboard/community-banner";
 import { SiteHeader } from "@/components/dashboard/site-header";
 import { SiteFooter } from "@/components/dashboard/site-footer";
 
@@ -42,6 +43,9 @@ export default function RootLayout({
                   if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.setAttribute('data-theme', 'dark');
                   }
+                  if (localStorage.getItem('community-banner-dismissed')) {
+                    document.documentElement.classList.add('community-dismissed');
+                  }
                 } catch (e) {}
               })();
             `,
@@ -49,6 +53,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <CommunityBanner />
         <SiteHeader />
         <div className="site-content">
           {children}

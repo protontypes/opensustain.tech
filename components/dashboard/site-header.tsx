@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { communityDiscordUrl, primaryNavigation } from "@/lib/navigation";
+import { primaryNavigation } from "@/lib/navigation";
 
 export function SiteHeader() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -76,18 +76,6 @@ export function SiteHeader() {
             ))}
           </nav>
 
-          {/* The icon carries the destination so the visible text can stay as
-              the invitation, without an aria-label overriding it. */}
-          <a
-            href={communityDiscordUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="header-discord"
-          >
-            <i className="fa-brands fa-discord" aria-hidden="true" />
-            Ask the Community
-          </a>
-
           <a
             href="https://github.com/OpenSustainTech"
             target="_blank"
@@ -139,15 +127,6 @@ export function SiteHeader() {
             {item.label}
           </Link>
         ))}
-        <a
-          href={communityDiscordUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="mobile-nav__link mobile-nav__link--discord"
-        >
-          <i className="fa-brands fa-discord" aria-hidden="true" />
-          Ask the Community
-        </a>
       </nav>
     </header>
   );

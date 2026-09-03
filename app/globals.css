@@ -16,6 +16,14 @@
   --color-card-bg: #ffffff;
   --color-border: #e6edf3;
   --color-header-bg: rgba(255, 255, 255, 0.98);
+  /* A shade off the page so the community strip reads as a band, not a panel. */
+  --color-banner-bg: #f1f5f9;
+  /*
+   * Primary as *ink*. --color-primary is tuned as a fill and stays put across
+   * themes, so on the dark ground it drops to 3.3:1 — under AA for body text.
+   * This one lightens instead: 8.6:1 on white, 6.8:1 on the dark page.
+   */
+  --color-link: #2563eb;
   --color-footer-bg: #101620;
   --font-heading: 'Space Grotesk', system-ui, sans-serif;
   --font-body: 'Georgia', serif;
@@ -33,6 +41,8 @@
   --color-text-secondary: #94a3b8;
   --color-silver: #1e293b;
   --color-header-bg: rgba(11, 15, 25, 0.9);
+  --color-banner-bg: #131b2e;
+  --color-link: #60a5fa;
   --color-footer-bg: #0b0f19;
 }
 
@@ -183,30 +193,78 @@ p {
   align-items: center;
 }
 
-/* Matches the ClimateTriage header treatment: small, bold, uppercase and
-   tracked, sitting to the right of the nav. */
-.header-discord {
+/*
+ * The community strip, above the sticky header and scrolling away with the
+ * page. It lived in the nav bar first, which crowded four routes, a repository
+ * link and the theme toggle into one row; ClimateTriage puts the same
+ * invitation in its own band, and so does this.
+ */
+.community-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+  padding: 10px 48px;
+  background: var(--color-banner-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Set before first paint by the inline script in layout.tsx, so a dismissed
+   bar never flashes and an undismissed one never shifts the page down. */
+:root.community-dismissed .community-bar {
+  display: none;
+}
+
+.community-bar__message {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-left: 32px;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
   font-family: var(--font-heading);
-  font-size: 13px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.community-bar__message i {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.community-bar__message a {
+  color: var(--color-link);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-black);
-  transition: color 0.15s ease, opacity 0.15s ease;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.header-discord i {
-  font-size: 16px;
-  color: var(--color-primary);
+.community-bar__message a:hover {
+  text-decoration-thickness: 2px;
 }
 
-.header-discord:hover {
-  color: var(--color-primary);
-  opacity: 0.85;
+.community-bar__close {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.community-bar__close:hover {
+  color: var(--color-link);
 }
 
 .header-github {
@@ -687,8 +745,10 @@ p {
   }
 
   .site-nav,
-  .header-discord {
-    display: none;
+  /* Padding stays symmetric so the wrapped message is still centred; 48px
+     clears the absolutely-positioned close button on the right. */
+  .community-bar__message {
+    font-size: 13px;
   }
 
   .nav-toggle {
@@ -1992,22 +2052,6 @@ p {
 .mobile-nav__link[aria-current="page"] {
   color: var(--color-primary);
   font-weight: 700;
-}
-
-.mobile-nav__link--discord {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border-bottom: none;
-}
-
-.mobile-nav__link--discord i {
-  font-size: 16px;
-  color: var(--color-primary);
 }
 
 .site-nav-link[aria-current="page"] {

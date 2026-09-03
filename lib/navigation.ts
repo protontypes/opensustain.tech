@@ -4,3 +4,6 @@ export const primaryNavigation = [
   { href: "/organizations", label: "Organizations" },
   { href: "/topics", label: "Topics" },
 ] as const;
+
+/** OpenSustain.tech community Discord, linked from the header as ClimateTriage does. */
+export const communityDiscordUrl = "https://discord.gg/JDUatGKxve";

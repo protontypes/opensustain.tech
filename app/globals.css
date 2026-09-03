@@ -617,6 +617,38 @@ p {
   gap: 24px;
 }
 
+/*
+ * The page-level organisation filters. Streamlit repeats this pair on each of
+ * its four organisation tabs; this page is those four at once, so the bar sits
+ * above every chart instead of being copied into each one.
+ */
+.org-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.org-filters__fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.org-filters__note {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
 /* Two panels side by side; collapses to one column on the same breakpoint. */
 .two-column-grid {
   display: grid;

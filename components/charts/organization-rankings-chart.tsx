@@ -17,7 +17,10 @@ import type {
   OrganizationRankingsPayload,
 } from "@/lib/types";
 
+import { useChartExport } from "@/lib/charts/use-chart-export";
+
 import { EChart } from "./echart";
+import { ExportMenu } from "./export-menu";
 import { useOrganizationFilters } from "./organization-filters";
 
 const TOP_N_CHOICES = [10, 25, 50, 100];
@@ -99,6 +102,27 @@ export function OrganizationRankingsChart({
       .sort((a, b) => scoreIn(b, category) - scoreIn(a, category))
       .slice(0, topN);
   }, [payload, category, topN, filters]);
+
+  const { chartRef, onExport } = useChartExport(
+    "organization-rankings",
+    () => ({
+      columns: ["organization", "score", "projects", "country", "type", "url"],
+      rows: top.map((record) => [
+        record.organization_name,
+        scoreIn(record, category),
+        record.matched_project_count,
+        record.location_country,
+        record.form_of_organization,
+        record.organization_url,
+      ]),
+    }),
+    [
+      category === ALL ? null : category,
+      `top-${topN}`,
+      filters.country,
+      filters.type,
+    ],
+  );
 
   const option: EChartsOption = useMemo(() => {
     const ordered = [...top].reverse();
@@ -232,6 +256,7 @@ export function OrganizationRankingsChart({
               ))}
             </select>
           </label>
+          <ExportMenu onExport={onExport} />
         </div>
       </div>
 
@@ -249,6 +274,7 @@ export function OrganizationRankingsChart({
         </div>
       ) : (
         <EChart
+          instanceRef={chartRef}
           option={option}
           height={Math.max(360, top.length * 28 + 60)}
           onClick={(params) => {

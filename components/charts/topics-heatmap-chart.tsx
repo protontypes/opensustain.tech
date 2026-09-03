@@ -11,7 +11,10 @@ import { useChartTokens } from "@/lib/hooks/use-chart-tokens";
 import { useTheme } from "@/lib/hooks/use-theme";
 import type { TopicsHeatmapPayload } from "@/lib/types";
 
+import { useChartExport } from "@/lib/charts/use-chart-export";
+
 import { EChart } from "./echart";
+import { ExportMenu } from "./export-menu";
 
 const TOP_N_CHOICES = [50, 100, 200, 400];
 
@@ -55,6 +58,25 @@ export function TopicsHeatmapChart({
       cancelled = true;
     };
   }, []);
+
+  const { chartRef, onExport } = useChartExport(
+    "topics-heatmap",
+    () => {
+      // One row per non-zero cell: a wide matrix as CSV columns is unusable
+      // in a spreadsheet, and most of the grid is empty anyway.
+      const topicCount = Math.min(topN, payload?.topics.length ?? 0);
+      const rows: (string | number)[][] = [];
+      payload?.matrix.forEach((row, y) => {
+        row.slice(0, topicCount).forEach((count, x) => {
+          if (count > 0) {
+            rows.push([payload.sub_categories[y], payload.topics[x], count]);
+          }
+        });
+      });
+      return { columns: ["sub_category", "topic", "projects"], rows };
+    },
+    [`top-${topN}`],
+  );
 
   const option: EChartsOption = useMemo(() => {
     if (!payload) return {};
@@ -168,6 +190,7 @@ export function TopicsHeatmapChart({
               ))}
             </select>
           </label>
+          <ExportMenu onExport={onExport} />
         </div>
       </div>
 
@@ -177,6 +200,7 @@ export function TopicsHeatmapChart({
         </div>
       ) : (
         <EChart
+          instanceRef={chartRef}
           option={option}
           height={Math.max(560, payload.sub_categories.length * 14 + 220)}
         />

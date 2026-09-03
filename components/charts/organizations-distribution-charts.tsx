@@ -97,6 +97,7 @@ function Frame({
 
 export function TopOrganizationsChart() {
   const { records, data, error } = useFilteredOrganizations();
+  const filters = useOrganizationFilters();
   const [topN, setTopN] = useState(25);
 
   const rows: BarDatum[] = useMemo(
@@ -136,6 +137,9 @@ export function TopOrganizationsChart() {
           labelWidth={220}
           clickNote="Click to open the organization"
           emptyMessage="No organizations match the current filters."
+          exportName="top-organizations"
+          labelColumn="organization"
+          exportParts={[`top-${topN}`, filters.country, filters.type]}
         />
         {/* Most organizations list exactly one project, so the tail is flat. */}
         {records.length > 0 ? (
@@ -201,6 +205,9 @@ export function TopCountriesChart() {
           valueLabel="Organizations"
           labelWidth={180}
           emptyMessage="No organizations match the current filters."
+          exportName="organizations-by-country"
+          labelColumn="country"
+          exportParts={[`top-${topN}`, filters.country, filters.type]}
         />
         {/* Only worth saying when one of those buckets is actually present —
             a filter can remove them. */}
@@ -240,6 +247,9 @@ export function ContinentsChart() {
         // Six values from 4 to 410: on the log ramp the top three shared a stop.
         scale="linear"
         emptyMessage="No organizations match the current filters."
+        exportName="organizations-by-continent"
+        labelColumn="continent"
+        exportParts={[filters.country, filters.type]}
       />
     </Frame>
   );
@@ -249,6 +259,7 @@ export function ContinentsChart() {
 
 export function OrganizationTypesChart() {
   const { records, data, error } = useFilteredOrganizations();
+  const filters = useOrganizationFilters();
 
   const rows: BarDatum[] = useMemo(
     () =>
@@ -270,6 +281,9 @@ export function OrganizationTypesChart() {
         rowHeight={44}
         scale="linear"
         emptyMessage="No organizations match the current filters."
+        exportName="organizations-by-type"
+        labelColumn="type"
+        exportParts={[filters.country, filters.type]}
       />
     </Frame>
   );

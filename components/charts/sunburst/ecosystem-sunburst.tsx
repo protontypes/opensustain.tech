@@ -24,7 +24,13 @@ import {
   flatten,
   matchesQuery,
 } from "@/lib/sunburst/tree";
-import { downloadBlob, toCsvBlob, toPngBlob, toSvgBlob } from "@/lib/sunburst/export";
+import {
+  downloadBlob,
+  exportFilename,
+  toCsvBlob,
+  toPngBlob,
+  toSvgBlob,
+} from "@/lib/sunburst/export";
 import {
   INITIAL_VIEW,
   metricValue,
@@ -315,25 +321,30 @@ export function EcosystemSunburst() {
   const handleExport = useCallback(
     async (kind: "png" | "svg" | "csv") => {
       const svg = svgHandle.current?.svg();
-      const stamp = focusNode?.name.replace(/\W+/g, "-").toLowerCase() ?? "ecosystem";
+      // The view's own state rides in the name, so a folder of downloads is
+      // still identifiable: which node, which metric, which activity filter.
+      const name = exportFilename("ecosystem", kind, [
+        focusNode?.kind === "root" ? null : focusNode?.name,
+        view.metric,
+        view.activity === "active" && "active-only",
+        view.query,
+      ]);
       if (kind === "csv") {
-        const leaves = laid
-          .filter((item) => item.visible && item.node.kind === "project")
-          .map((item) => item.node);
-        downloadBlob(
-          toCsvBlob(leaves, payload!.metric_labels),
-          `opensustain-${stamp}.csv`,
-        );
+        // Every project under the focus that passes the filters — not the arcs
+        // currently drawn. The chart shows two rings at a time, so at the root
+        // no project arc is visible and this exported a header and nothing.
+        const leaves = focusNode
+          ? flatten(focusNode).filter(
+              (node) => node.kind === "project" && node.visibleLeaves > 0,
+            )
+          : [];
+        downloadBlob(toCsvBlob(leaves, payload!.metric_labels), name);
         return;
       }
       if (!svg) return;
-      if (kind === "svg") {
-        downloadBlob(toSvgBlob(svg), `opensustain-${stamp}.svg`);
-        return;
-      }
-      downloadBlob(await toPngBlob(svg), `opensustain-${stamp}.png`);
+      downloadBlob(kind === "svg" ? toSvgBlob(svg) : await toPngBlob(svg), name);
     },
-    [laid, payload, focusNode],
+    [laid, payload, focusNode, view],
   );
 
   const size = Math.max(280, Math.min(width || MAX_CHART, MAX_CHART));

@@ -83,6 +83,8 @@ export function CommitActivityChart() {
         labelWidth={90}
         rowHeight={52}
         scale="linear"
+        exportName="commit-activity"
+        labelColumn="activity"
       />
       {active && total > 0 ? (
         <p className="viz-chart__note">
@@ -122,6 +124,8 @@ function BooleanField({
         labelWidth={100}
         rowHeight={48}
         scale="linear"
+        exportName={field.replace(/_/g, "-")}
+        labelColumn="present"
       />
     </Frame>
   );
@@ -181,7 +185,14 @@ export function LicensesChart() {
             />
           </div>
         </div>
-        <HorizontalBarChart data={rows} valueLabel="Projects" labelWidth={170} />
+        <HorizontalBarChart
+          data={rows}
+          valueLabel="Projects"
+          labelWidth={170}
+          exportName="licenses"
+          labelColumn="license"
+          exportParts={[`top-${topN}`]}
+        />
       </div>
     </Frame>
   );
@@ -208,7 +219,14 @@ export function LanguagesChart() {
             />
           </div>
         </div>
-        <HorizontalBarChart data={rows} valueLabel="Projects" labelWidth={170} />
+        <HorizontalBarChart
+          data={rows}
+          valueLabel="Projects"
+          labelWidth={170}
+          exportName="languages"
+          labelColumn="language"
+          exportParts={[`top-${topN}`]}
+        />
       </div>
     </Frame>
   );
@@ -235,7 +253,14 @@ export function PlatformsChart() {
             />
           </div>
         </div>
-        <HorizontalBarChart data={rows} valueLabel="Projects" labelWidth={230} />
+        <HorizontalBarChart
+          data={rows}
+          valueLabel="Projects"
+          labelWidth={230}
+          exportName="git-platforms"
+          labelColumn="platform"
+          exportParts={[`top-${topN}`]}
+        />
         <p className="viz-chart__note">
           Self-hosted GitLab instances are counted by hostname, so each research
           institute appears separately.
@@ -275,7 +300,14 @@ export function EcosystemsChart() {
             />
           </div>
         </div>
-        <HorizontalBarChart data={rows} valueLabel="Entries" labelWidth={150} />
+        <HorizontalBarChart
+          data={rows}
+          valueLabel="Entries"
+          labelWidth={150}
+          exportName="package-ecosystems"
+          labelColumn="ecosystem"
+          exportParts={[`top-${topN}`]}
+        />
         <p className="viz-chart__note">
           Counts are registry entries, not projects: a project can publish to
           several registries, and the source lists a registry once per package,

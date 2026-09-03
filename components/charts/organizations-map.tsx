@@ -17,7 +17,10 @@ import type {
   OrganizationsOverviewPayload,
 } from "@/lib/types";
 
+import { useChartExport } from "@/lib/charts/use-chart-export";
+
 import { EChart, registerMap } from "./echart";
+import { ExportMenu } from "./export-menu";
 import { useOrganizationFilters } from "./organization-filters";
 
 // Registered here rather than in echart.tsx: that module is imported by every
@@ -141,6 +144,23 @@ export function OrganizationsMap() {
       offMap: resolved.filter((country) => !country.map_eligible),
     };
   }, [data, filters]);
+
+  const { chartRef, onExport } = useChartExport(
+    "projects-per-country",
+    () => ({
+      columns: ["iso_a3", "country", "organizations", "projects", "on_map"],
+      // Both halves: the countries that could not be shaded are the point of
+      // the note under the chart, so a CSV without them would mislead.
+      rows: [...onMap, ...offMap].map((country) => [
+        country.iso_alpha,
+        country.country_name,
+        country.organization_count,
+        country.total_projects,
+        country.map_eligible,
+      ]),
+    }),
+    [metric, filters.country, filters.type],
+  );
 
   const option: EChartsOption = useMemo(() => {
     const max = scaleMax(onMap.map((country) => country[metric]));
@@ -294,10 +314,11 @@ export function OrganizationsMap() {
               ))}
             </select>
           </label>
+          <ExportMenu onExport={onExport} />
         </div>
       </div>
 
-      <EChart option={option} height={560} />
+      <EChart instanceRef={chartRef} option={option} height={560} />
 
       {/* Roughly a fifth of the ecosystem has no territory to sit on, so the
           map alone would understate it without saying this. Both counts are

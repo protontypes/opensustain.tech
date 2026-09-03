@@ -21,10 +21,18 @@ import {
   applySubcategoryFilters,
   buildSubcategoryTree,
 } from "@/lib/sunburst/subcategory-tree";
+import {
+  downloadBlob,
+  exportFilename,
+  nodesToCsvBlob,
+  toPngBlob,
+  toSvgBlob,
+} from "@/lib/sunburst/export";
 import { ancestors, flatten } from "@/lib/sunburst/tree";
 import type { SunburstNode } from "@/lib/sunburst/types";
 
 import { useOrganizationFilters } from "../organization-filters";
+import { ExportMenu } from "../export-menu";
 import { SunburstNodeTooltip } from "./sunburst-node-tooltip";
 import { SunburstSvg, type SunburstSvgHandle } from "./sunburst-svg";
 
@@ -141,6 +149,45 @@ export function SubcategorySunburst({
     setZoomId((current) => (current === node.id ? null : node.id));
     setFocusedIndex(-1);
   }, []);
+
+  const handleExport = useCallback(
+    async (format: "png" | "svg" | "csv") => {
+      const name = exportFilename("organizations-by-subcategory", format, [
+        filters.country,
+        filters.type,
+      ]);
+      if (format === "csv") {
+        // One row per listing on screen — the sub-category is what makes the
+        // row, so an organization in three of them is three rows.
+        const rows = (tree?.children ?? []).flatMap((sub) =>
+          sub.children.filter((org) => org.visibleLeaves > 0),
+        );
+        downloadBlob(
+          nodesToCsvBlob(
+            rows,
+            ["sub_category", "category", "organization", "country", "type", "url"],
+            (org) => [
+              org.parent?.name ?? "",
+              org.category,
+              org.name,
+              org.detail?.country ?? "",
+              org.detail?.orgType ?? "",
+              org.detail?.url ?? "",
+            ],
+          ),
+          name,
+        );
+        return;
+      }
+      const svg = svgHandle.current?.svg();
+      if (!svg) return;
+      downloadBlob(
+        format === "svg" ? toSvgBlob(svg) : await toPngBlob(svg),
+        name,
+      );
+    },
+    [tree, filters],
+  );
 
   const zoomOut = useCallback(() => {
     setHover({ node: null, x: 0, y: 0 });
@@ -271,6 +318,7 @@ export function SubcategorySunburst({
           >
             Reset zoom
           </button>
+          <ExportMenu formats={["png", "svg", "csv"]} onExport={handleExport} />
         </div>
       </div>
 

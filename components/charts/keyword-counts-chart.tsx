@@ -9,7 +9,10 @@ import { formatNumber } from "@/lib/format";
 import { useChartTokens } from "@/lib/hooks/use-chart-tokens";
 import type { KeywordCountRecord } from "@/lib/types";
 
+import { useChartExport } from "@/lib/charts/use-chart-export";
+
 import { EChart } from "./echart";
+import { ExportMenu } from "./export-menu";
 
 const TOP_N_CHOICES = [15, 30, 60, 120];
 
@@ -22,6 +25,17 @@ export function KeywordCountsChart({
 }) {
   const [topN, setTopN] = useState(defaultTopN);
   const tokens = useChartTokens();
+
+  const { chartRef, onExport } = useChartExport(
+    "keyword-counts",
+    () => ({
+      columns: ["keyword", "mentions"],
+      rows: records
+        .slice(0, topN)
+        .map((record) => [record.keyword, record.count]),
+    }),
+    [`top-${topN}`],
+  );
 
   const option: EChartsOption = useMemo(() => {
     const top = records.slice(0, topN).reverse();
@@ -98,9 +112,14 @@ export function KeywordCountsChart({
               )}
             </select>
           </label>
+          <ExportMenu onExport={onExport} />
         </div>
       </div>
-      <EChart option={option} height={Math.max(360, topN * 24 + 60)} />
+      <EChart
+        instanceRef={chartRef}
+        option={option}
+        height={Math.max(360, topN * 24 + 60)}
+      />
     </div>
   );
 }

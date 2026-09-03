@@ -25,10 +25,18 @@ import {
   buildOrganizationTree,
   limitOrganizations,
 } from "@/lib/sunburst/org-tree";
+import {
+  downloadBlob,
+  exportFilename,
+  nodesToCsvBlob,
+  toPngBlob,
+  toSvgBlob,
+} from "@/lib/sunburst/export";
 import { ancestors, flatten } from "@/lib/sunburst/tree";
 import type { SunburstNode } from "@/lib/sunburst/types";
 
 import { useOrganizationFilters } from "../organization-filters";
+import { ExportMenu } from "../export-menu";
 import { SunburstNodeTooltip } from "./sunburst-node-tooltip";
 import { SunburstSvg, type SunburstSvgHandle } from "./sunburst-svg";
 
@@ -173,6 +181,44 @@ export function OrganizationSunburst({
     [],
   );
 
+  const handleExport = useCallback(
+    async (format: "png" | "svg" | "csv") => {
+      const svg = svgHandle.current?.svg();
+      const name = exportFilename(
+        "projects-by-organization",
+        format,
+        [`top-${topN}`, filters.country, filters.type],
+      );
+      if (format === "csv") {
+        // The organizations on screen, not the payload: a top-40 view exports
+        // 40 rows, and a filtered one exports what survived the filter.
+        const shown = (tree?.children ?? []).filter(
+          (org) => org.visibleLeaves > 0,
+        );
+        downloadBlob(
+          nodesToCsvBlob(
+            shown,
+            ["organization", "projects", "category", "url"],
+            (org) => [
+              org.name,
+              org.visibleLeaves,
+              org.category,
+              org.detail?.url ?? "",
+            ],
+          ),
+          name,
+        );
+        return;
+      }
+      if (!svg) return;
+      downloadBlob(
+        format === "svg" ? toSvgBlob(svg) : await toPngBlob(svg),
+        name,
+      );
+    },
+    [tree, topN, filters],
+  );
+
   const zoomOut = useCallback(() => {
     setHover({ node: null, x: 0, y: 0 });
     setZoomId(null);
@@ -299,6 +345,7 @@ export function OrganizationSunburst({
           >
             Reset
           </button>
+          <ExportMenu formats={["png", "svg", "csv"]} onExport={handleExport} />
         </div>
       </div>
 

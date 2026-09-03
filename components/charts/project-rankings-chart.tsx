@@ -15,7 +15,10 @@ import type {
   RankingMetricId,
 } from "@/lib/types";
 
+import { useChartExport } from "@/lib/charts/use-chart-export";
+
 import { EChart } from "./echart";
+import { ExportMenu } from "./export-menu";
 
 const TOP_N_CHOICES = [10, 25, 50, 100];
 
@@ -72,6 +75,27 @@ export function ProjectRankingsChart({
       .sort((a, b) => metricValue(b, metric) - metricValue(a, metric))
       .slice(0, topN);
   }, [payload, metric, category, topN, activeOnly]);
+
+  const { chartRef, onExport } = useChartExport(
+    "project-rankings",
+    () => ({
+      columns: ["project", "category", "sub_category", metric, "active", "url"],
+      rows: top.map((record) => [
+        record.name,
+        record.category,
+        record.sub_category,
+        metricValue(record, metric),
+        record.is_active_last_365d,
+        record.url,
+      ]),
+    }),
+    [
+      metric,
+      category === "all" ? null : category,
+      `top-${topN}`,
+      activeOnly && "active-only",
+    ],
+  );
 
   const option: EChartsOption = useMemo(() => {
     const ordered = [...top].reverse();
@@ -181,7 +205,8 @@ export function ProjectRankingsChart({
             >
               Active
             </button>
-          </div>
+            <ExportMenu onExport={onExport} />
+        </div>
 
           <label className="viz-field viz-field--select">
             <span className="viz-field__label">Rank by</span>
@@ -242,6 +267,7 @@ export function ProjectRankingsChart({
         </div>
       ) : (
         <EChart
+          instanceRef={chartRef}
           option={option}
           height={Math.max(360, top.length * 28 + 60)}
           onClick={(params) => {

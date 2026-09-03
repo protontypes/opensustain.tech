@@ -19,7 +19,10 @@ import type {
   BubbleSizeMetricId,
 } from "@/lib/types";
 
+import { useChartExport } from "@/lib/charts/use-chart-export";
+
 import { EChart } from "./echart";
+import { ExportMenu } from "./export-menu";
 
 function symbolSize(value: number) {
   return Math.max(7, Math.min(28, Math.sqrt(Math.max(value, 0)) * 1.8 + 4));
@@ -69,6 +72,31 @@ export function ProjectsOverTimeChart({
       ? payload.records
       : payload.records.filter((record) => record.category === category);
   }, [payload, category]);
+
+  const { chartRef, onExport } = useChartExport(
+    "projects-over-time",
+    () => ({
+      columns: [
+        "project",
+        "category",
+        "sub_category",
+        "project_age_years",
+        String(sizeMetric),
+        "active",
+        "url",
+      ],
+      rows: records.map((record) => [
+        record.name,
+        record.category,
+        record.sub_category,
+        record.project_age_years,
+        record.size_metrics[sizeMetric] ?? "",
+        record.is_active_last_365d,
+        record.url,
+      ]),
+    }),
+    [category === "all" ? null : category, String(sizeMetric)],
+  );
 
   const option: EChartsOption = useMemo(() => {
     const shown = Array.from(
@@ -205,6 +233,7 @@ export function ProjectsOverTimeChart({
               )}
             </select>
           </label>
+          <ExportMenu onExport={onExport} />
         </div>
       </div>
 
@@ -214,6 +243,7 @@ export function ProjectsOverTimeChart({
         </div>
       ) : (
         <EChart
+          instanceRef={chartRef}
           option={option}
           height={Math.max(520, 18 * subCategoryCount + 260)}
           onClick={(params) => {

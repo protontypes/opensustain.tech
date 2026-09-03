@@ -1,15 +1,23 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 
 import type { EChartsOption } from "echarts";
 
+import {
+  downloadBlob,
+  echartPngBlob,
+  exportFilename,
+  toCsvBlob,
+  type CsvValue,
+} from "@/lib/charts/export";
 import { buildTooltip, type TooltipRow } from "@/lib/charts/tooltip";
 import { formatNumber } from "@/lib/format";
 import { useChartTokens, type ChartTokens } from "@/lib/hooks/use-chart-tokens";
 import { useTheme } from "@/lib/hooks/use-theme";
 
-import { EChart } from "./echart";
+import { EChart, type EChartHandle } from "./echart";
+import { ExportMenu } from "./export-menu";
 
 export type BarDatum = {
   /** Stable identity — the label is not unique across every dataset. */
@@ -76,6 +84,9 @@ export function HorizontalBarChart({
   emptyMessage = "Nothing to show.",
   clickNote,
   onSelect,
+  exportName,
+  exportParts,
+  labelColumn = "label",
 }: {
   data: BarDatum[];
   /** Row label for the value in the tooltip, e.g. "Organizations". */
@@ -87,9 +98,16 @@ export function HorizontalBarChart({
   /** Footer line in the tooltip; only shown for rows that carry an href. */
   clickNote?: string;
   onSelect?: (datum: BarDatum) => void;
+  /** Names the download. Omit to leave this chart without an export control. */
+  exportName?: string;
+  /** View state that belongs in the filename — a top-N, a category, a filter. */
+  exportParts?: (string | number | null | undefined | false)[];
+  /** Header for the label column in the CSV — "country", not "label". */
+  labelColumn?: string;
 }) {
   const tokens = useChartTokens();
   const theme = useTheme();
+  const chartRef = useRef<EChartHandle | null>(null);
 
   const ramp = useMemo(() => sequentialRamp(), [theme]);
 
@@ -107,21 +125,86 @@ export function HorizontalBarChart({
   }
 
   return (
-    <EChart
-      option={option}
-      // The floor only has to keep a one- or two-row chart from collapsing;
-      // 260 left a two-bar chart with 90px between its bars.
-      height={Math.max(150, data.length * rowHeight + 64)}
-      onClick={(params) => {
-        const datum = (params.data as { datum?: BarDatum } | undefined)?.datum;
-        if (!datum) return;
-        if (onSelect) onSelect(datum);
-        else if (datum.href) {
-          window.open(datum.href, "_blank", "noopener,noreferrer");
-        }
-      }}
-    />
+    <>
+      {exportName ? (
+        <div className="viz-toolbar viz-toolbar--trailing">
+          <ExportMenu
+            formats={["png", "csv"]}
+            onExport={(format) => {
+              const name = exportFilename(
+                exportName,
+                format,
+                exportParts ?? [],
+              );
+              if (format === "csv") {
+                downloadBlob(csvOf(data, labelColumn, valueLabel), name);
+              } else if (chartRef.current) {
+                downloadBlob(
+                  echartPngBlob(chartRef.current, tokens.surface),
+                  name,
+                );
+              }
+            }}
+          />
+        </div>
+      ) : null}
+      <EChart
+        option={option}
+        instanceRef={chartRef}
+        // The floor only has to keep a one- or two-row chart from collapsing;
+        // 260 left a two-bar chart with 90px between its bars.
+        height={Math.max(150, data.length * rowHeight + 64)}
+        onClick={(params) => {
+          const datum = (params.data as { datum?: BarDatum } | undefined)?.datum;
+          if (!datum) return;
+          if (onSelect) onSelect(datum);
+          else if (datum.href) {
+            window.open(datum.href, "_blank", "noopener,noreferrer");
+          }
+        }}
+      />
+    </>
   );
+}
+
+/**
+ * The rows on screen, not the payload behind them.
+ *
+ * A top-25 view exports 25 rows, and a filtered view exports what survived the
+ * filter — dumping the whole file would make the download unrelated to what the
+ * reader is looking at.
+ */
+function csvOf(
+  data: BarDatum[],
+  labelColumn: string,
+  valueLabel: string,
+): Blob {
+  const extra: string[] = [];
+  for (const datum of data) {
+    for (const row of datum.rows ?? []) {
+      if (!extra.includes(row.label)) extra.push(row.label);
+    }
+  }
+  const hasSubtitle = data.some((datum) => datum.subtitle);
+  const hasHref = data.some((datum) => datum.href);
+
+  const columns = [
+    labelColumn,
+    valueLabel,
+    ...(hasSubtitle ? ["detail"] : []),
+    ...extra,
+    ...(hasHref ? ["url"] : []),
+  ];
+  const rows: CsvValue[][] = data.map((datum) => [
+    datum.label,
+    datum.value,
+    ...(hasSubtitle ? [datum.subtitle ?? ""] : []),
+    ...extra.map(
+      (label) => datum.rows?.find((row) => row.label === label)?.value ?? "",
+    ),
+    ...(hasHref ? [datum.href ?? ""] : []),
+  ]);
+  return toCsvBlob(columns, rows);
 }
 
 function buildOption(

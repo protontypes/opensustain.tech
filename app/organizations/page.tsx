@@ -1,21 +1,21 @@
 import { OrganizationRankingsChart } from "@/components/charts/organization-rankings-chart";
-import { ProjectsByOrganizationChart } from "@/components/charts/projects-by-organization-chart";
+import { OrganizationSunburst } from "@/components/charts/sunburst/organization-sunburst";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import {
+  loadFilters,
   loadOrganizationRankings,
   loadOrganizationsBySubcategory,
   loadOrganizationsOverview,
-  loadProjectsByOrganization,
 } from "@/lib/data";
 
 export default async function OrganizationsPage() {
-  const [overview, rankings, projectsByOrganization, organizationsBySubcategory] =
+  const [overview, rankings, organizationsBySubcategory, filters] =
     await Promise.all([
       loadOrganizationsOverview(),
       loadOrganizationRankings(),
-      loadProjectsByOrganization(),
       loadOrganizationsBySubcategory(),
+      loadFilters(),
     ]);
 
   return (
@@ -35,10 +35,11 @@ export default async function OrganizationsPage() {
         </Panel>
 
         <Panel
+          className="panel--viz"
           title="Projects by Organization"
-          description="A hierarchical view of organizations and their associated projects within the ecosystem."
+          description="Organizations with two or more tracked projects. Each wedge takes the colour of the ecosystem category that organization works in most, sized by how many projects it maintains. Click one to open its projects."
         >
-          <ProjectsByOrganizationChart payload={projectsByOrganization} />
+          <OrganizationSunburst categoryColors={filters.category_colors} />
         </Panel>
 
         <Panel

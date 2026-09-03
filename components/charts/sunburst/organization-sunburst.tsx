@@ -1,0 +1,321 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import { analyticsPayloadUrl } from "@/lib/data/contracts";
+import { formatNumber } from "@/lib/format";
+import { useElementSize } from "@/lib/hooks/use-element-size";
+import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
+import { useTheme } from "@/lib/hooks/use-theme";
+import type { ProjectsByOrganizationPayload } from "@/lib/types";
+import { categoryColor } from "@/lib/sunburst/color";
+import { holeRadius, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
+import {
+  buildOrganizationTree,
+  limitOrganizations,
+} from "@/lib/sunburst/org-tree";
+import { ancestors, flatten } from "@/lib/sunburst/tree";
+import type { SunburstNode } from "@/lib/sunburst/types";
+
+import { OrganizationTooltip } from "./organization-tooltip";
+import { SunburstSvg, type SunburstSvgHandle } from "./sunburst-svg";
+
+const MAX_CHART = 1040;
+/** One ring at a time: organizations, then that organization's projects. */
+const ORG_MAX_RINGS = 1;
+// Median org has 2 projects, so a high cap turns the ring into unlabelled
+// slivers. 40 keeps every wedge nameable; the rest are one select away.
+const TOP_N_CHOICES = [20, 40, 80, 150, 276];
+
+export function OrganizationSunburst({
+  categoryColors,
+}: {
+  categoryColors: Record<string, string>;
+}) {
+  const [payload, setPayload] = useState<ProjectsByOrganizationPayload | null>(
+    null,
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [topN, setTopN] = useState(40);
+  const [zoomId, setZoomId] = useState<string | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [hover, setHover] = useState<{
+    node: SunburstNode | null;
+    x: number;
+    y: number;
+  }>({ node: null, x: 0, y: 0 });
+
+  const svgHandle = useRef<SunburstSvgHandle | null>(null);
+  const { ref: frameRef, width } = useElementSize<HTMLDivElement>();
+  const reducedMotion = useReducedMotion();
+  const theme = useTheme();
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(analyticsPayloadUrl("projectsByOrganization"))
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json() as Promise<ProjectsByOrganizationPayload>;
+      })
+      .then((data) => {
+        if (!cancelled) setPayload(data);
+      })
+      .catch((cause: unknown) => {
+        if (!cancelled) {
+          setError(cause instanceof Error ? cause.message : "Unknown error");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const tree = useMemo(
+    () => (payload ? buildOrganizationTree(payload) : null),
+    [payload],
+  );
+
+  const allNodes = useMemo(
+    () => (tree ? flatten(tree).filter((node) => node.kind !== "root") : []),
+    [tree],
+  );
+
+  const limits = useMemo(() => {
+    if (!tree) return { shown: 0, hidden: 0, hiddenProjects: 0 };
+    const result = limitOrganizations(tree, topN);
+    // Roll the leaf counts back up after filtering.
+    for (const org of tree.children) {
+      org.visibleLeaves = org.children.reduce(
+        (sum, child) => sum + child.visibleLeaves,
+        0,
+      );
+    }
+    tree.visibleLeaves = tree.children.reduce(
+      (sum, org) => sum + org.visibleLeaves,
+      0,
+    );
+    return result;
+  }, [tree, topN]);
+
+  const focusNode = useMemo(() => {
+    if (!tree) return null;
+    if (!zoomId) return tree;
+    return tree.children.find((child) => child.id === zoomId) ?? tree;
+  }, [tree, zoomId]);
+
+  const laid: LaidOutNode[] = useMemo(() => {
+    if (!focusNode || allNodes.length === 0) return [];
+    return layoutAll(allNodes, focusNode, ORG_MAX_RINGS);
+  }, [allNodes, focusNode, topN, limits]);
+
+  const fills = useMemo(
+    () =>
+      laid.map((item) =>
+        item.node.category
+          ? categoryColor(item.node.category, categoryColors)
+          : "var(--viz-null)",
+      ),
+    [laid, categoryColors, theme],
+  );
+
+  const handleActivate = useCallback(
+    (node: SunburstNode, openRepo: boolean) => {
+      setHover({ node: null, x: 0, y: 0 });
+      const url = node.detail?.url;
+      if (node.kind === "project") {
+        if (url) window.open(url, "_blank", "noopener,noreferrer");
+        return;
+      }
+      if (openRepo && url) {
+        window.open(url, "_blank", "noopener,noreferrer");
+        return;
+      }
+      setZoomId((current) => (current === node.id ? null : node.id));
+      setFocusedIndex(-1);
+    },
+    [],
+  );
+
+  const zoomOut = useCallback(() => {
+    setHover({ node: null, x: 0, y: 0 });
+    setZoomId(null);
+    setFocusedIndex(-1);
+  }, []);
+
+  useEffect(() => {
+    const dismiss = () =>
+      setHover((current) => (current.node ? { node: null, x: 0, y: 0 } : current));
+    window.addEventListener("scroll", dismiss, { passive: true });
+    return () => window.removeEventListener("scroll", dismiss);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || !zoomId) return;
+      const target = event.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.isContentEditable)) {
+        return;
+      }
+      zoomOut();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoomId, zoomOut]);
+
+  const size = Math.max(280, Math.min(width || MAX_CHART, MAX_CHART));
+
+  if (error) {
+    return (
+      <div className="viz-state viz-state--error" role="alert">
+        <p>Organization data could not be loaded ({error}).</p>
+      </div>
+    );
+  }
+
+  if (!payload || !focusNode) {
+    return (
+      <div className="viz-state" aria-busy="true" aria-live="polite">
+        <div className="viz-skeleton" style={{ height: MAX_CHART }}>
+          <span className="viz-skeleton__ring viz-skeleton__ring--2" />
+          <span className="viz-skeleton__ring viz-skeleton__ring--3" />
+        </div>
+        <p className="viz-state__label">Loading organizations…</p>
+      </div>
+    );
+  }
+
+  const zoomed = focusNode.kind !== "root";
+  const trail = ancestors(focusNode);
+
+  return (
+    <div className="viz-root">
+      <div className="viz-toolbar">
+        <nav className="viz-breadcrumb" aria-label="Chart zoom level">
+          {trail.map((node, index) => {
+            const isLast = index === trail.length - 1;
+            return (
+              <span key={node.id} className="viz-breadcrumb__item">
+                {index > 0 ? (
+                  <span className="viz-breadcrumb__sep" aria-hidden="true">
+                    /
+                  </span>
+                ) : null}
+                <button
+                  type="button"
+                  className="viz-breadcrumb__link"
+                  aria-current={isLast ? "location" : undefined}
+                  disabled={isLast}
+                  onClick={zoomOut}
+                >
+                  {index === 0 ? "All organizations" : node.name}
+                </button>
+              </span>
+            );
+          })}
+        </nav>
+
+        <div className="viz-toolbar__controls">
+          <label className="viz-field viz-field--select">
+            <span className="viz-field__label">Show</span>
+            <select
+              value={topN}
+              onChange={(event) => {
+                setTopN(Number(event.target.value));
+                setZoomId(null);
+              }}
+            >
+              {TOP_N_CHOICES.map((choice) => (
+                <option key={choice} value={choice}>
+                  {choice >= (payload.root.children.length ?? 0)
+                    ? `All ${payload.root.children.length} organizations`
+                    : `Top ${choice} organizations`}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            className="viz-button"
+            onClick={zoomOut}
+            disabled={!zoomed}
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <div className="viz-body" ref={frameRef}>
+        <div className="viz-chart">
+          <div className="viz-chart__stage" style={{ height: size }}>
+            <SunburstSvg
+              laid={laid}
+              size={size}
+              zoomDepth={focusNode.depth}
+              fills={fills}
+              centreFill={
+                zoomed && focusNode.category
+                  ? categoryColor(focusNode.category, categoryColors)
+                  : "var(--viz-centre-root)"
+              }
+              matches={null}
+              selectedId={null}
+              focusedIndex={focusedIndex}
+              reducedMotion={reducedMotion}
+              handleRef={svgHandle}
+              onHover={(node, x, y) => setHover({ node, x, y })}
+              onActivate={handleActivate}
+              onFocusIndex={setFocusedIndex}
+            />
+
+            <div
+              className={zoomed ? "viz-hole viz-hole--filled" : "viz-hole"}
+              style={{
+                width: size * holeRadius(focusNode.depth),
+                height: size * holeRadius(focusNode.depth),
+              }}
+            >
+              {zoomed ? (
+                <button
+                  type="button"
+                  className="viz-hole__button"
+                  onClick={zoomOut}
+                >
+                  <span className="viz-hole__eyebrow">Organization</span>
+                  <span className="viz-hole__title">{focusNode.name}</span>
+                  <span className="viz-hole__meta">
+                    {formatNumber(focusNode.visibleLeaves)} projects
+                  </span>
+                  <span className="viz-hole__back">Back</span>
+                </button>
+              ) : (
+                <div className="viz-hole__button">
+                  <span className="viz-hole__eyebrow">Who builds it</span>
+                  <span className="viz-hole__title">Projects by Organization</span>
+                  <span className="viz-hole__meta">
+                    {formatNumber(limits.shown)} organizations ·{" "}
+                    {formatNumber(focusNode.visibleLeaves)} projects
+                  </span>
+                  {/* The project ring is not drawn until an organization is
+                      opened, so the chart has to say so. */}
+                  <span className="viz-hole__hint">
+                    Click an organization to see its projects
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* The old chart hard-coded a top-80 cut and said nothing about it. */}
+          {limits.hidden > 0 ? (
+            <p className="viz-chart__note" role="status">
+              {formatNumber(limits.hidden)} smaller organizations (
+              {formatNumber(limits.hiddenProjects)} projects) are not shown.
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <OrganizationTooltip node={hover.node} x={hover.x} y={hover.y} />
+    </div>
+  );
+}

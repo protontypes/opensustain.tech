@@ -2,12 +2,14 @@ import { KeywordCountsChart } from "@/components/charts/keyword-counts-chart";
 import { TopicsHeatmapChart } from "@/components/charts/topics-heatmap-chart";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { loadKeywordCounts, loadTopicsHeatmap, loadWordcloud } from "@/lib/data";
+import { loadKeywordCounts, loadWordcloud } from "@/lib/data";
 
 export default async function TopicsPage() {
-  const [keywordCounts, topicsHeatmap, wordcloud] = await Promise.all([
+  // topics-heatmap is ~820 KB; the chart fetches it from /data instead of
+  // having it serialised into the RSC stream. keyword-counts is 17 KB and
+  // stays server-loaded.
+  const [keywordCounts, wordcloud] = await Promise.all([
     loadKeywordCounts(),
-    loadTopicsHeatmap(),
     loadWordcloud(),
   ]);
 
@@ -24,14 +26,17 @@ export default async function TopicsPage() {
           title="Keyword Counts"
           description="The most frequently occurring technical and conceptual keywords across the ecosystem."
         >
-          <KeywordCountsChart records={keywordCounts.records} />
+          <KeywordCountsChart
+            records={keywordCounts.records}
+            defaultTopN={keywordCounts.default_top_n}
+          />
         </Panel>
 
         <Panel
           title="Topics Heatmap"
-          description="A correlation matrix revealing the density of specific topics across different sub-categories."
+          description="How often each topic appears in the projects of each sub-category. Colour is on a log scale, so a single dense cell does not flatten the rest."
         >
-          <TopicsHeatmapChart payload={topicsHeatmap} />
+          <TopicsHeatmapChart />
         </Panel>
 
         <Panel

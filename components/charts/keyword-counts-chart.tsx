@@ -1,74 +1,106 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import type { EChartsOption } from "echarts";
 
+import { buildTooltip } from "@/lib/charts/tooltip";
 import { formatNumber } from "@/lib/format";
+import { useChartTokens } from "@/lib/hooks/use-chart-tokens";
 import type { KeywordCountRecord } from "@/lib/types";
 
 import { EChart } from "./echart";
 
+const TOP_N_CHOICES = [15, 30, 60, 120];
+
 export function KeywordCountsChart({
   records,
-  topN = 30,
+  defaultTopN = 30,
 }: {
   records: KeywordCountRecord[];
-  topN?: number;
+  defaultTopN?: number;
 }) {
+  const [topN, setTopN] = useState(defaultTopN);
+  const tokens = useChartTokens();
+
   const option: EChartsOption = useMemo(() => {
     const top = records.slice(0, topN).reverse();
-
     return {
-      grid: {
-        left: 180,
-        right: 24,
-        top: 16,
-        bottom: 24,
-      },
+      animationDuration: 400,
+      grid: { left: 180, right: 72, top: 12, bottom: 32 },
       tooltip: {
-        backgroundColor: "rgba(16, 22, 32, 0.92)",
-        borderWidth: 0,
-        textStyle: { color: "#e2e8f0" },
-        formatter: (params: any) =>
-          `<strong>${params.name ?? ""}</strong><br/>Count: ${formatNumber(
-            Number(params.value ?? 0),
-          )}`,
+        confine: true,
+        backgroundColor: tokens.tooltipBg,
+        borderColor: tokens.tooltipBorder,
+        borderWidth: 1,
+        extraCssText:
+          "box-shadow:0 14px 40px rgba(16,22,32,.14);border-radius:12px",
+        formatter: (params: unknown) => {
+          const point = params as { name?: string; value?: unknown };
+          return buildTooltip(tokens, {
+            title: point.name ?? "",
+            rows: [
+              {
+                label: "Mentions",
+                value: formatNumber(Number(point.value ?? 0)),
+                strong: true,
+              },
+            ],
+          });
+        },
       },
       xAxis: {
         type: "value",
-        splitLine: {
-          lineStyle: {
-            color: "rgba(230, 237, 243, 0.95)",
-          },
-        },
+        axisLabel: { color: tokens.muted },
+        splitLine: { lineStyle: { color: tokens.grid } },
       },
       yAxis: {
         type: "category",
         data: top.map((record) => record.keyword),
+        axisLabel: { color: tokens.ink },
+        axisLine: { lineStyle: { color: tokens.border } },
+        axisTick: { show: false },
       },
       series: [
         {
           type: "bar",
-          barWidth: 18,
-          data: top.map((record) => ({
-            value: record.count,
-            name: record.keyword,
-            itemStyle: {
-              color: "#2563eb",
-              borderRadius: [0, 10, 10, 0],
-            },
-          })),
+          barWidth: 14,
+          itemStyle: { color: tokens.primary, borderRadius: [0, 8, 8, 0] },
+          data: top.map((record) => record.count),
           label: {
             show: true,
             position: "right",
-            formatter: ({ value }: any) => formatNumber(value),
-            color: "#101620",
+            color: tokens.ink,
+            formatter: (params: { value?: unknown }) =>
+              formatNumber(Number(params.value ?? 0)),
           },
         },
       ],
     };
-  }, [records, topN]);
+  }, [records, topN, tokens]);
 
-  return <EChart option={option} height={Math.max(520, topN * 28)} />;
+  return (
+    <div className="viz-root">
+      <div className="viz-toolbar">
+        <div className="viz-toolbar__controls">
+          <label className="viz-field viz-field--select">
+            <span className="viz-field__label">Show</span>
+            <select
+              value={topN}
+              onChange={(event) => setTopN(Number(event.target.value))}
+            >
+              {TOP_N_CHOICES.filter((choice) => choice <= records.length).map(
+                (choice) => (
+                  <option key={choice} value={choice}>
+                    Top {choice} keywords
+                  </option>
+                ),
+              )}
+            </select>
+          </label>
+        </div>
+      </div>
+      <EChart option={option} height={Math.max(360, topN * 24 + 60)} />
+    </div>
+  );
 }

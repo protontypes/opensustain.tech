@@ -4,19 +4,20 @@ import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import {
   loadFilters,
-  loadOrganizationRankings,
   loadOrganizationsBySubcategory,
   loadOrganizationsOverview,
 } from "@/lib/data";
 
 export default async function OrganizationsPage() {
-  const [overview, rankings, organizationsBySubcategory, filters] =
-    await Promise.all([
-      loadOrganizationsOverview(),
-      loadOrganizationRankings(),
-      loadOrganizationsBySubcategory(),
-      loadFilters(),
-    ]);
+  // organization-rankings is ~835 KB and its 1,274 records crossed into a
+  // client component, serialising the whole payload into the RSC stream.
+  // The overview and sub-category payloads only feed server-rendered lists,
+  // so they stay here.
+  const [overview, organizationsBySubcategory, filters] = await Promise.all([
+    loadOrganizationsOverview(),
+    loadOrganizationsBySubcategory(),
+    loadFilters(),
+  ]);
 
   return (
     <main className="page-shell">
@@ -29,9 +30,12 @@ export default async function OrganizationsPage() {
       <div className="stack">
         <Panel
           title="Organization Rankings"
-          description="Top organizations ranked by aggregated project score."
+          description="Organizations ranked by the combined score of the projects they maintain. Filter to a category to rank by that category\u2019s score alone; each bar takes the colour of the category the organization scores highest in."
         >
-          <OrganizationRankingsChart records={rankings.records} />
+          <OrganizationRankingsChart
+            categories={filters.categories}
+            categoryColors={filters.category_colors}
+          />
         </Panel>
 
         <Panel

@@ -105,6 +105,51 @@ export function holeRadius(zoomDepth: number): number {
   return HOLE_RADII[Math.min(zoomDepth, 2)];
 }
 
+/**
+ * Below this the hole has no room for the instruction line.
+ *
+ * The hole is a fraction of the chart, but the type inside it was fixed px, so
+ * on a phone a 94px circle was handed 147px of text and it spilled across the
+ * rings. Type now scales with `--viz-hole-d`; these two thresholds drop the
+ * lines that still will not fit, and the chart shows them underneath instead.
+ */
+const HOLE_HINT_MIN_PX = 210;
+/** Below this only the identity and the back affordance fit. */
+const HOLE_COMPACT_MAX_PX = 170;
+/**
+ * Below this the eyebrow's own box clips the circle — it is the topmost line,
+ * so its corners sit where the chord is shortest. All that is left is a name.
+ */
+const HOLE_TINY_MAX_PX = 112;
+
+export type HoleFit = {
+  /** Diameter in px — also published to CSS as `--viz-hole-d`. */
+  diameter: number;
+  /** The instruction line fits inside the circle. */
+  showHint: boolean;
+  /** Too small for the count, or for a long title. */
+  compact: boolean;
+  /** Room for a name and nothing else. */
+  tiny: boolean;
+};
+
+/**
+ * What the centre can hold at this chart size.
+ *
+ * Usable width inside a circle is about 0.72 of its diameter — the inscribed
+ * square, less the button's padding — and the height budget shrinks as the
+ * block widens, so these are measured thresholds rather than breakpoints.
+ */
+export function holeFit(size: number, zoomDepth: number): HoleFit {
+  const diameter = size * holeRadius(zoomDepth);
+  return {
+    diameter,
+    showHint: diameter >= HOLE_HINT_MIN_PX,
+    compact: diameter < HOLE_COMPACT_MAX_PX,
+    tiny: diameter < HOLE_TINY_MAX_PX,
+  };
+}
+
 export type LaidOutNode = {
   node: SunburstNode;
   rect: Rect;

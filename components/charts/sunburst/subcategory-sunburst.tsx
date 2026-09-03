@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
 import { pluralize } from "@/lib/format";
@@ -9,7 +16,7 @@ import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 import { useTheme } from "@/lib/hooks/use-theme";
 import type { OrganizationsBySubcategoryPayload } from "@/lib/types";
 import { categoryColor } from "@/lib/sunburst/color";
-import { holeRadius, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
+import { holeFit, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
 import {
   applySubcategoryFilters,
   buildSubcategoryTree,
@@ -30,6 +37,7 @@ const MAX_CHART = 1040;
  * (tabs/organisations_by_subcategory_tab.py:60).
  */
 const SUBCATEGORY_MAX_RINGS = 1;
+const ROOT_HINT = "Click a sub-category to see its organizations";
 
 export function SubcategorySunburst({
   categoryColors,
@@ -196,6 +204,17 @@ export function SubcategorySunburst({
   const filtered = Boolean(country || orgType);
   const trail = ancestors(focusNode);
   const empty = counts.listings === 0;
+  const fit = holeFit(size, focusNode.depth);
+  const holeStyle = {
+    width: fit.diameter,
+    height: fit.diameter,
+    "--viz-hole-d": `${fit.diameter}px`,
+  } as CSSProperties;
+  const rootMeta = `${pluralize(
+    counts.subcategories,
+    "sub-category",
+    "sub-categories",
+  )} · ${pluralize(counts.organizations, "organization")}`;
 
   // An organization listed under three sub-categories is three wedges, so the
   // wedge count and the organization count differ and the chart has to say why.
@@ -209,6 +228,18 @@ export function SubcategorySunburst({
   ]
     .filter(Boolean)
     .join(" ");
+
+  // Whatever the circle was too small to hold goes on the line beneath it.
+  const caption = [
+    fit.compact
+      ? zoomed
+        ? pluralize(focusNode.visibleLeaves, "organization")
+        : rootMeta
+      : null,
+    !fit.showHint && !zoomed ? ROOT_HINT : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <div className="viz-root">
@@ -312,11 +343,15 @@ export function SubcategorySunburst({
               />
 
               <div
-                className={zoomed ? "viz-hole viz-hole--filled" : "viz-hole"}
-                style={{
-                  width: size * holeRadius(focusNode.depth),
-                  height: size * holeRadius(focusNode.depth),
-                }}
+                className={[
+                  "viz-hole",
+                  zoomed ? "viz-hole--filled" : null,
+                  fit.compact ? "viz-hole--compact" : null,
+                  fit.tiny ? "viz-hole--tiny" : null,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                style={holeStyle}
               >
                 {zoomed ? (
                   <button
@@ -337,22 +372,21 @@ export function SubcategorySunburst({
                   <div className="viz-hole__button">
                     <span className="viz-hole__eyebrow">Where they work</span>
                     <span className="viz-hole__title">
-                      Organizations by Sub-Category
+                      {fit.tiny
+                        ? "Sub-Categories"
+                        : "Organizations by Sub-Category"}
                     </span>
-                    <span className="viz-hole__meta">
-                      {pluralize(counts.subcategories, "sub-category", "sub-categories")}{" "}
-                      · {pluralize(counts.organizations, "organization")}
-                    </span>
+                    <span className="viz-hole__meta">{rootMeta}</span>
                     {/* The organization ring is not drawn until a sub-category
                         is opened, so the chart has to say so. */}
-                    <span className="viz-hole__hint">
-                      Click a sub-category to see its organizations
-                    </span>
+                    <span className="viz-hole__hint">{ROOT_HINT}</span>
                   </div>
                 )}
               </div>
             </div>
           )}
+
+          {caption ? <p className="viz-chart__caption">{caption}</p> : null}
 
           {note ? (
             <p className="viz-chart__note" role="status">

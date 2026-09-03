@@ -1,15 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 
 import { useElementSize } from "@/lib/hooks/use-element-size";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 import { useTheme } from "@/lib/hooks/use-theme";
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
-import { formatNumber } from "@/lib/format";
+import { formatNumber, pluralize } from "@/lib/format";
 import type { RankingMetricId } from "@/lib/types";
 import { categoryColor, computeBins, fillFor } from "@/lib/sunburst/color";
-import { holeRadius, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
+import { holeFit, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
 import {
   applyFilters,
   ancestors,
@@ -37,6 +44,7 @@ import {
 } from "./sunburst-rail";
 
 const MAX_CHART = 1040;
+const ROOT_HINT = "Click a category to see its projects";
 
 export function EcosystemSunburst() {
   const [payload, setPayload] = useState<EcosystemSunburstPayload | null>(null);
@@ -366,6 +374,27 @@ export function EcosystemSunburst() {
   }
 
   const hole = focusNode.kind === "root" ? null : focusNode;
+  const fit = holeFit(size, focusNode.depth);
+  const holeStyle = {
+    width: fit.diameter,
+    height: fit.diameter,
+    "--viz-hole-d": `${fit.diameter}px`,
+  } as CSSProperties;
+  const rootMeta = `${pluralize(focusNode.visibleLeaves, "project")} · ${pluralize(
+    focusNode.children.length,
+    "category",
+    "categories",
+  )}`;
+  const caption = [
+    fit.compact
+      ? focusNode.kind === "root"
+        ? rootMeta
+        : pluralize(focusNode.visibleLeaves, "project")
+      : null,
+    fit.showHint || focusNode.kind !== "root" ? null : ROOT_HINT,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <div className="viz-root">
@@ -410,16 +439,20 @@ export function EcosystemSunburst() {
             />
 
             <div
-              className={
-                focusNode.kind === "root" ? "viz-hole" : "viz-hole viz-hole--filled"
-              }
               // holeRadius is a fraction of the OUTER radius (size / 2), so the
               // overlay's diameter is size * holeRadius — not twice that, which
               // would spill over the category ring and swallow its clicks.
-              style={{
-                width: size * holeRadius(focusNode.depth),
-                height: size * holeRadius(focusNode.depth),
-              }}
+              className={[
+                "viz-hole",
+                focusNode.kind === "root" ? null : "viz-hole--filled",
+                fit.compact ? "viz-hole--compact" : null,
+                fit.tiny ? "viz-hole--tiny" : null,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              // Everything inside is sized from this, so the type shrinks with
+              // the circle instead of overflowing it on a narrow screen.
+              style={holeStyle}
             >
               {hole ? (
                 <button
@@ -432,7 +465,7 @@ export function EcosystemSunburst() {
                   </span>
                   <span className="viz-hole__title">{hole.name}</span>
                   <span className="viz-hole__meta">
-                    {formatNumber(hole.visibleLeaves)} projects
+                    {pluralize(hole.visibleLeaves, "project")}
                   </span>
                   <span className="viz-hole__back">Back</span>
                 </button>
@@ -445,19 +478,23 @@ export function EcosystemSunburst() {
                 >
                   <span className="viz-hole__eyebrow">OpenSustain.tech</span>
                   <span className="viz-hole__title">
-                    The Open Source Ecosystem in Sustainability
+                    {/* 43 characters will not wrap inside a 94px circle, and
+                        at 67px only the wordmark is left. */}
+                    {fit.tiny
+                      ? "OpenSustain.tech"
+                      : fit.compact
+                        ? "Open Source Sustainability"
+                        : "The Open Source Ecosystem in Sustainability"}
                   </span>
-                  <span className="viz-hole__meta">
-                    {formatNumber(focusNode.visibleLeaves)} projects ·{" "}
-                    {formatNumber(focusNode.children.length)} categories
-                  </span>
-                  <span className="viz-hole__hint">
-                    Click a category to see its projects
-                  </span>
+                  <span className="viz-hole__meta">{rootMeta}</span>
+                  <span className="viz-hole__hint">{ROOT_HINT}</span>
                 </a>
               )}
             </div>
           </div>
+
+          {/* Whatever did not fit in the circle, on the full-width line. */}
+          {caption ? <p className="viz-chart__caption">{caption}</p> : null}
 
           {matches ? (
             <p className="viz-chart__note" role="status">

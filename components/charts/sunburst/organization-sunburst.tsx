@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
 import { pluralize } from "@/lib/format";
@@ -9,7 +16,7 @@ import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 import { useTheme } from "@/lib/hooks/use-theme";
 import type { ProjectsByOrganizationPayload } from "@/lib/types";
 import { categoryColor } from "@/lib/sunburst/color";
-import { holeRadius, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
+import { holeFit, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
 import {
   buildOrganizationTree,
   limitOrganizations,
@@ -26,6 +33,7 @@ const ORG_MAX_RINGS = 1;
 // Median org has 2 projects, so a high cap turns the ring into unlabelled
 // slivers. 40 keeps every wedge nameable; the rest are one select away.
 const TOP_N_CHOICES = [20, 40, 80, 150, 276];
+const ROOT_HINT = "Click an organization to see its projects";
 
 export function OrganizationSunburst({
   categoryColors,
@@ -186,6 +194,27 @@ export function OrganizationSunburst({
 
   const zoomed = focusNode.kind !== "root";
   const trail = ancestors(focusNode);
+  const fit = holeFit(size, focusNode.depth);
+  const holeStyle = {
+    width: fit.diameter,
+    height: fit.diameter,
+    "--viz-hole-d": `${fit.diameter}px`,
+  } as CSSProperties;
+  const rootMeta = `${pluralize(limits.shown, "organization")} · ${pluralize(
+    focusNode.visibleLeaves,
+    "project",
+  )}`;
+  // Whatever the circle was too small to hold goes on the line beneath it.
+  const caption = [
+    fit.compact
+      ? zoomed
+        ? pluralize(focusNode.visibleLeaves, "project")
+        : rootMeta
+      : null,
+    !fit.showHint && !zoomed ? ROOT_HINT : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <div className="viz-root">
@@ -268,11 +297,15 @@ export function OrganizationSunburst({
             />
 
             <div
-              className={zoomed ? "viz-hole viz-hole--filled" : "viz-hole"}
-              style={{
-                width: size * holeRadius(focusNode.depth),
-                height: size * holeRadius(focusNode.depth),
-              }}
+              className={[
+                "viz-hole",
+                zoomed ? "viz-hole--filled" : null,
+                fit.compact ? "viz-hole--compact" : null,
+                fit.tiny ? "viz-hole--tiny" : null,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              style={holeStyle}
             >
               {zoomed ? (
                 <button
@@ -290,20 +323,19 @@ export function OrganizationSunburst({
               ) : (
                 <div className="viz-hole__button">
                   <span className="viz-hole__eyebrow">Who builds it</span>
-                  <span className="viz-hole__title">Projects by Organization</span>
-                  <span className="viz-hole__meta">
-                    {pluralize(limits.shown, "organization")} ·{" "}
-                    {pluralize(focusNode.visibleLeaves, "project")}
+                  <span className="viz-hole__title">
+                    {fit.tiny ? "Organizations" : "Projects by Organization"}
                   </span>
+                  <span className="viz-hole__meta">{rootMeta}</span>
                   {/* The project ring is not drawn until an organization is
                       opened, so the chart has to say so. */}
-                  <span className="viz-hole__hint">
-                    Click an organization to see its projects
-                  </span>
+                  <span className="viz-hole__hint">{ROOT_HINT}</span>
                 </div>
               )}
             </div>
           </div>
+
+          {caption ? <p className="viz-chart__caption">{caption}</p> : null}
 
           {/* The old chart hard-coded a top-80 cut and said nothing about it. */}
           {limits.hidden > 0 ? (

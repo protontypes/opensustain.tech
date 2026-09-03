@@ -1,17 +1,24 @@
+import {
+  CodeOfConductChart,
+  CommitActivityChart,
+  ContributingGuideChart,
+  EcosystemsChart,
+  LanguagesChart,
+  LicensesChart,
+  PlatformsChart,
+} from "@/components/charts/project-attributes-charts";
 import { ProjectRankingsChart } from "@/components/charts/project-rankings-chart";
 import { ProjectsOverTimeChart } from "@/components/charts/projects-over-time-chart";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { loadFilters, loadProjectAttributes } from "@/lib/data";
+import { loadFilters } from "@/lib/data";
 
 export default async function ProjectsPage() {
-  // The rankings and lifecycle payloads are ~1.7 MB and ~1.4 MB. Loading them
-  // here serialised both into the RSC stream on every navigation; the charts
-  // fetch them from /data instead, where they are cacheable static assets.
-  const [filters, projectAttributes] = await Promise.all([
-    loadFilters(),
-    loadProjectAttributes(),
-  ]);
+  // Every payload this page draws is fetched client-side by the chart that
+  // needs it — loading them here serialised each one into the RSC stream on
+  // every navigation, and the rankings and lifecycle files alone are ~1.7 MB
+  // and ~1.4 MB. `filters` is 9 KB of controls and stays here.
+  const filters = await loadFilters();
 
   return (
     <main className="page-shell">
@@ -40,45 +47,56 @@ export default async function ProjectsPage() {
         </Panel>
 
         <Panel
-          title="Attribute Snapshots"
-          description="A summary of commit activity, programming languages, and software licenses across the tracked ecosystem."
+          title="Recent Commit Activity"
+          description="Whether each tracked project has recorded a commit in the last 365 days."
         >
-          <div className="three-column-grid">
-            <div>
-              <h3 className="mini-heading">Commit Activity</h3>
-              <ul className="plain-list">
-                {projectAttributes.commit_activity.map((item) => (
-                  <li key={item.label}>
-                    <span>{item.label}</span>
-                    <strong>{item.count}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="mini-heading">Top Languages</h3>
-              <ul className="plain-list">
-                {projectAttributes.fields.language.slice(0, 8).map((item) => (
-                  <li key={item.label}>
-                    <span>{item.label}</span>
-                    <strong>{item.count}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="mini-heading">Top Licenses</h3>
-              <ul className="plain-list">
-                {projectAttributes.fields.license.slice(0, 8).map((item) => (
-                  <li key={item.label}>
-                    <span>{item.label}</span>
-                    <strong>{item.count}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <CommitActivityChart />
         </Panel>
+
+        <div className="two-column-grid">
+          <Panel
+            title="Code of Conduct"
+            description="Projects publishing a code of conduct."
+          >
+            <CodeOfConductChart />
+          </Panel>
+
+          <Panel
+            title="Contributing Guide"
+            description="Projects publishing contribution guidelines."
+          >
+            <ContributingGuideChart />
+          </Panel>
+        </div>
+
+        <Panel
+          title="Languages"
+          description="The primary language each repository reports."
+        >
+          <LanguagesChart />
+        </Panel>
+
+        <Panel
+          title="Licenses"
+          description="The license each repository declares, by SPDX identifier."
+        >
+          <LicensesChart />
+        </Panel>
+
+        <Panel
+          title="Package Ecosystems"
+          description="The package registries these projects publish to."
+        >
+          <EcosystemsChart />
+        </Panel>
+
+        <Panel
+          title="Git Platforms"
+          description="Where the repositories are hosted."
+        >
+          <PlatformsChart />
+        </Panel>
+
       </div>
     </main>
   );

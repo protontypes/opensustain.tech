@@ -1,19 +1,22 @@
 import { OrganizationRankingsChart } from "@/components/charts/organization-rankings-chart";
+import {
+  ContinentsChart,
+  OrganizationTypesChart,
+  TopCountriesChart,
+  TopOrganizationsChart,
+} from "@/components/charts/organizations-distribution-charts";
+import { OrganizationsMap } from "@/components/charts/organizations-map";
 import { OrganizationSunburst } from "@/components/charts/sunburst/organization-sunburst";
 import { SubcategorySunburst } from "@/components/charts/sunburst/subcategory-sunburst";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { loadFilters, loadOrganizationsOverview } from "@/lib/data";
+import { loadFilters } from "@/lib/data";
 
 export default async function OrganizationsPage() {
-  // organization-rankings (~835 KB) and organizations-by-subcategory (~670 KB)
-  // are fetched client-side by their charts; crossing them into a client
-  // component would serialise the whole payload into the RSC stream. Only the
-  // overview, which feeds server-rendered lists, is loaded here.
-  const [overview, filters] = await Promise.all([
-    loadOrganizationsOverview(),
-    loadFilters(),
-  ]);
+  // Every payload on this page is fetched client-side by the chart that needs
+  // it — crossing one into a client component serialises the whole thing into
+  // the RSC stream. `filters` is 9 KB of controls and stays here.
+  const filters = await loadFilters();
 
   return (
     <main className="page-shell">
@@ -54,34 +57,42 @@ export default async function OrganizationsPage() {
         </Panel>
 
         <Panel
-          title="Geography and Organization Types"
-          description="A breakdown of the top contributing countries and the kinds of organization behind them."
+          className="panel--viz"
+          title="Projects per Country"
+          description="Where the organizations behind these projects are based, shaded by how many projects they list between them. Countries are joined on their ISO 3166-1 alpha-3 code."
         >
-          <div className="three-column-grid">
-            <div>
-              <h3 className="mini-heading">Top Countries</h3>
-              <ul className="plain-list">
-                {overview.countries.slice(0, 8).map((item) => (
-                  <li key={item.iso_alpha}>
-                    <span>{item.country_name}</span>
-                    <strong>{item.organization_count}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="mini-heading">Organization Types</h3>
-              <ul className="plain-list">
-                {overview.organization_type_counts.slice(0, 8).map((item) => (
-                  <li key={item.form_of_organization}>
-                    <span>{item.form_of_organization}</span>
-                    <strong>{item.count}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <OrganizationsMap />
         </Panel>
+
+        <Panel
+          title="Top Organizations by Projects"
+          description="Organizations ranked by how many tracked projects they list, not by score. Click a bar to open the organization."
+        >
+          <TopOrganizationsChart />
+        </Panel>
+
+        <Panel
+          title="Top Countries by Organizations"
+          description="How many organizations record each country as their location."
+        >
+          <TopCountriesChart />
+        </Panel>
+
+        <div className="two-column-grid">
+          <Panel
+            title="Organizations by Continent"
+            description="The same organizations, grouped by continent."
+          >
+            <ContinentsChart />
+          </Panel>
+
+          <Panel
+            title="Organizations by Type"
+            description="Academia, community, government and the rest, as each organization describes itself."
+          >
+            <OrganizationTypesChart />
+          </Panel>
+        </div>
       </div>
     </main>
   );

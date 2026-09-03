@@ -617,6 +617,14 @@ p {
   gap: 24px;
 }
 
+/* Two panels side by side; collapses to one column on the same breakpoint. */
+.two-column-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
 /*
  * Named for its widest form, but auto-fit so a panel with two lists fills the
  * row instead of leaving a third column empty.

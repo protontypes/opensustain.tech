@@ -7,8 +7,7 @@ import { formatNumber } from "@/lib/format";
 import type { OrganizationsOverviewPayload } from "@/lib/types";
 
 import { HorizontalBarChart, type BarDatum } from "./horizontal-bar-chart";
-
-const TOP_N_CHOICES = [10, 25, 50, 100];
+import { TopNField } from "./top-n-field";
 
 /** Title-cases the raw `form_of_organization` values, which are lower-cased. */
 function titleCase(value: string): string {
@@ -45,38 +44,6 @@ function Frame({
     );
   }
   return <>{children}</>;
-}
-
-function TopNField({
-  value,
-  onChange,
-  max,
-  noun,
-}: {
-  value: number;
-  onChange: (next: number) => void;
-  max: number;
-  noun: string;
-}) {
-  const choices = TOP_N_CHOICES.filter((choice) => choice < max);
-  return (
-    <label className="viz-field viz-field--select">
-      <span className="viz-field__label">Show</span>
-      <select
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-      >
-        {choices.map((choice) => (
-          <option key={choice} value={choice}>
-            Top {choice}
-          </option>
-        ))}
-        <option value={max}>
-          All {formatNumber(max)} {noun}
-        </option>
-      </select>
-    </label>
-  );
 }
 
 /* ------------------------------------------------- top organizations */

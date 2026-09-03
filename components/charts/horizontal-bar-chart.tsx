@@ -109,7 +109,9 @@ export function HorizontalBarChart({
   return (
     <EChart
       option={option}
-      height={Math.max(260, data.length * rowHeight + 64)}
+      // The floor only has to keep a one- or two-row chart from collapsing;
+      // 260 left a two-bar chart with 90px between its bars.
+      height={Math.max(150, data.length * rowHeight + 64)}
       onClick={(params) => {
         const datum = (params.data as { datum?: BarDatum } | undefined)?.datum;
         if (!datum) return;

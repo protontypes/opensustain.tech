@@ -25,6 +25,9 @@ echarts.use([
   CanvasRenderer,
 ]);
 
+/** Replace rather than merge, so removed series and filtered data disappear. */
+const DEFAULT_SET_OPTION: SetOptionOpts = { notMerge: true, lazyUpdate: true };
+
 type EChartProps = {
   option: EChartsOption;
   className?: string;
@@ -42,6 +45,10 @@ export function EChart({
 }: EChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<echarts.EChartsType | null>(null);
+  // Held in a ref so a parent's inline arrow does not churn the subscription
+  // on every render, and so the cleanup can never run against a disposed chart.
+  const onClickRef = useRef(onClick);
+  onClickRef.current = onClick;
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -52,7 +59,13 @@ export function EChart({
       renderer: "canvas",
     });
     chartRef.current = chart;
-    chart.setOption(option, setOptionOpts);
+
+    const handler = (params: unknown) => {
+      if (typeof params === "object" && params !== null) {
+        onClickRef.current?.(params as Record<string, unknown>);
+      }
+    };
+    chart.on("click", handler);
 
     const resizeObserver = new ResizeObserver(() => {
       chart.resize();
@@ -66,30 +79,12 @@ export function EChart({
     };
   }, []);
 
+  // The single owner of setOption. The init effect deliberately does not call
+  // it: doing both built every chart twice, the second time with a stale
+  // closure over `option` from the empty-dependency init effect.
   useEffect(() => {
-    if (!chartRef.current) {
-      return;
-    }
-    chartRef.current.setOption(option, setOptionOpts);
+    chartRef.current?.setOption(option, setOptionOpts ?? DEFAULT_SET_OPTION);
   }, [option, setOptionOpts]);
-
-  useEffect(() => {
-    const chart = chartRef.current;
-    if (!chart || !onClick) {
-      return;
-    }
-
-    const handler = (params: unknown) => {
-      if (typeof params === "object" && params !== null) {
-        onClick(params as Record<string, unknown>);
-      }
-    };
-
-    chart.on("click", handler);
-    return () => {
-      chart.off("click", handler);
-    };
-  }, [onClick]);
 
   return (
     <div

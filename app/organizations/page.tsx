@@ -1,21 +1,17 @@
 import { OrganizationRankingsChart } from "@/components/charts/organization-rankings-chart";
 import { OrganizationSunburst } from "@/components/charts/sunburst/organization-sunburst";
+import { SubcategorySunburst } from "@/components/charts/sunburst/subcategory-sunburst";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
-import {
-  loadFilters,
-  loadOrganizationsBySubcategory,
-  loadOrganizationsOverview,
-} from "@/lib/data";
+import { loadFilters, loadOrganizationsOverview } from "@/lib/data";
 
 export default async function OrganizationsPage() {
-  // organization-rankings is ~835 KB and its 1,274 records crossed into a
-  // client component, serialising the whole payload into the RSC stream.
-  // The overview and sub-category payloads only feed server-rendered lists,
-  // so they stay here.
-  const [overview, organizationsBySubcategory, filters] = await Promise.all([
+  // organization-rankings (~835 KB) and organizations-by-subcategory (~670 KB)
+  // are fetched client-side by their charts; crossing them into a client
+  // component would serialise the whole payload into the RSC stream. Only the
+  // overview, which feeds server-rendered lists, is loaded here.
+  const [overview, filters] = await Promise.all([
     loadOrganizationsOverview(),
-    loadOrganizationsBySubcategory(),
     loadFilters(),
   ]);
 
@@ -30,7 +26,7 @@ export default async function OrganizationsPage() {
       <div className="stack">
         <Panel
           title="Organization Rankings"
-          description="Organizations ranked by the combined score of the projects they maintain. Filter to a category to rank by that category\u2019s score alone; each bar takes the colour of the category the organization scores highest in."
+          description="Organizations ranked by the combined score of the projects they maintain. Filter to a category to rank by that category’s score alone; each bar takes the colour of the category the organization scores highest in."
         >
           <OrganizationRankingsChart
             categories={filters.categories}
@@ -47,8 +43,19 @@ export default async function OrganizationsPage() {
         </Panel>
 
         <Panel
-          title="Geography and Sub-category Summaries"
-          description="A breakdown of top contributing countries, organization types, and technical sub-categories."
+          className="panel--viz"
+          title="Organizations by Sub-Category"
+          description="The 81 technical sub-categories, sized by how many organizations work in each and coloured by their parent ecosystem category. Click a sub-category to see the organizations behind it, and filter by country or organization type."
+        >
+          <SubcategorySunburst
+            categoryColors={filters.category_colors}
+            subCategoriesByCategory={filters.sub_categories_by_category}
+          />
+        </Panel>
+
+        <Panel
+          title="Geography and Organization Types"
+          description="A breakdown of the top contributing countries and the kinds of organization behind them."
         >
           <div className="three-column-grid">
             <div>
@@ -69,17 +76,6 @@ export default async function OrganizationsPage() {
                   <li key={item.form_of_organization}>
                     <span>{item.form_of_organization}</span>
                     <strong>{item.count}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="mini-heading">Top Sub-categories</h3>
-              <ul className="plain-list">
-                {organizationsBySubcategory.subcategories.slice(0, 8).map((item) => (
-                  <li key={item.sub_category}>
-                    <span>{item.sub_category}</span>
-                    <strong>{item.organization_count}</strong>
                   </li>
                 ))}
               </ul>

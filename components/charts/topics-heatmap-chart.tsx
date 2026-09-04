@@ -142,13 +142,19 @@ export function TopicsHeatmapChart({
         splitArea: { show: false },
       },
       visualMap: {
+        type: "continuous" as const,
         min: 0,
         max: max || 1,
         calculable: true,
         orient: "horizontal",
         left: "center",
         bottom: 8,
-        textStyle: { color: tokens.muted },
+        textStyle: { color: tokens.muted, fontFamily: "inherit" },
+        // The scale is log10(count + 1), so its raw endpoints read as a legend
+        // from "0" to "1.46" of nothing. Invert them back to project counts.
+        formatter: (value: unknown) =>
+          formatNumber(Math.round(10 ** Number(value) - 1)),
+        text: ["More projects", "Fewer"],
         inRange: { color: ramp },
       },
       series: [

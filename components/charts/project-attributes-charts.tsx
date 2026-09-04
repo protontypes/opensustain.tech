@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
 import { formatNumber, formatPercent } from "@/lib/format";
@@ -15,6 +15,21 @@ const MISSING_LABEL = "Not recorded";
 
 function useAttributes() {
   return useAnalyticsPayload<ProjectAttributesPayload>("projectAttributes");
+}
+
+/**
+ * Top-N seeded from the payload's own `top_n_default` (30) rather than a
+ * hardcoded 25, once the payload lands.
+ */
+function usePayloadTopN(data: ProjectAttributesPayload | null, fallback = 25) {
+  const [topN, setTopN] = useState(fallback);
+  const seeded = useRef(false);
+  useEffect(() => {
+    if (seeded.current || !data?.top_n_default) return;
+    seeded.current = true;
+    setTopN(data.top_n_default);
+  }, [data]);
+  return [topN, setTopN] as const;
 }
 
 function Frame({
@@ -168,7 +183,7 @@ function licenseLabel(raw: string): string {
 export function LicensesChart() {
   const { data, error } = useAttributes();
   const records = data?.fields.license ?? [];
-  const [topN, setTopN] = useState(25);
+  const [topN, setTopN] = usePayloadTopN(data);
   const rows = useMemo(
     () => toRows(records.slice(0, topN), licenseLabel),
     [records, topN],
@@ -206,7 +221,7 @@ export function LicensesChart() {
 export function LanguagesChart() {
   const { data, error } = useAttributes();
   const records = data?.fields.language ?? [];
-  const [topN, setTopN] = useState(25);
+  const [topN, setTopN] = usePayloadTopN(data);
   const rows = useMemo(() => toRows(records.slice(0, topN)), [records, topN]);
 
   return (
@@ -279,7 +294,7 @@ export function PlatformsChart() {
 
 export function EcosystemsChart() {
   const { data, error } = useAttributes();
-  const [topN, setTopN] = useState(25);
+  const [topN, setTopN] = usePayloadTopN(data);
 
   const records = useMemo(
     // Every non-empty `ecosystems` value in projects.csv ends with a trailing

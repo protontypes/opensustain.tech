@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { EChartsOption } from "echarts";
 
@@ -26,7 +26,9 @@ import { EChart } from "./echart";
 import { ExportMenu } from "./export-menu";
 import { useOrganizationFilters } from "./organization-filters";
 
-const TOP_N_CHOICES = [10, 25, 50, 100];
+// Streamlit reaches 300; capping at 100 put a third of its range out of
+// reach. The payload states its own default, which was ignored for a 25.
+const TOP_N_CHOICES = [10, 25, 50, 100, 300];
 const ALL = "All Categories";
 
 /** The category an organization scores highest in — used for its bar colour. */
@@ -63,6 +65,8 @@ export function OrganizationRankingsChart({
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState(ALL);
   const [topN, setTopN] = useState(25);
+  // Seeded from the payload once it lands, since these fetch client-side.
+  const seeded = useRef(false);
   const tokens = useChartTokens();
   const theme = useTheme();
   const filters = useOrganizationFilters();
@@ -79,7 +83,16 @@ export function OrganizationRankingsChart({
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response.json() as Promise<OrganizationRankingsPayload>;
       })
-      .then((data) => !cancelled && setPayload(data))
+      .then((data) => {
+        if (cancelled) return;
+        setPayload(data);
+        // The pipeline tunes this; the literal above is only what shows while
+        // the payload is in flight.
+        if (!seeded.current && data.default_top_n) {
+          seeded.current = true;
+          setTopN(data.default_top_n);
+        }
+      })
       .catch((cause: unknown) => {
         if (!cancelled) {
           setError(cause instanceof Error ? cause.message : "Unknown error");

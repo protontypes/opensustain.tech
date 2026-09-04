@@ -571,7 +571,13 @@ a.panel:hover {
  * its four organisation tabs; this page is those four at once, so the bar sits
  * above every chart instead of being copied into each one.
  */
+/* One bar drives seven charts down a ~5,000px page, so it has to stay in
+   reach — otherwise a filtered chart far below has no visible cause and no
+   control to clear it. 76px clears the sticky header. */
 .org-filters {
+  position: sticky;
+  top: 76px;
+  z-index: 900;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -596,6 +602,27 @@ a.panel:hover {
   font-size: 13px;
   font-weight: 500;
   color: var(--color-text-secondary);
+}
+
+/* Scope and provenance under the hero badges. */
+.hero-scope {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-top: 20px;
+}
+
+.hero-scope time {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.site-footer .footer-copyright a {
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .error-actions {

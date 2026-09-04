@@ -27,8 +27,18 @@ import { useChartExport } from "@/lib/charts/use-chart-export";
 import { EChart } from "./echart";
 import { ExportMenu } from "./export-menu";
 
-function symbolSize(value: number) {
-  return Math.max(7, Math.min(28, Math.sqrt(Math.max(value, 0)) * 1.8 + 4));
+/**
+ * Bubble radius, normalised against the points actually on screen.
+ *
+ * The previous curve clamped at 28px, so every project above 178 drew as the
+ * identical maximum dot — 1,623 of 2,691 points for Total Commits, where a
+ * project with 131,014 commits and one with 2,699 were the same circle. Scaling
+ * to the filtered maximum keeps the range legible whichever metric and category
+ * are selected, which is what Plotly's `size_max` does in the reference.
+ */
+function makeSymbolSize(max: number) {
+  const root = Math.sqrt(Math.max(max, 1));
+  return (value: number) => 6 + (Math.sqrt(Math.max(value, 0)) / root) * 26;
 }
 
 export function ProjectsOverTimeChart({
@@ -107,6 +117,14 @@ export function ProjectsOverTimeChart({
   );
 
   const option: EChartsOption = useMemo(() => {
+    // Normalised per view, so switching metric or category rescales the dots.
+    const sizeFor = makeSymbolSize(
+      records.reduce(
+        (best, record) => Math.max(best, record.size_metrics[sizeMetric] ?? 0),
+        0,
+      ),
+    );
+
     const shown = Array.from(
       new Set(records.map((record) => record.category)),
     ).filter(Boolean);
@@ -193,7 +211,7 @@ export function ProjectsOverTimeChart({
             value: [record.project_age_years, record.sub_category],
             url: record.url,
             record,
-            symbolSize: symbolSize(record.size_metrics[sizeMetric] ?? 0),
+            symbolSize: sizeFor(record.size_metrics[sizeMetric] ?? 0),
           })),
       })),
     };

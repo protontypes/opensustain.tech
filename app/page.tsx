@@ -4,6 +4,7 @@ import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunbur
 import { MetricCard, MetricStat } from "@/components/ui/metric-card";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { snapshotOf } from "@/lib/data/snapshot";
 import { loadFilters, loadProjectRankings, loadSummary } from "@/lib/data";
 import {
   formatCompactNumber,
@@ -39,6 +40,7 @@ export default async function HomePage() {
     loadFilters(),
     loadProjectRankings(),
   ]);
+  const snapshot = snapshotOf(summary.as_of);
 
   const activeRate =
     summary.totals.projects > 0
@@ -60,6 +62,14 @@ export default async function HomePage() {
           <span>{filters.sub_categories.length} sub-categories</span>
           <span>{formatPercent(activeRate)} active</span>
         </div>
+        {/* Scope and provenance in one line, so a reader arriving from a link
+            knows what this covers and how current it is. */}
+        <p className="hero-scope">
+          {formatNumber(summary.totals.projects)} projects and{" "}
+          {formatNumber(summary.totals.organizations)} organizations, from a
+          snapshot of{" "}
+          <time dateTime={snapshot.iso}>{snapshot.label}</time>.
+        </p>
       </section>
 
       <section className="metric-grid">

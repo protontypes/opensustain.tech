@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { CommunityBanner } from "@/components/dashboard/community-banner";
 import { SiteHeader } from "@/components/dashboard/site-header";
 import { SiteFooter } from "@/components/dashboard/site-footer";
+import { loadSnapshot } from "@/lib/data/snapshot";
 
 import "./globals.css";
 
@@ -18,11 +19,12 @@ export const metadata: Metadata = {
     "Visualizing the open-source sustainability ecosystem. Insights into project health, community engagement, and technological trends in climate-tech.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const snapshot = await loadSnapshot();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -63,7 +65,7 @@ export default function RootLayout({
         <div className="site-content">
           {children}
         </div>
-        <SiteFooter />
+        <SiteFooter snapshot={snapshot} />
       </body>
     </html>
   );

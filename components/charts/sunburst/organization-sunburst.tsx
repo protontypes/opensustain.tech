@@ -32,12 +32,13 @@ import {
   toPngBlob,
   toSvgBlob,
 } from "@/lib/sunburst/export";
-import { ancestors, flatten } from "@/lib/sunburst/tree";
+import { ancestors, flatten, matchesQuery } from "@/lib/sunburst/tree";
 import type { SunburstNode } from "@/lib/sunburst/types";
 
 import { useOrganizationFilters } from "../organization-filters";
 import { ExportMenu } from "../export-menu";
 import { SunburstNodeTooltip } from "./sunburst-node-tooltip";
+import { SunburstSearch } from "./sunburst-search";
 import { SunburstSvg, type SunburstSvgHandle } from "./sunburst-svg";
 
 const MAX_CHART = 1040;
@@ -61,6 +62,7 @@ export function OrganizationSunburst({
   const [error, setError] = useState<string | null>(null);
   const [topN, setTopN] = useState(40);
   const [zoomId, setZoomId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [hover, setHover] = useState<{
     node: SunburstNode | null;
@@ -155,6 +157,18 @@ export function OrganizationSunburst({
     return found && found.visibleLeaves > 0 ? found : tree;
   }, [tree, zoomId, limits]);
 
+  const matches = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (needle.length < 2) return null;
+    const set = new Set<string>();
+    for (const node of allNodes) {
+      if (matchesQuery(node, needle)) {
+        for (const ancestor of ancestors(node)) set.add(ancestor.id);
+      }
+    }
+    return set;
+  }, [allNodes, query]);
+
   const laid: LaidOutNode[] = useMemo(() => {
     if (!focusNode || allNodes.length === 0) return [];
     return layoutAll(allNodes, focusNode, ORG_MAX_RINGS);
@@ -231,6 +245,16 @@ export function OrganizationSunburst({
     setZoomId(null);
     setFocusedIndex(-1);
   }, []);
+
+  const matchCount = useMemo(
+    () =>
+      matches
+        ? allNodes.filter(
+            (node) => node.visibleLeaves > 0 && matches.has(node.id),
+          ).length
+        : 0,
+    [matches, allNodes],
+  );
 
   useEffect(() => {
     const dismiss = () =>
@@ -326,6 +350,11 @@ export function OrganizationSunburst({
         </nav>
 
         <div className="viz-toolbar__controls">
+          <SunburstSearch
+            query={query}
+            onQuery={setQuery}
+            placeholder="Organization or project name"
+          />
           <label className="viz-field viz-field--select">
             <span className="viz-field__label">Show</span>
             <select
@@ -352,10 +381,13 @@ export function OrganizationSunburst({
           <button
             type="button"
             className="viz-button"
-            onClick={zoomOut}
-            disabled={!zoomed}
+            onClick={() => {
+              setQuery("");
+              zoomOut();
+            }}
+            disabled={!zoomed && !query}
           >
-            Reset zoom
+            Reset
           </button>
           <ExportMenu formats={["png", "svg", "csv"]} onExport={handleExport} />
         </div>
@@ -375,7 +407,7 @@ export function OrganizationSunburst({
                   ? categoryColor(focusNode.category, categoryColors)
                   : "var(--viz-centre-root)"
               }
-              matches={null}
+              matches={matches}
               selectedId={null}
               focusedIndex={focusedIndex}
               reducedMotion={reducedMotion}
@@ -434,6 +466,14 @@ export function OrganizationSunburst({
           </p>
 
           {/* The old chart hard-coded a top-80 cut and said nothing about it. */}
+          {matches ? (
+            <p className="viz-chart__note" role="status">
+              {matchCount > 0
+                ? `${formatNumber(matchCount)} match “${query}”.`
+                : `Nothing matches “${query}”. Try a shorter term.`}
+            </p>
+          ) : null}
+
           {limits.matched === 0 ? (
             <p className="viz-chart__note" role="status">
               No organizations match the current filters.

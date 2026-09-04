@@ -219,7 +219,8 @@ p {
   justify-content: center;
   gap: 16px;
   position: relative;
-  padding: 10px 48px;
+  /* 8px offset + a 44px target = 52px to clear on the right. */
+  padding: 10px 56px;
   background: var(--color-banner-bg);
   border-bottom: 1px solid var(--color-border);
 }
@@ -260,14 +261,15 @@ p {
 
 .community-bar__close {
   position: absolute;
-  right: 16px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  /* The glyph stays 14px; the tappable box is the WCAG 2.2 AA minimum. */
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -282,9 +284,15 @@ p {
 }
 
 .header-github {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   font-size: 20px;
   color: var(--color-text-secondary);
-  margin-left: 32px;
+  /* 32px minus the box's own 12px of slack, so the icon does not visibly move. */
+  margin-left: 20px;
   transition: color 0.15s ease;
 }
 
@@ -314,14 +322,19 @@ p {
 
 /* --- Theme Toggle --- */
 .theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 20px;
   color: var(--color-text-secondary);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 4px;
-  margin-left: 32px;
+  padding: 0;
+  margin-left: 20px;
 }
 
 .theme-toggle:hover {
@@ -348,7 +361,6 @@ p {
 }
 
 /* --- Hero Section --- */
-.hero-section,
 .hero {
   padding: 80px 0;
   background: var(--color-bg);
@@ -432,11 +444,6 @@ p {
 /* ============================================================
    Sunburst Chart
    ============================================================ */
-.sunburst-chart {
-  border-radius: 16px;
-  overflow: hidden;
-}
-
 /* ============================================================
    Panels
    ============================================================ */
@@ -455,8 +462,7 @@ p {
  * to every panel it made whole charts jump as the mouse crossed them, and
  * promised a click that most of them do not have.
  */
-a.panel:hover,
-.panel--interactive:hover {
+a.panel:hover {
   transform: translateY(-4px);
   border-color: rgba(37, 99, 235, 0.25);
   box-shadow: 0 18px 44px rgba(16, 22, 32, 0.10);
@@ -485,46 +491,9 @@ a.panel:hover,
    theme, so the ink on it must not either. Keying it to --color-black flipped
    the text to near-white in dark mode: 1.33:1 against #47f6ad. */
 .hero-badges span,
-.category-chip {
-  display: inline-block;
-  background: var(--color-green);
-  color: #101620;
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-family: var(--font-heading);
-  letter-spacing: 0.1em;
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
-}
-
 /* ============================================================
    Route Links (Button-like)
    ============================================================ */
-.route-links a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 14px 28px;
-  border-radius: 0;
-  border: 1px solid var(--color-black);
-  background: transparent;
-  color: var(--color-black);
-  transition: all 0.15s ease;
-}
-
-.route-links a:hover {
-  background: var(--color-black);
-  color: #fff;
-}
-
 /* ============================================================
    Inline Links
    ============================================================ */
@@ -554,78 +523,32 @@ a.panel:hover,
    Leader List (Rankings)
    ============================================================ */
 
-.leader-rank {
-  color: var(--color-link);
-  font-family: var(--font-heading);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-}
-
-.leader-meta {
-  color: var(--color-text-secondary);
-}
-
 /* ============================================================
    Assessment List (Green Bullets)
    ============================================================ */
-.plain-list {
-  list-style: none;
-  padding: 0;
-}
-
-.plain-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 12px;
-  font-family: var(--font-body);
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--color-text);
-}
-
-.plain-list li::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-green);
-  box-shadow: 0 0 0 4px rgba(71, 246, 173, 0.12);
-  flex-shrink: 0;
-  margin-top: 6px;
-}
-
 /* ============================================================
    Mini Heading
    ============================================================ */
-.mini-heading {
-  font-family: var(--font-heading);
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-link);
-  margin: 0 0 16px;
-}
-
 /* ============================================================
    Wordcloud
    ============================================================ */
+/*
+ * A remote PNG with a solid white background baked in, so in dark mode it is a
+ * white slab. It is generated upstream by the osta repository and is not ours
+ * to re-render, so it gets a light plate to sit on in both themes — the same
+ * treatment a photograph would get — rather than being inverted, which would
+ * turn the word colours into their complements.
+ */
 .wordcloud-image {
   border-radius: 16px;
   border: 1px solid var(--color-border);
+  background: #ffffff;
+  padding: 12px;
 }
 
 /* ============================================================
    Grids & Layout Utilities
    ============================================================ */
-.page-grid--wide {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-}
-
 /*
  * The page-level organisation filters. Streamlit repeats this pair on each of
  * its four organisation tabs; this page is those four at once, so the bar sits
@@ -670,12 +593,6 @@ a.panel:hover,
  * Named for its widest form, but auto-fit so a panel with two lists fills the
  * row instead of leaving a third column empty.
  */
-.three-column-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
-}
-
 .stack {
   display: flex;
   flex-direction: column;
@@ -753,13 +670,6 @@ a.panel:hover,
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .page-grid--wide {
-    grid-template-columns: 1fr;
-  }
-
-  .three-column-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ============================================================
@@ -770,7 +680,6 @@ a.panel:hover,
     font-size: 40px;
   }
 
-  .hero-section,
   .hero {
     padding: 56px 0;
   }
@@ -1059,7 +968,6 @@ a.panel:hover,
 .viz-field select:focus-visible,
 .viz-field input:focus-visible,
 .viz-button:focus-visible,
-.viz-legend__row:focus-visible,
 .viz-breadcrumb__link:focus-visible,
 .viz-arc:focus-visible,
 .viz-hole__button:focus-visible {
@@ -1600,49 +1508,6 @@ a.panel:hover,
   height: 10px;
   border-radius: 2px;
   flex-shrink: 0;
-}
-
-.viz-legend__row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 7px 0;
-  border: none;
-  border-bottom: 1px solid var(--color-border);
-  background: none;
-  font-family: var(--font-heading);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-text);
-  text-align: left;
-  cursor: pointer;
-}
-
-.viz-legend__row.is-off {
-  color: var(--color-text-secondary);
-}
-
-.viz-legend__row.is-off .viz-swatch {
-  opacity: 0.28;
-}
-
-.viz-legend__row:hover {
-  color: var(--color-link);
-}
-
-.viz-legend__name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.viz-legend__count {
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-text-secondary);
 }
 
 .viz-details__name {

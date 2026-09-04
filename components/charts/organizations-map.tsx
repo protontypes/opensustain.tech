@@ -68,6 +68,7 @@ export function OrganizationsMap() {
     "organizationsOverview",
   );
   const [mapReady, setMapReady] = useState(false);
+  const [width, setWidth] = useState(0);
   const [mapError, setMapError] = useState<string | null>(null);
   const [metric, setMetric] = useState<Metric>("total_projects");
   const tokens = useChartTokens();
@@ -316,8 +317,17 @@ export function OrganizationsMap() {
         </div>
       </div>
 
-      <EChart instanceRef={chartRef}
-          label={`World map: ${METRICS.find((item) => item.id === metric)?.label ?? ""} per country`} option={option} height={560} />
+      {/* The projection is about 2:1, so a fixed 560px left roughly 400px of
+          empty canvas under the map on a phone. */}
+      <EChart
+        instanceRef={chartRef}
+        option={option}
+        onWidth={setWidth}
+        height={
+          width > 0 ? Math.round(Math.max(260, Math.min(560, width * 0.55))) : 560
+        }
+        label={`World map: ${METRICS.find((item) => item.id === metric)?.label ?? ""} per country`}
+      />
 
       {/* Roughly a fifth of the ecosystem has no territory to sit on, so the
           map alone would understate it without saying this. Both counts are

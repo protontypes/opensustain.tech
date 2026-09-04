@@ -189,11 +189,22 @@ p {
 }
 
 .site-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-heading);
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--color-black);
+}
+
+/* The mark is transparent and its two arcs read on both grounds, so it needs
+   no theme treatment. */
+.site-mark__logo {
+  width: 30px;
+  height: 30px;
+  flex: none;
 }
 
 .site-nav {
@@ -654,11 +665,20 @@ a.panel:hover {
 }
 
 .footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-heading);
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #ffffff;
+}
+
+.footer-logo__mark {
+  width: 28px;
+  height: 28px;
+  flex: none;
 }
 
 .footer-copyright {
@@ -727,6 +747,16 @@ a.panel:hover {
      clears the absolutely-positioned close button on the right. */
   .community-bar__message {
     font-size: 13px;
+  }
+
+  .site-mark {
+    font-size: 15px;
+    gap: 8px;
+  }
+
+  .site-mark__logo {
+    width: 26px;
+    height: 26px;
   }
 
   .container,

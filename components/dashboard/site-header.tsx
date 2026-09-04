@@ -59,7 +59,16 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="header-inner">
         <Link className="site-mark" href="/">
-          OPENSUSTAIN ANALYTICS
+          {/* Decorative: the wordmark beside it already names the site, so an
+              alt here would make a screen reader say it twice. */}
+          <img
+            className="site-mark__logo"
+            src="/images/logo.png"
+            alt=""
+            width={200}
+            height={200}
+          />
+          <span className="site-mark__word">OPENSUSTAIN ANALYTICS</span>
         </Link>
 
         <div className="header-right">

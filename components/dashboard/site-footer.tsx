@@ -6,7 +6,16 @@ export function SiteFooter() {
       <div className="container">
         <div className="footer-inner">
           <div className="footer-brand">
-            <span className="footer-logo">OpenSustain Analytics</span>
+            <span className="footer-logo">
+              <img
+                className="footer-logo__mark"
+                src="/images/logo.png"
+                alt=""
+                width={200}
+                height={200}
+              />
+              OpenSustain Analytics
+            </span>
             <p className="footer-copyright">
               © {new Date().getFullYear()} OpenSustain.tech
             </p>

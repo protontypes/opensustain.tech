@@ -43,6 +43,11 @@ type Props = {
   focusedIndex: number;
   /** All three sunbursts share this renderer, so each names itself. */
   label: string;
+  /**
+   * True where a plain click selects a leaf rather than opening it. Only the
+   * ecosystem chart has a selection panel.
+   */
+  selectsOnClick?: boolean;
   reducedMotion: boolean;
   handleRef: RefObject<SunburstSvgHandle | null>;
   onHover: (node: SunburstNode | null, x: number, y: number) => void;
@@ -60,6 +65,7 @@ export function SunburstSvg({
   selectedId,
   focusedIndex,
   label,
+  selectsOnClick = false,
   reducedMotion,
   handleRef,
   onHover,
@@ -306,11 +312,15 @@ export function SunburstSvg({
       // Only leaves open a repo. Without this, double-clicking a branch zoomed
       // on the first click and then opened whatever project had landed under
       // the cursor in the new layout.
-      if (node.kind === "project" && laid[index].visible) {
+      //
+      // `selectsOnClick` is false in the two organisation charts, where a
+      // single click already opens the repository — activating again here
+      // opened it a second and third time for one double-click.
+      if (selectsOnClick && node.kind === "project" && laid[index].visible) {
         onActivate(node, true);
       }
     },
-    [resolve, laid, onActivate],
+    [resolve, laid, onActivate, selectsOnClick],
   );
 
   const handleKeyDown = useCallback(
@@ -462,5 +472,8 @@ function ariaLabelFor(node: SunburstNode): string {
       : node.kind === "organization"
         ? "organization"
         : "sub-category";
-  return `${node.name}, ${kind}, ${node.visibleLeaves} projects`;
+  const noun = node.detail?.leafNoun ?? "project";
+  return `${node.name}, ${kind}, ${node.visibleLeaves} ${noun}${
+    node.visibleLeaves === 1 ? "" : "s"
+  }`;
 }

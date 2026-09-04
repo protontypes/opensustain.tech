@@ -75,7 +75,8 @@ export function buildOrganizationTree(
         detail: {
           url: project.url,
           subtitle: `${project.category} › ${project.sub_category}`,
-          hint: "Click to select · ⌘/Ctrl-click to open the repository",
+          // This chart has no selection state — a plain click opens the repo.
+          hint: "Click to open the repository",
           stats: [
             {
               label: "Total Score (All Metrics)",

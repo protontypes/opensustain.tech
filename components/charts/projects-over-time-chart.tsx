@@ -76,6 +76,11 @@ export function ProjectsOverTimeChart({
       : payload.records.filter((record) => record.category === category);
   }, [payload, category]);
 
+  // The last ECharts chart on a fixed gutter: 210px of a 360px phone.
+  const [width, setWidth] = useState(0);
+  const gutter =
+    width > 0 ? Math.max(72, Math.min(210, width * 0.34)) : 210;
+
   const { chartRef, onExport } = useChartExport(
     "projects-over-time",
     () => ({
@@ -119,7 +124,7 @@ export function ProjectsOverTimeChart({
         pageTextStyle: { color: tokens.muted },
         inactiveColor: tokens.muted,
       },
-      grid: { left: 210, right: 28, top: 64, bottom: 44 },
+      grid: { left: gutter + 16, right: 28, top: 92, bottom: 16 },
       tooltip: {
         ...tooltipChrome(tokens),
         formatter: (params: unknown) => {
@@ -150,6 +155,11 @@ export function ProjectsOverTimeChart({
       },
       xAxis: {
         type: "value",
+        // The chart is ~1,700px tall with all 81 sub-categories, so an axis at
+        // the bottom is off-screen for most of the scroll and a bubble's
+        // horizontal position becomes unreadable. Streamlit moved it up for the
+        // same reason (tabs/projects_over_time_tab.py:137).
+        position: "top",
         name: "Project age (years)",
         nameLocation: "middle",
         nameGap: 30,
@@ -161,7 +171,11 @@ export function ProjectsOverTimeChart({
       yAxis: {
         type: "category",
         data: subCategories,
-        axisLabel: { width: 180, overflow: "truncate", color: tokens.ink },
+        axisLabel: {
+          width: Math.max(56, gutter - 8),
+          overflow: "truncate",
+          color: tokens.ink,
+        },
         axisLine: { lineStyle: { color: tokens.border } },
         axisTick: { show: false },
         splitLine: { show: true, lineStyle: { color: tokens.grid } },
@@ -183,7 +197,7 @@ export function ProjectsOverTimeChart({
           })),
       })),
     };
-  }, [records, palette, sizeMetric, tokens, payload]);
+  }, [records, palette, sizeMetric, tokens, payload, gutter]);
 
   if (error) {
     return (
@@ -241,6 +255,7 @@ export function ProjectsOverTimeChart({
         </div>
       ) : (
         <EChart
+          onWidth={setWidth}
           instanceRef={chartRef}
           label={`Scatter chart: ${records.length} projects by age and sub-category`}
           option={option}

@@ -51,6 +51,12 @@ function useFilteredOrganizations(): {
   return { records, data, error };
 }
 
+/** "A", "A and B", "A, B or C" — for a list inside a sentence. */
+function listSentence(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
 /** Counts by key, descending, as every chart here wants them. */
 function tally<T>(
   records: T[],
@@ -188,6 +194,10 @@ export function TopCountriesChart() {
     [filters.index],
   );
 
+  const shownNonCountries = rows
+    .filter((row) => nonCountries.has(row.key))
+    .map((row) => row.label);
+
   return (
     <Frame error={error} data={data}>
       <div className="viz-root">
@@ -211,12 +221,12 @@ export function TopCountriesChart() {
           labelColumn="country"
           exportParts={[`top-${topN}`, filters.country, filters.type]}
         />
-        {/* Only worth saying when one of those buckets is actually present —
-            a filter can remove them. */}
-        {rows.some((row) => nonCountries.has(row.key)) ? (
+        {/* Built from the rows on screen: the payload has three of these
+            buckets, the sentence named two, and a filter can remove any. */}
+        {shownNonCountries.length > 0 ? (
           <p className="viz-chart__note">
-            Includes Global and European Union, which organizations record in
-            place of a country.
+            Includes {listSentence(shownNonCountries)}, which organizations
+            record in place of a country.
           </p>
         ) : null}
       </div>

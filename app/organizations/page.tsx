@@ -51,7 +51,7 @@ export default async function OrganizationsPage() {
         <Panel
           className="panel--viz"
           title="Projects by Organization"
-          description="Organizations with two or more tracked projects. Each wedge takes the color of the ecosystem category that organization works in most, sized by how many projects it maintains. Click one to open its projects."
+          description="Each wedge takes the color of the ecosystem category that organization works in most, sized by how many projects it maintains. Click one to open its projects."
         >
           <OrganizationSunburst categoryColors={filters.category_colors} />
         </Panel>

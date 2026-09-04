@@ -60,6 +60,11 @@ export type SunburstNode = {
     liveCountLabel?: string;
     /** Footer line: what a click here will do. */
     hint?: string;
+    /**
+     * What this node's leaves ARE, for the screen-reader label. The
+     * sub-category chart's leaves are organisations, not projects.
+     */
+    leafNoun?: string;
   };
   children: SunburstNode[];
   parent: SunburstNode | null;

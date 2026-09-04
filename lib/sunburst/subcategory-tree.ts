@@ -73,6 +73,7 @@ export function buildSubcategoryTree(
       detail: {
         subtitle: category ? `Sub-category · ${category}` : "Sub-category",
         liveCountLabel: "Organizations",
+        leafNoun: "organization",
         hint: "Click to see its organizations",
       },
     };
@@ -97,6 +98,7 @@ export function buildSubcategoryTree(
         detail: {
           url: org.organization_url || undefined,
           subtitle: `Organization · ${record.sub_category}`,
+          leafNoun: "organization",
           country,
           orgType: type,
           stats: [

@@ -11,7 +11,7 @@ import {
 
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
 import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
-import { pluralize } from "@/lib/format";
+import { formatNumber, pluralize } from "@/lib/format";
 import { useElementSize } from "@/lib/hooks/use-element-size";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 import { useTheme } from "@/lib/hooks/use-theme";
@@ -44,8 +44,10 @@ const MAX_CHART = 1040;
 /** One ring at a time: organizations, then that organization's projects. */
 const ORG_MAX_RINGS = 1;
 // Median org has 2 projects, so a high cap turns the ring into unlabelled
-// slivers. 40 keeps every wedge nameable; the rest are one select away.
-const TOP_N_CHOICES = [20, 40, 80, 150, 276];
+// slivers. 40 keeps every wedge nameable; the rest are one select away. The
+// full set is appended from the payload — 276 was hardcoded here, so the day
+// the bot's count rose the remaining organisations became unreachable.
+const TOP_N_CHOICES = [20, 40, 80, 150];
 const ROOT_HINT = "Click an organization to see its projects";
 
 export function OrganizationSunburst({
@@ -145,8 +147,13 @@ export function OrganizationSunburst({
   const focusNode = useMemo(() => {
     if (!tree) return null;
     if (!zoomId) return tree;
-    return tree.children.find((child) => child.id === zoomId) ?? tree;
-  }, [tree, zoomId]);
+    // A filter can empty the organisation you had zoomed into. Falling back
+    // only when the id is missing left the chart focused on a node with
+    // nothing under it, and `limits` has to be a dependency because
+    // limitOrganizations mutates the tree in place.
+    const found = tree.children.find((child) => child.id === zoomId);
+    return found && found.visibleLeaves > 0 ? found : tree;
+  }, [tree, zoomId, limits]);
 
   const laid: LaidOutNode[] = useMemo(() => {
     if (!focusNode || allNodes.length === 0) return [];
@@ -328,10 +335,15 @@ export function OrganizationSunburst({
                 setZoomId(null);
               }}
             >
-              {TOP_N_CHOICES.map((choice) => (
+              {[
+                ...TOP_N_CHOICES.filter(
+                  (choice) => choice < payload.root.children.length,
+                ),
+                payload.root.children.length,
+              ].map((choice) => (
                 <option key={choice} value={choice}>
-                  {choice >= (payload.root.children.length ?? 0)
-                    ? `All ${payload.root.children.length} organizations`
+                  {choice >= payload.root.children.length
+                    ? `All ${formatNumber(payload.root.children.length)} organizations`
                     : `Top ${choice} organizations`}
                 </option>
               ))}
@@ -413,6 +425,13 @@ export function OrganizationSunburst({
           </div>
 
           {caption ? <p className="viz-chart__caption">{caption}</p> : null}
+
+          {/* The threshold was prose in the panel description, where the
+              payload that states it is not in scope. */}
+          <p className="viz-chart__note">
+            Organizations with {formatNumber(payload.minimum_project_count)} or
+            more tracked projects.
+          </p>
 
           {/* The old chart hard-coded a top-80 cut and said nothing about it. */}
           {limits.matched === 0 ? (

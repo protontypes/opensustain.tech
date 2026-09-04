@@ -147,7 +147,7 @@ export function ProjectRankingsChart({
       yAxis: {
         type: "category",
         data: ordered.map((record) => record.name),
-        axisLabel: { width: 180, overflow: "truncate", color: tokens.ink },
+        axisLabel: { width: Math.max(56, gutter - 8), overflow: "truncate", color: tokens.ink },
         axisLine: { lineStyle: { color: tokens.border } },
         axisTick: { show: false },
       },

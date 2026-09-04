@@ -165,8 +165,11 @@ export function HorizontalBarChart({
         label={label}
         onWidth={setWidth}
         // The floor only has to keep a one- or two-row chart from collapsing;
-        // 260 left a two-bar chart with 90px between its bars.
-        height={Math.max(150, data.length * rowHeight + 64)}
+        // 260 left a two-bar chart with 90px between its bars. The ceiling is
+        // the browser's: "All 1,274 organizations" asked for 33,188px, past
+        // Firefox's 32,767px canvas limit and past Chrome's at dpr 2, so the
+        // allocation failed and the panel painted nothing at all.
+        height={Math.max(150, Math.min(12000, data.length * rowHeight + 64))}
         onClick={(params) => {
           const datum = (params.data as { datum?: BarDatum } | undefined)?.datum;
           if (!datum) return;

@@ -175,10 +175,15 @@ export function EcosystemSunburst() {
 
   const matchCount = useMemo(() => {
     if (!matches) return 0;
+    // `visible` is about arcs, not data. The chart draws two rings at a time,
+    // so at the root — the home page's default view — every project is parked
+    // off-ring and this counted zero on every search, while the ring was in
+    // fact correctly dimmed to the matches. `visibleLeaves` keeps the count in
+    // step with the activity filter and the legend instead.
     return laid.filter(
       (item) =>
-        item.visible &&
         item.node.kind === "project" &&
+        item.node.visibleLeaves > 0 &&
         matches.has(item.node.id),
     ).length;
   }, [matches, laid]);
@@ -392,7 +397,9 @@ export function EcosystemSunburst() {
     "--viz-hole-d": `${fit.diameter}px`,
   } as CSSProperties;
   const rootMeta = `${pluralize(focusNode.visibleLeaves, "project")} · ${pluralize(
-    focusNode.children.length,
+    // The raw child array ignores the legend's isolation, so this kept saying
+    // "13 categories" with one category showing.
+    focusNode.children.filter((child) => child.visibleLeaves > 0).length,
     "category",
     "categories",
   )}`;
@@ -433,6 +440,7 @@ export function EcosystemSunburst() {
               laid={laid}
               size={size}
               zoomDepth={focusNode.depth}
+              selectsOnClick
               label={"Sunburst: the open source sustainability ecosystem, by category and sub-category"}
               fills={fills}
               centreFill={

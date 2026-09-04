@@ -33,6 +33,9 @@ export type OrganizationFilters = {
   ) => boolean;
 };
 
+/** Matches the label the types chart draws for organisations with no type. */
+const UNKNOWN_TYPE = "unknown";
+
 const EMPTY: OrganizationFilters = {
   country: "",
   type: "",
@@ -77,8 +80,11 @@ export function OrganizationFiltersProvider({
   const types = useMemo(() => {
     const counts = new Map<string, number>();
     for (const record of data?.organizations_by_project_count ?? []) {
-      const key = normalizeType(record.form_of_organization);
-      if (key) counts.set(key, (counts.get(key) ?? 0) + 1);
+      // The types chart draws an "Unknown" bar for the 101 organisations with
+      // no type recorded; skipping the empty key here made that bar the one
+      // thing on the page the filter could not reach.
+      const key = normalizeType(record.form_of_organization) || UNKNOWN_TYPE;
+      counts.set(key, (counts.get(key) ?? 0) + 1);
     }
     return [...counts.entries()]
       .map(([value, count]) => ({ value, label: titleCase(value), count }))
@@ -102,7 +108,7 @@ export function OrganizationFiltersProvider({
       index,
       matches: (rawCountry, rawType) => {
         if (country && index?.resolve(rawCountry) !== country) return false;
-        if (type && normalizeType(rawType) !== type) return false;
+        if (type && (normalizeType(rawType) || UNKNOWN_TYPE) !== type) return false;
         return true;
       },
     };

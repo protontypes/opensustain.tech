@@ -21,17 +21,20 @@ export function TopNField({
   max: number;
   noun: string;
 }) {
-  const options = [...CHOICES.filter((choice) => choice < max), max];
-  // A caller's default can sit above every option — a top-25 default against
-  // 24 licenses — and a <select> whose value matches nothing falls back to its
-  // first option, so the control read "Top 10" while all 24 were drawn.
-  const selected = options.includes(value) ? value : max;
+  // A caller's default need not be one of these choices — it can sit above
+  // every one of them (25 against 24 licenses) or between two of them (30
+  // against [10, 25, 50, …]). A <select> whose value matches no option silently
+  // shows its first, so the control read "Top 10" while 24 rows were drawn, and
+  // "All 300 keywords" while 30 were. Fold the value in rather than drop it.
+  const options = [
+    ...new Set([...CHOICES.filter((choice) => choice < max), Math.min(value, max), max]),
+  ].sort((a, b) => a - b);
 
   return (
     <label className="viz-field viz-field--select">
       <span className="viz-field__label">Show</span>
       <select
-        value={selected}
+        value={Math.min(value, max)}
         onChange={(event) => onChange(Number(event.target.value))}
       >
         {options.map((choice) => (

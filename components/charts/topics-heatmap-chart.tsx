@@ -185,7 +185,9 @@ export function TopicsHeatmapChart({
           <TopNField
             value={topN}
             onChange={setTopN}
-            max={payload?.topics.length ?? 0}
+            // Without the fallback this read "All 0 topics" for the whole
+            // 820 KB load, since the toolbar renders above the loading guard.
+            max={payload?.topics.length ?? topN}
             noun="topics"
           />
           <ExportMenu onExport={onExport} />

@@ -16,7 +16,12 @@ import { analyticsPayloadUrl } from "@/lib/data/contracts";
 import { formatNumber, pluralize } from "@/lib/format";
 import type { RankingMetricId } from "@/lib/types";
 import { categoryColor, computeBins, fillFor } from "@/lib/sunburst/color";
-import { holeFit, layoutAll, type LaidOutNode } from "@/lib/sunburst/geometry";
+import {
+  holeFit,
+  layoutAll,
+  MAX_RINGS,
+  type LaidOutNode,
+} from "@/lib/sunburst/geometry";
 import {
   applyFilters,
   ancestors,
@@ -133,8 +138,17 @@ export function EcosystemSunburst() {
 
   const laid: LaidOutNode[] = useMemo(() => {
     if (!focusNode || allNodes.length === 0) return [];
-    return layoutAll(allNodes, focusNode);
-  }, [allNodes, focusNode, view.activity, view.isolated]);
+    // Re-order the ring on the selected metric. The payload is pre-sorted by
+    // total_score_combined, so without this the ring read high-to-low for the
+    // default metric only, and picking Stars recoloured it without resequencing.
+    // Branches keep their payload order; only leaves carry a metric.
+    return layoutAll(allNodes, focusNode, MAX_RINGS, (a, b) => {
+      if (a.kind !== "project" || b.kind !== "project") return 0;
+      return (
+        (metricValue(b, view.metric) ?? 0) - (metricValue(a, view.metric) ?? 0)
+      );
+    });
+  }, [allNodes, focusNode, view.activity, view.isolated, view.metric]);
 
   const bins = useMemo(() => {
     if (!filtered) return computeBins([]);

@@ -176,6 +176,14 @@ export function layoutAll(
   allNodes: SunburstNode[],
   focus: SunburstNode,
   maxRings: number = MAX_RINGS,
+  /**
+   * Orders siblings within each wedge. The payload is pre-sorted by
+   * `total_score_combined`, so without this the ring reads high-to-low only for
+   * that one metric — selecting Stars or Citations recoloured the arcs but left
+   * the sequence alone. Applied only where angles are assigned, so the returned
+   * array stays index-aligned with `allNodes` and the tween's path refs survive.
+   */
+  compare?: (a: SunburstNode, b: SunburstNode) => number,
 ): LaidOutNode[] {
   const bands = bandsForFocus(focus, maxRings);
   const rimY = bands[bands.length - 1].y1;
@@ -187,11 +195,14 @@ export function layoutAll(
   if (total > 0) {
     // Angles are assigned to the whole subtree, not just the visible rings, so a
     // project keeps its bearing while it waits collapsed at the rim.
+    const ordered = (node: SunburstNode) =>
+      compare ? [...node.children].sort(compare) : node.children;
+
     const assign = (node: SunburstNode, x0: number, x1: number) => {
       angles.set(node.id, [x0, x1]);
       const span = x1 - x0;
       let cursor = x0;
-      for (const child of node.children) {
+      for (const child of ordered(node)) {
         if (child.visibleLeaves <= 0) continue;
         const width = (child.visibleLeaves / node.visibleLeaves) * span;
         assign(child, cursor, cursor + width);
@@ -199,7 +210,7 @@ export function layoutAll(
       }
     };
     let cursor = 0;
-    for (const child of focus.children) {
+    for (const child of ordered(focus)) {
       if (child.visibleLeaves <= 0) continue;
       const width = (child.visibleLeaves / total) * TAU;
       assign(child, cursor, cursor + width);

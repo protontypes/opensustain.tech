@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunburst";
+import { Avatar } from "@/components/ui/avatar";
 import { MetricCard, MetricStat } from "@/components/ui/metric-card";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -143,6 +144,8 @@ export default async function HomePage() {
                     <p className="leader-item__rank">
                       {String(index + 1).padStart(2, "0")}
                     </p>
+                    {/* Populated on 2,571 of 2,691 records and drawn nowhere. */}
+                    <Avatar src={project.avatar_url} />
                     <a
                       href={project.url}
                       target="_blank"

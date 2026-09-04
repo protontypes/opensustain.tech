@@ -604,6 +604,14 @@ a.panel:hover {
   color: var(--color-text-secondary);
 }
 
+.avatar {
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+}
+
 /* A metric's definition, above the chart that ranks by it. */
 .viz-chart__help {
   font-family: var(--font-body);
@@ -2052,8 +2060,18 @@ a.panel:hover {
   margin-top: 2px;
 }
 
+/* Rank, logo and name on one line; the meta and stats wrap under them. */
 .leader-item__body {
   min-width: 0;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.leader-item__body .leader-item__meta,
+.leader-item__body .leader-item__stats {
+  grid-column: 1 / -1;
 }
 
 .leader-item__stats {

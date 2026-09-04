@@ -29,6 +29,8 @@ export type BarDatum = {
   label: string;
   value: number;
   subtitle?: string;
+  /** A description from the source data, shown as prose in the tooltip. */
+  body?: string;
   /** Extra tooltip rows beyond the value itself. */
   rows?: TooltipRow[];
   /** Opens in a new tab on click. */
@@ -248,6 +250,7 @@ function buildOption(
         return buildTooltip(tokens, {
           title: datum.label,
           subtitle: datum.subtitle,
+          body: datum.body,
           rows: [
             { label: valueLabel, value: formatNumber(datum.value), strong: true },
             ...(datum.rows ?? []),

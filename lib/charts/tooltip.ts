@@ -30,17 +30,22 @@ export function buildTooltip(
   {
     title,
     subtitle,
+    body,
     rows,
     note,
   }: {
     title: string;
     subtitle?: string;
+    /** A description from the source CSV — set as text, never as markup. */
+    body?: string;
     rows?: TooltipRow[];
     note?: string;
   },
 ): HTMLElement {
   const root = document.createElement("div");
-  root.style.cssText = `font-family:var(--font-heading);max-width:300px;color:${tokens.ink}`;
+  // ECharts sets `white-space: nowrap` on the container it puts this in, so
+  // prose has to opt back out or it runs off the right edge of the box.
+  root.style.cssText = `font-family:var(--font-heading);max-width:300px;white-space:normal;color:${tokens.ink}`;
 
   const heading = document.createElement("p");
   heading.textContent = title;
@@ -52,6 +57,14 @@ export function buildTooltip(
     sub.textContent = subtitle;
     sub.style.cssText = `margin:3px 0 0;font-size:12px;font-weight:500;color:${tokens.muted}`;
     root.appendChild(sub);
+  }
+
+  if (body) {
+    const prose = document.createElement("p");
+    // textContent, not innerHTML: this is third-party CSV.
+    prose.textContent = body.length > 220 ? `${body.slice(0, 219)}…` : body;
+    prose.style.cssText = `margin:8px 0 0;font-family:var(--font-body);font-size:12px;line-height:1.5;white-space:normal;color:${tokens.ink}`;
+    root.appendChild(prose);
   }
 
   if (rows?.length) {

@@ -115,6 +115,7 @@ export function TopOrganizationsChart() {
         subtitle: [record.location_country, titleCase(record.form_of_organization)]
           .filter(Boolean)
           .join(" · "),
+        body: record.organization_description || undefined,
         href: record.organization_url || undefined,
       })),
     [records, topN],

@@ -148,22 +148,14 @@ export function ProjectRankingsChart({
           return buildTooltip(tokens, {
             title: record.name,
             subtitle: `${record.category} › ${record.sub_category}`,
-            rows: [
-              {
-                label: payload?.metric_labels[metric] ?? metric,
-                value: formatMetric(metric, metricValue(record, metric)),
-                strong: true,
-              },
-              { label: "Stars", value: formatCompactNumber(record.stars) },
-              {
-                label: "Contributors",
-                value: formatNumber(record.contributors),
-              },
-              {
-                label: "Commits",
-                value: formatCompactNumber(record.total_commits),
-              },
-            ],
+            body: record.description || undefined,
+            // All nine, as the reference does — four of them were unreachable
+            // anywhere on this route while sitting on the fetched record.
+            rows: METRIC_ORDER.map((id) => ({
+              label: payload?.metric_labels[id] ?? id,
+              value: formatMetric(id, metricValue(record, id)),
+              strong: id === metric,
+            })),
             note: "Click to open the repository",
           });
         },

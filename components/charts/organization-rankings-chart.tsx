@@ -185,6 +185,7 @@ export function OrganizationRankingsChart({
           return buildTooltip(tokens, {
             title: record.organization_name,
             subtitle: dominantCategory(record) || undefined,
+            body: record.organization_description || undefined,
             rows,
             note: "Click to open the organization",
           });

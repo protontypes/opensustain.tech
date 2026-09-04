@@ -152,6 +152,7 @@ export function ProjectsOverTimeChart({
           return buildTooltip(tokens, {
             title: record.name,
             subtitle: `${record.category} › ${record.sub_category}`,
+            body: record.description || undefined,
             rows: [
               {
                 label: "Age",

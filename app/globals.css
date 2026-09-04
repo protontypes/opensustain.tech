@@ -24,6 +24,11 @@
    * This one lightens instead: 8.6:1 on white, 6.8:1 on the dark page.
    */
   --color-link: #2563eb;
+  /*
+   * The wordmark's own blue — lighter and less indigo than --color-primary,
+   * matching the OpenSustain.tech lockup. 4.54:1 on the light header.
+   */
+  --color-wordmark: #1878cf;
   --color-footer-bg: #101620;
   --font-heading: 'Space Grotesk', system-ui, sans-serif;
   --font-body: 'Georgia', serif;
@@ -44,6 +49,7 @@
   --color-header-bg: rgba(11, 15, 25, 0.9);
   --color-banner-bg: #131b2e;
   --color-link: #60a5fa;
+  --color-wordmark: #4d8ff0;
   --color-footer-bg: #0b0f19;
 }
 
@@ -193,17 +199,17 @@ p {
   align-items: center;
   gap: 10px;
   font-family: var(--font-heading);
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--color-black);
+  color: var(--color-wordmark);
 }
 
 /* The mark is transparent and its two arcs read on both grounds, so it needs
    no theme treatment. */
 .site-mark__logo {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   flex: none;
 }
 
@@ -669,15 +675,16 @@ a.panel:hover {
   align-items: center;
   gap: 10px;
   font-family: var(--font-heading);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  /* The footer ground is dark in both themes, so this ink is fixed. 5.62:1. */
+  color: #4d8ff0;
 }
 
 .footer-logo__mark {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   flex: none;
 }
 
@@ -750,13 +757,13 @@ a.panel:hover {
   }
 
   .site-mark {
-    font-size: 15px;
+    font-size: 17px;
     gap: 8px;
   }
 
   .site-mark__logo {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
   }
 
   .container,

@@ -14,7 +14,7 @@ export function SiteFooter() {
                 width={200}
                 height={200}
               />
-              OpenSustain Analytics
+              OpenSustain.Analytics
             </span>
             <p className="footer-copyright">
               © {new Date().getFullYear()} OpenSustain.tech

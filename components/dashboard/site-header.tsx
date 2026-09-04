@@ -68,7 +68,7 @@ export function SiteHeader() {
             width={200}
             height={200}
           />
-          <span className="site-mark__word">OPENSUSTAIN ANALYTICS</span>
+          <span className="site-mark__word">OpenSustain.Analytics</span>
         </Link>
 
         <div className="header-right">

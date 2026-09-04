@@ -1,8 +1,16 @@
+import type { Metadata } from "next";
+
 import { KeywordCountsChart } from "@/components/charts/keyword-counts-chart";
 import { TopicsHeatmapChart } from "@/components/charts/topics-heatmap-chart";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { loadKeywordCounts, loadWordcloud } from "@/lib/data";
+
+export const metadata: Metadata = {
+  title: "Topics",
+  description:
+    "Which topics and keywords recur across the READMEs of open-source climate and sustainability projects, and how they map onto the ecosystem's sub-categories.",
+};
 
 export default async function TopicsPage() {
   // topics-heatmap is ~820 KB; the chart fetches it from /data instead of

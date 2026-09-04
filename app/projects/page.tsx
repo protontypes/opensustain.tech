@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import {
   CodeOfConductChart,
   CommitActivityChart,
@@ -12,6 +14,12 @@ import { ProjectsOverTimeChart } from "@/components/charts/projects-over-time-ch
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { loadFilters } from "@/lib/data";
+
+export const metadata: Metadata = {
+  title: "Projects",
+  description:
+    "Rank 2,691 open-source climate and sustainability projects by nine metrics, track how the ecosystem has grown, and see the licences, languages and registries behind them.",
+};
 
 export default async function ProjectsPage() {
   // Every payload this page draws is fetched client-side by the chart that

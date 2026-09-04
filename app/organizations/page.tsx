@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { OrganizationFiltersProvider } from "@/components/charts/organization-filters";
 import { OrganizationRankingsChart } from "@/components/charts/organization-rankings-chart";
 import {
@@ -12,6 +14,12 @@ import { SubcategorySunburst } from "@/components/charts/sunburst/subcategory-su
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { loadFilters } from "@/lib/data";
+
+export const metadata: Metadata = {
+  title: "Organizations",
+  description:
+    "The 1,274 organizations building open-source climate tech: where they are, what kind they are, which sub-categories they work in, and what they maintain.",
+};
 
 export default async function OrganizationsPage() {
   // Every payload on this page is fetched client-side by the chart that needs

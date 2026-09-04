@@ -8,7 +8,12 @@ import { SiteFooter } from "@/components/dashboard/site-footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OpenSustain Analytics",
+  // Every route shared one title, so four different pages were indistinguishable
+  // in a tab strip, in browser history and in a shared link.
+  title: {
+    default: "OpenSustain Analytics",
+    template: "%s · OpenSustain Analytics",
+  },
   description:
     "Visualizing the open-source sustainability ecosystem. Insights into project health, community engagement, and technological trends in climate-tech.",
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EChartsOption } from "echarts";
 
@@ -21,6 +21,7 @@ import type {
 import { metricCoverage } from "@/lib/charts/coverage";
 import { METRIC_HELP } from "@/lib/charts/metric-help";
 import { useChartExport } from "@/lib/charts/use-chart-export";
+import { param, useUrlState } from "@/lib/hooks/use-url-state";
 
 import { EChart } from "./echart";
 import { ExportMenu } from "./export-menu";
@@ -54,6 +55,54 @@ export function ProjectRankingsChart({
   const [topN, setTopN] = useState(25);
   // Seeded from the payload once it lands, since these fetch client-side.
   const seeded = useRef(false);
+  const { params, write } = useUrlState();
+
+  /** Sets a control and records it in the address bar, dropping defaults. */
+  const setAndRecord = useCallback(
+    (patch: {
+      rank?: RankingMetricId;
+      cat?: string;
+      top?: number;
+      active?: boolean;
+    }) => {
+      const url: Record<string, string | null> = {};
+      if (patch.rank !== undefined) {
+        setMetric(patch.rank);
+        url.rank = patch.rank === "total_score_combined" ? null : patch.rank;
+      }
+      if (patch.cat !== undefined) {
+        setCategory(patch.cat);
+        url.cat = patch.cat === "all" ? null : patch.cat;
+      }
+      if (patch.top !== undefined) {
+        seeded.current = true;
+        setTopN(patch.top);
+        url.top = String(patch.top);
+      }
+      if (patch.active !== undefined) {
+        setActiveOnly(patch.active);
+        url.active = patch.active ? null : "0";
+      }
+      write(url);
+    },
+    [write],
+  );
+
+  // The URL wins over the payload default, and over Back/Forward.
+  useEffect(() => {
+    if (!params) return;
+    const rank = params.get("rank");
+    const cat = params.get("cat");
+    const top = Number(params.get("top"));
+    const active = params.get("active");
+    if (rank) setMetric(rank as RankingMetricId);
+    if (cat) setCategory(cat);
+    if (Number.isFinite(top) && top > 0) {
+      seeded.current = true;
+      setTopN(top);
+    }
+    if (active) setActiveOnly(active !== "0");
+  }, [params]);
   const [activeOnly, setActiveOnly] = useState(true);
   const tokens = useChartTokens();
 
@@ -219,14 +268,14 @@ export function ProjectRankingsChart({
             <button
               type="button"
               aria-pressed={!activeOnly}
-              onClick={() => setActiveOnly(false)}
+              onClick={() => setAndRecord({ active: false })}
             >
               All
             </button>
             <button
               type="button"
               aria-pressed={activeOnly}
-              onClick={() => setActiveOnly(true)}
+              onClick={() => setAndRecord({ active: true })}
             >
               Active
             </button>
@@ -237,7 +286,7 @@ export function ProjectRankingsChart({
             <select
               value={metric}
               onChange={(event) =>
-                setMetric(event.target.value as RankingMetricId)
+                setAndRecord({ rank: event.target.value as RankingMetricId })
               }
             >
               {METRIC_ORDER.map((id) => (
@@ -252,7 +301,7 @@ export function ProjectRankingsChart({
             <span className="viz-field__label">Category</span>
             <select
               value={category}
-              onChange={(event) => setCategory(event.target.value)}
+              onChange={(event) => setAndRecord({ cat: event.target.value })}
             >
               <option value="all">All categories</option>
               {categories.map((name) => (
@@ -267,7 +316,9 @@ export function ProjectRankingsChart({
             <span className="viz-field__label">Show</span>
             <select
               value={topN}
-              onChange={(event) => setTopN(Number(event.target.value))}
+              onChange={(event) =>
+                setAndRecord({ top: Number(event.target.value) })
+              }
             >
               {TOP_N_CHOICES.map((choice) => (
                 <option key={choice} value={choice}>

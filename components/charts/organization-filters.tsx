@@ -2,13 +2,16 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 
 import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
+import { useUrlState } from "@/lib/hooks/use-url-state";
 import { formatNumber } from "@/lib/format";
 import type { OrganizationsOverviewPayload } from "@/lib/types";
 import {
@@ -70,6 +73,29 @@ export function OrganizationFiltersProvider({
   );
   const [country, setCountry] = useState("");
   const [type, setType] = useState("");
+  const { params, write } = useUrlState();
+
+  // One bar drives seven charts, so its state is the most worth sharing on
+  // this page — and Back has to undo it.
+  useEffect(() => {
+    if (!params) return;
+    setCountry(params.get("country") ?? "");
+    setType(params.get("type") ?? "");
+  }, [params]);
+
+  const choose = useCallback(
+    (patch: { country?: string; type?: string }) => {
+      if (patch.country !== undefined) setCountry(patch.country);
+      if (patch.type !== undefined) setType(patch.type);
+      write({
+        ...(patch.country !== undefined
+          ? { country: patch.country || null }
+          : {}),
+        ...(patch.type !== undefined ? { type: patch.type || null } : {}),
+      });
+    },
+    [write],
+  );
 
   const index = useMemo(() => {
     if (!data) return null;
@@ -122,7 +148,7 @@ export function OrganizationFiltersProvider({
             <span className="viz-field__label">Country</span>
             <select
               value={country}
-              onChange={(event) => setCountry(event.target.value)}
+              onChange={(event) => choose({ country: event.target.value })}
               disabled={!data}
             >
               <option value="">All countries</option>
@@ -138,7 +164,7 @@ export function OrganizationFiltersProvider({
             <span className="viz-field__label">Organization type</span>
             <select
               value={type}
-              onChange={(event) => setType(event.target.value)}
+              onChange={(event) => choose({ type: event.target.value })}
               disabled={!data}
             >
               <option value="">All types</option>
@@ -153,10 +179,7 @@ export function OrganizationFiltersProvider({
           <button
             type="button"
             className="viz-button"
-            onClick={() => {
-              setCountry("");
-              setType("");
-            }}
+            onClick={() => choose({ country: "", type: "" })}
             disabled={!country && !type}
           >
             Reset

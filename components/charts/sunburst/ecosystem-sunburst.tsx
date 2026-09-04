@@ -11,6 +11,12 @@ import {
 
 import { useElementSize } from "@/lib/hooks/use-element-size";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
+import {
+  listParam,
+  param,
+  useUrlState,
+  type UrlWriteMode,
+} from "@/lib/hooks/use-url-state";
 import { useTheme } from "@/lib/hooks/use-theme";
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
 import { formatNumber, pluralize } from "@/lib/format";
@@ -61,6 +67,33 @@ export function EcosystemSunburst() {
   const [payload, setPayload] = useState<EcosystemSunburstPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<ViewState>(INITIAL_VIEW);
+  const { params, write } = useUrlState();
+
+  // Adopt the URL once it has been read, and again on Back/Forward.
+  useEffect(() => {
+    if (!params) return;
+    setView((current) => {
+      const next: ViewState = {
+        ...current,
+        metric: param(params, "m", INITIAL_VIEW.metric) as RankingMetricId,
+        activity: param(
+          params,
+          "a",
+          INITIAL_VIEW.activity,
+        ) as ViewState["activity"],
+        zoomPath: listParam(params, "z"),
+        isolated: listParam(params, "iso"),
+        query: param(params, "q", ""),
+      };
+      const same =
+        next.metric === current.metric &&
+        next.activity === current.activity &&
+        next.query === current.query &&
+        next.zoomPath.join(",") === current.zoomPath.join(",") &&
+        next.isolated.join(",") === current.isolated.join(",");
+      return same ? current : next;
+    });
+  }, [params]);
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [hover, setHover] = useState<{
     node: SunburstNode | null;
@@ -215,20 +248,49 @@ export function EcosystemSunburst() {
     );
   }, [laid, view.selectedId]);
 
-  const update = useCallback((patch: Partial<ViewState>) => {
-    setView((current) => {
-      // Idempotent: a patch that changes nothing must not produce a new state
-      // object, or any effect keyed on view state re-fires forever.
-      let changed = false;
-      for (const key of Object.keys(patch) as (keyof ViewState)[]) {
-        if (!Object.is(current[key], patch[key])) {
-          changed = true;
-          break;
-        }
-      }
-      return changed ? { ...current, ...patch } : current;
-    });
+  /**
+   * Maps a patch onto query parameters, omitting anything at its default so a
+   * shared link is only as long as the view is unusual. Only the keys the patch
+   * actually touches are written — passing null for the rest would clear the
+   * parameters the patch says nothing about.
+   */
+  const urlPatchFor = useCallback((patch: Partial<ViewState>) => {
+    const out: Record<string, string | null> = {};
+    if ("metric" in patch) {
+      out.m =
+        patch.metric === INITIAL_VIEW.metric ? null : (patch.metric ?? null);
+    }
+    if ("activity" in patch) {
+      out.a =
+        patch.activity === INITIAL_VIEW.activity
+          ? null
+          : (patch.activity ?? null);
+    }
+    if ("zoomPath" in patch) out.z = (patch.zoomPath ?? []).join(",") || null;
+    if ("isolated" in patch) out.iso = (patch.isolated ?? []).join(",") || null;
+    if ("query" in patch) out.q = patch.query || null;
+    return out;
   }, []);
+
+  const update = useCallback(
+    (patch: Partial<ViewState>, mode: UrlWriteMode = "replace") => {
+      const urlPatch = urlPatchFor(patch);
+      if (Object.keys(urlPatch).length > 0) write(urlPatch, mode);
+      setView((current) => {
+        // Idempotent: a patch that changes nothing must not produce a new state
+        // object, or any effect keyed on view state re-fires forever.
+        let changed = false;
+        for (const key of Object.keys(patch) as (keyof ViewState)[]) {
+          if (!Object.is(current[key], patch[key])) {
+            changed = true;
+            break;
+          }
+        }
+        return changed ? { ...current, ...patch } : current;
+      });
+    },
+    [urlPatchFor, write],
+  );
 
   /* Every handler passed to a child is stable. Inline arrows here gave the
      toolbar a fresh onQuery on each render, which restarted its debounce
@@ -265,12 +327,15 @@ export function EcosystemSunburst() {
         update({ selectedId: node.id });
         return;
       }
-      update({
-        zoomPath: ancestors(node)
-          .slice(1)
-          .map((item) => item.id),
-        selectedId: null,
-      });
+      update(
+        {
+          zoomPath: ancestors(node)
+            .slice(1)
+            .map((item) => item.id),
+          selectedId: null,
+        },
+        "push",
+      );
       setFocusedIndex(-1);
     },
     [update],
@@ -325,17 +390,21 @@ export function EcosystemSunburst() {
 
   const handleZoomTo = useCallback(
     (index: number) =>
-      update({
-        zoomPath: trail.slice(1, index + 1).map((item) => item.id),
-        selectedId: null,
-      }),
+      update(
+        {
+          zoomPath: trail.slice(1, index + 1).map((item) => item.id),
+          selectedId: null,
+        },
+        "push",
+      ),
     [update, trail],
   );
 
   const handleReset = useCallback(() => {
+    write({ m: null, a: null, z: null, iso: null, q: null });
     setView(INITIAL_VIEW);
     setFocusedIndex(-1);
-  }, []);
+  }, [write]);
 
   const handleExport = useCallback(
     async (kind: "png" | "svg" | "csv") => {

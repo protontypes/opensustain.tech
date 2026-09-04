@@ -329,12 +329,6 @@ export function EcosystemsChart() {
           labelColumn="ecosystem"
           exportParts={[`top-${topN}`]}
         />
-        <p className="viz-chart__note">
-          Counts are registry entries, not projects: a project can publish to
-          several registries, and the source lists a registry once per package,
-          so these run well above the project total. An empty bucket produced by
-          a trailing comma in the source is excluded.
-        </p>
       </div>
     </Frame>
   );

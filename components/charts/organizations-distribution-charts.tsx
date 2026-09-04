@@ -226,8 +226,9 @@ export function TopCountriesChart() {
             buckets, the sentence named two, and a filter can remove any. */}
         {shownNonCountries.length > 0 ? (
           <p className="viz-chart__note">
-            Includes {listSentence(shownNonCountries)}, which organizations
-            record in place of a country.
+            {listSentence(shownNonCountries)}{" "}
+            {shownNonCountries.length === 1 ? "is a row here" : "are rows here"}
+            , not {shownNonCountries.length === 1 ? "a country" : "countries"}.
           </p>
         ) : null}
       </div>

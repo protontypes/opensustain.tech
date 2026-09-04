@@ -110,6 +110,13 @@ export function EChart({
     });
     resizeObserver.observe(containerRef.current);
 
+    // Measure once here too. getBoundingClientRect forces layout and always
+    // answers, where the observer's first callback is only delivered once the
+    // page renders a frame — so a chart that mounts in a background tab would
+    // otherwise sit on its fallback width indefinitely.
+    const initial = containerRef.current.getBoundingClientRect().width;
+    if (initial) onWidthRef.current?.(initial);
+
     return () => {
       resizeObserver.disconnect();
       chart.dispose();

@@ -9,6 +9,15 @@ type PanelProps = PropsWithChildren<{
    * panel nested inside another section can drop to h3.
    */
   titleAs?: "h2" | "h3";
+  /**
+   * What a reader has to know to read this chart honestly — a caveat, a
+   * coverage limit, a counting rule. Rendered under the chart, where
+   * Datawrapper and Our World in Data both put it, rather than in the
+   * description above it, which is read before the chart makes sense.
+   */
+  notes?: ReactNode;
+  /** Where the numbers came from. */
+  source?: ReactNode;
 }>;
 
 export function Panel({
@@ -16,6 +25,8 @@ export function Panel({
   description,
   className,
   titleAs: Title = "h2",
+  notes,
+  source,
   children,
 }: PanelProps) {
   return (
@@ -27,6 +38,13 @@ export function Panel({
         </header>
       )}
       {children}
+
+      {notes || source ? (
+        <footer className="panel-footer">
+          {notes ? <p className="panel-footer__notes">{notes}</p> : null}
+          {source ? <p className="panel-footer__source">{source}</p> : null}
+        </footer>
+      ) : null}
     </section>
   );
 }

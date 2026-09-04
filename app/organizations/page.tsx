@@ -71,6 +71,7 @@ export default async function OrganizationsPage() {
           className="panel--viz"
           title="Where the Organizations Are"
           description="Every organization behind these projects, by the country it records. Shade the map by projects or by organizations; countries are joined on their ISO 3166-1 alpha-3 code."
+          notes="Projects carry no country of their own — this is the location the organization behind them records, and 102 organizations record none. Singapore is drawn from its own bounding box, which the map's source omits at this scale."
         >
           <OrganizationsMap />
         </Panel>
@@ -85,6 +86,7 @@ export default async function OrganizationsPage() {
         <Panel
           title="Top Countries by Organizations"
           description="How many organizations record each country as their location."
+          notes="Projects carry no country of their own — this is the location the organization behind them records, and 102 organizations record none."
         >
           <TopCountriesChart />
         </Panel>
@@ -93,6 +95,7 @@ export default async function OrganizationsPage() {
           <Panel
             title="Organizations by Continent"
             description="The same organizations, grouped by continent."
+            notes="“Global” is a value organizations record instead of a country, not a continent."
           >
             <ContinentsChart />
           </Panel>
@@ -100,6 +103,7 @@ export default async function OrganizationsPage() {
           <Panel
             title="Organizations by Type"
             description="Academia, community, government and the rest, as each organization describes itself."
+            notes="Self-reported. “Unknown” is the 101 organizations that record no type."
           >
             <OrganizationTypesChart />
           </Panel>

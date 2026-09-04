@@ -604,6 +604,51 @@ a.panel:hover {
   color: var(--color-text-secondary);
 }
 
+/* A metric's definition, above the chart that ranks by it. */
+.viz-chart__help {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  max-width: 80ch;
+  margin-top: 16px;
+}
+
+.viz-chart__help a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Where a chart's caveats and provenance sit — under the chart, not above it. */
+.panel-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  gap: 6px;
+}
+
+.panel-footer__notes,
+.panel-footer__source {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  max-width: 78ch;
+}
+
+.panel-footer__source {
+  font-family: var(--font-heading);
+  font-size: 12px;
+}
+
+.panel-footer a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Scope and provenance under the hero badges. */
 .hero-scope {
   font-family: var(--font-heading);

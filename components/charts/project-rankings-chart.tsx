@@ -18,6 +18,8 @@ import type {
   RankingMetricId,
 } from "@/lib/types";
 
+import { metricCoverage } from "@/lib/charts/coverage";
+import { METRIC_HELP } from "@/lib/charts/metric-help";
 import { useChartExport } from "@/lib/charts/use-chart-export";
 
 import { EChart } from "./echart";
@@ -82,15 +84,29 @@ export function ProjectRankingsChart({
     };
   }, []);
 
-  const top = useMemo(() => {
+  // Sparse metrics were drawn as zero: ranking by citations gave eighteen
+  // empty bars out of twenty-five, which reads as "these projects scored zero"
+  // rather than "these projects do not report this".
+  const eligible = useMemo(() => {
     if (!payload) return [];
     return payload.records
       .filter((record) => (activeOnly ? record.is_active_last_365d : true))
-      .filter((record) => category === "all" || record.category === category)
-      .slice()
+      .filter((record) => category === "all" || record.category === category);
+  }, [payload, activeOnly, category]);
+
+  const coverage = useMemo(
+    () => metricCoverage(eligible, (record) => metricValue(record, metric)),
+    [eligible, metric],
+  );
+
+  const help = METRIC_HELP[metric];
+
+  const top = useMemo(() => {
+    return eligible
+      .filter((record) => metricValue(record, metric) > 0)
       .sort((a, b) => metricValue(b, metric) - metricValue(a, metric))
       .slice(0, topN);
-  }, [payload, metric, category, topN, activeOnly]);
+  }, [eligible, metric, topN]);
 
   // A fixed grid gutter is wider than the whole chart box on a phone.
   const [width, setWidth] = useState(0);
@@ -273,6 +289,30 @@ export function ProjectRankingsChart({
         </div>
       </div>
 
+      {help ? (
+        <p className="viz-chart__help">
+          {help.text}
+          {help.href ? (
+            <>
+              {" "}
+              <a href={help.href} target="_blank" rel="noreferrer">
+                {help.hrefLabel ?? "More"}
+              </a>
+              .
+            </>
+          ) : null}
+        </p>
+      ) : null}
+
+      {/* Only worth saying when the metric is actually sparse. */}
+      {coverage.sparse && coverage.total > 0 ? (
+        <p className="viz-chart__note" role="status">
+          {formatNumber(coverage.covered)} of {formatNumber(coverage.total)}{" "}
+          projects report {payload?.metric_labels[metric] ?? metric}. The rest
+          are left out rather than drawn as zero.
+        </p>
+      ) : null}
+
       {!payload ? (
         <div className="viz-state" aria-busy="true" aria-live="polite">
           <p className="viz-state__label">Loading rankings…</p>
@@ -280,7 +320,11 @@ export function ProjectRankingsChart({
       ) : top.length === 0 ? (
         <div className="viz-state">
           <p className="viz-state__label">
-            No projects match these filters. Try “All” or a different category.
+            {eligible.length > 0
+              ? `None of these ${formatNumber(eligible.length)} projects report ${
+                  payload.metric_labels[metric] ?? metric
+                }.`
+              : "No projects match these filters. Try “All” or a different category."}
           </p>
         </div>
       ) : (

@@ -48,6 +48,7 @@ export default async function ProjectsPage() {
         <Panel
           title="Projects Over Time"
           description="Project age against sub-category, with each bubble sized by the metric you choose and colored by ecosystem category."
+          notes="Age is measured from the first commit, so a repository migrated from elsewhere reads as younger than the work in it. Bubble area is scaled to the largest value currently shown, so it rescales when you change metric or category."
         >
           <ProjectsOverTimeChart
             categoryColors={filters.category_colors}
@@ -88,6 +89,7 @@ export default async function ProjectsPage() {
         <Panel
           title="Licenses"
           description="The license each repository declares, by SPDX identifier."
+          notes="What the hosting platform detected, not a legal review. “Other” covers licences the detector could not match to an SPDX identifier."
         >
           <LicensesChart />
         </Panel>
@@ -95,6 +97,7 @@ export default async function ProjectsPage() {
         <Panel
           title="Package Ecosystems"
           description="The package registries these projects publish to."
+          notes="Counts are registry entries, not projects: the source lists a registry once per package, so a project publishing several packages to PyPI is counted several times. An empty bucket produced by a trailing comma in the source data is excluded."
         >
           <EcosystemsChart />
         </Panel>

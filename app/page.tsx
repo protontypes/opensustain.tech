@@ -69,7 +69,10 @@ export default async function HomePage() {
           {formatNumber(summary.totals.projects)} projects and{" "}
           {formatNumber(summary.totals.organizations)} organizations, from a
           snapshot of{" "}
-          <time dateTime={snapshot.iso}>{snapshot.label}</time>.
+          <time dateTime={snapshot.iso}>{snapshot.label}</time>.{" "}
+          <Link className="inline-link" href="/methodology">
+            How this is measured
+          </Link>
         </p>
       </section>
 

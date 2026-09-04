@@ -44,6 +44,7 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
             <Link href="/projects">Projects</Link>
             <Link href="/organizations">Organizations</Link>
             <Link href="/topics">Topics</Link>
+            <Link href="/methodology">Methodology</Link>
           </nav>
         </div>
       </div>

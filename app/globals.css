@@ -604,6 +604,107 @@ a.panel:hover {
   color: var(--color-text-secondary);
 }
 
+/* ============================================================
+   Methodology
+   ============================================================ */
+.prose {
+  max-width: 72ch;
+}
+
+.prose p {
+  margin-bottom: 16px;
+}
+
+.prose h3 {
+  font-size: 18px;
+  margin: 28px 0 8px;
+}
+
+.prose h3:first-child {
+  margin-top: 0;
+}
+
+.prose a,
+.definition-list a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.definition-list {
+  display: grid;
+  gap: 20px;
+  max-width: 72ch;
+}
+
+.definition-list__item dt {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-link);
+  margin-bottom: 4px;
+}
+
+.definition-list__item dd {
+  margin: 0;
+  font-family: var(--font-body);
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.coverage-list {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.coverage-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 16ch) 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.coverage-list__name {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* A bar, not a chart: no axis to read, only a share to compare down the column. */
+.coverage-list__bar {
+  position: relative;
+  height: 10px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+}
+
+.coverage-list__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--share);
+  background: var(--color-primary);
+}
+
+.coverage-list__value {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--color-black);
+}
+
+.coverage-list__value small {
+  display: block;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
 .avatar {
   border-radius: 50%;
   flex: none;

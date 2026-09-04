@@ -581,6 +581,18 @@ a.panel:hover {
   color: var(--color-text-secondary);
 }
 
+.error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.error-actions .viz-button {
+  text-decoration: none;
+}
+
 /* Two panels side by side; collapses to one column on the same breakpoint. */
 .two-column-grid {
   display: grid;

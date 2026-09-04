@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import type { EChartsOption } from "echarts";
 
@@ -11,7 +11,11 @@ import {
   toCsvBlob,
   type CsvValue,
 } from "@/lib/charts/export";
-import { buildTooltip, type TooltipRow } from "@/lib/charts/tooltip";
+import {
+  buildTooltip,
+  tooltipChrome,
+  type TooltipRow,
+} from "@/lib/charts/tooltip";
 import { formatNumber } from "@/lib/format";
 import { useChartTokens, type ChartTokens } from "@/lib/hooks/use-chart-tokens";
 import { useTheme } from "@/lib/hooks/use-theme";
@@ -87,6 +91,7 @@ export function HorizontalBarChart({
   exportName,
   exportParts,
   labelColumn = "label",
+  label,
 }: {
   data: BarDatum[];
   /** Row label for the value in the tooltip, e.g. "Organizations". */
@@ -104,16 +109,22 @@ export function HorizontalBarChart({
   exportParts?: (string | number | null | undefined | false)[];
   /** Header for the label column in the CSV — "country", not "label". */
   labelColumn?: string;
+  /** What the chart shows, for the canvas's accessible name. */
+  label: string;
 }) {
   const tokens = useChartTokens();
   const theme = useTheme();
   const chartRef = useRef<EChartHandle | null>(null);
+  // `labelWidth` is the desktop gutter. On a phone it is wider than the whole
+  // chart box, so the bars had nowhere to draw.
+  const [width, setWidth] = useState(0);
+  const gutter = width > 0 ? Math.max(72, Math.min(labelWidth, width * 0.34)) : labelWidth;
 
   const ramp = useMemo(() => sequentialRamp(), [theme]);
 
   const option: EChartsOption = useMemo(
-    () => buildOption(data, valueLabel, labelWidth, scale, tokens, ramp, clickNote),
-    [data, valueLabel, labelWidth, scale, tokens, ramp, clickNote],
+    () => buildOption(data, valueLabel, gutter, scale, tokens, ramp, clickNote),
+    [data, valueLabel, gutter, scale, tokens, ramp, clickNote],
   );
 
   if (data.length === 0) {
@@ -151,6 +162,8 @@ export function HorizontalBarChart({
       <EChart
         option={option}
         instanceRef={chartRef}
+        label={label}
+        onWidth={setWidth}
         // The floor only has to keep a one- or two-row chart from collapsing;
         // 260 left a two-bar chart with 90px between its bars.
         height={Math.max(150, data.length * rowHeight + 64)}
@@ -223,14 +236,9 @@ function buildOption(
 
   return {
     animationDuration: 400,
-    grid: { left: labelWidth + 16, right: 72, top: 12, bottom: 32 },
+    grid: { left: labelWidth + 16, right: Math.min(72, labelWidth * 0.4), top: 12, bottom: 32 },
     tooltip: {
-      confine: true,
-      backgroundColor: tokens.tooltipBg,
-      borderColor: tokens.tooltipBorder,
-      borderWidth: 1,
-      extraCssText:
-        "box-shadow:0 14px 40px rgba(16,22,32,.14);border-radius:12px",
+      ...tooltipChrome(tokens),
       formatter: (params: unknown) => {
         const datum = (params as { data?: { datum?: BarDatum } }).data?.datum;
         if (!datum) return "";

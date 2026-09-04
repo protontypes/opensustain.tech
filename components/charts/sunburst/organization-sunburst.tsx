@@ -343,7 +343,7 @@ export function OrganizationSunburst({
             onClick={zoomOut}
             disabled={!zoomed}
           >
-            Reset
+            Reset zoom
           </button>
           <ExportMenu formats={["png", "svg", "csv"]} onExport={handleExport} />
         </div>
@@ -356,6 +356,7 @@ export function OrganizationSunburst({
               laid={laid}
               size={size}
               zoomDepth={focusNode.depth}
+              label={"Sunburst: organizations, opening to the projects each maintains"}
               fills={fills}
               centreFill={
                 zoomed && focusNode.category

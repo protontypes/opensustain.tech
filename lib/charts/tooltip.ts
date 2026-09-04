@@ -3,6 +3,22 @@ import type { ChartTokens } from "@/lib/hooks/use-chart-tokens";
 export type TooltipRow = { label: string; value: string; strong?: boolean };
 
 /**
+ * The tooltip's chrome, shared by every ECharts chart.
+ *
+ * Seven charts repeated this block, each hardcoding a drop shadow tuned for a
+ * light background — `--viz-tooltip-shadow` exists and has a dark value.
+ */
+export function tooltipChrome(tokens: ChartTokens) {
+  return {
+    confine: true,
+    backgroundColor: tokens.tooltipBg,
+    borderColor: tokens.tooltipBorder,
+    borderWidth: 1,
+    extraCssText: `box-shadow:${tokens.tooltipShadow};border-radius:12px`,
+  };
+}
+
+/**
  * Builds an ECharts tooltip as real DOM.
  *
  * ECharts formatters accept an HTMLElement, which sidesteps the HTML-string

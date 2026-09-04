@@ -53,6 +53,17 @@ type EChartProps = {
   setOptionOpts?: SetOptionOpts;
   /** Filled with the live instance, so the caller can export the canvas. */
   instanceRef?: RefObject<EChartHandle | null>;
+  /**
+   * What this chart shows. ECharts paints to a canvas, which carries no
+   * structure at all, so without a name a screen reader announces nothing.
+   */
+  label: string;
+  /**
+   * The container's measured width. ECharts grids are absolute pixels, so a
+   * chart reserving 240px for its y-axis labels overflows a 320px phone; the
+   * caller scales its own layout from this.
+   */
+  onWidth?: (width: number) => void;
 };
 
 export function EChart({
@@ -62,6 +73,8 @@ export function EChart({
   onClick,
   setOptionOpts,
   instanceRef,
+  label,
+  onWidth,
 }: EChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<echarts.EChartsType | null>(null);
@@ -69,6 +82,8 @@ export function EChart({
   // on every render, and so the cleanup can never run against a disposed chart.
   const onClickRef = useRef(onClick);
   onClickRef.current = onClick;
+  const onWidthRef = useRef(onWidth);
+  onWidthRef.current = onWidth;
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -88,8 +103,10 @@ export function EChart({
     };
     chart.on("click", handler);
 
-    const resizeObserver = new ResizeObserver(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
       chart.resize();
+      const width = entries[0]?.contentRect.width;
+      if (width) onWidthRef.current?.(width);
     });
     resizeObserver.observe(containerRef.current);
 
@@ -113,6 +130,8 @@ export function EChart({
       ref={containerRef}
       className={["chart-frame", className].filter(Boolean).join(" ")}
       style={{ height }}
+      role="img"
+      aria-label={label}
     />
   );
 }

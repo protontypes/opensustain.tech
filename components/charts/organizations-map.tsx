@@ -7,7 +7,10 @@ import * as echarts from "echarts/core";
 import { GeoComponent } from "echarts/components";
 import { MapChart } from "echarts/charts";
 
-import { buildTooltip } from "@/lib/charts/tooltip";
+import {
+  buildTooltip,
+  tooltipChrome,
+} from "@/lib/charts/tooltip";
 import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
 import { formatNumber, pluralize } from "@/lib/format";
 import { useChartTokens } from "@/lib/hooks/use-chart-tokens";
@@ -170,12 +173,7 @@ export function OrganizationsMap() {
       animationDuration: 400,
       tooltip: {
         trigger: "item",
-        confine: true,
-        backgroundColor: tokens.tooltipBg,
-        borderColor: tokens.tooltipBorder,
-        borderWidth: 1,
-        extraCssText:
-          "box-shadow:0 14px 40px rgba(16,22,32,.14);border-radius:12px",
+        ...tooltipChrome(tokens),
         formatter: (params: unknown) => {
           const point = params as {
             name?: string;
@@ -318,7 +316,8 @@ export function OrganizationsMap() {
         </div>
       </div>
 
-      <EChart instanceRef={chartRef} option={option} height={560} />
+      <EChart instanceRef={chartRef}
+          label={`World map: ${METRICS.find((item) => item.id === metric)?.label ?? ""} per country`} option={option} height={560} />
 
       {/* Roughly a fifth of the ecosystem has no territory to sit on, so the
           map alone would understate it without saying this. Both counts are

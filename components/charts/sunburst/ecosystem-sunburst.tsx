@@ -433,6 +433,7 @@ export function EcosystemSunburst() {
               laid={laid}
               size={size}
               zoomDepth={focusNode.depth}
+              label={"Sunburst: the open source sustainability ecosystem, by category and sub-category"}
               fills={fills}
               centreFill={
                 focusNode.kind === "root"

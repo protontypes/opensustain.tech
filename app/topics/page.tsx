@@ -16,6 +16,7 @@ export default async function TopicsPage() {
   return (
     <main className="page-shell">
       <SectionHeading
+        as="h1"
         eyebrow="Topics"
         title="Topic & Keyword Analysis"
         description="Explore the most frequent terms and thematic clusters extracted from project documentation and README files."
@@ -34,7 +35,7 @@ export default async function TopicsPage() {
 
         <Panel
           title="Topics Heatmap"
-          description="How often each topic appears in the projects of each sub-category. Colour is on a log scale, so a single dense cell does not flatten the rest."
+          description="How often each topic appears in the projects of each sub-category. Color is on a log scale, so a single dense cell does not flatten the rest."
         >
           <TopicsHeatmapChart />
         </Panel>

@@ -22,6 +22,7 @@ export default async function OrganizationsPage() {
   return (
     <main className="page-shell">
       <SectionHeading
+        as="h1"
         eyebrow="Organizations"
         title="Ecosystem Organizations"
         description="Analyze the geographic distribution, hierarchy, and sustainability impact of organizations contributing to open-source climate tech."
@@ -31,7 +32,7 @@ export default async function OrganizationsPage() {
       <div className="stack">
         <Panel
           title="Organization Rankings"
-          description="Organizations ranked by the combined score of the projects they maintain. Filter to a category to rank by that category’s score alone; each bar takes the colour of the category the organization scores highest in."
+          description="Organizations ranked by the combined score of the projects they maintain. Filter to a category to rank by that category’s score alone; each bar takes the color of the category the organization scores highest in."
         >
           <OrganizationRankingsChart
             categories={filters.categories}
@@ -42,7 +43,7 @@ export default async function OrganizationsPage() {
         <Panel
           className="panel--viz"
           title="Projects by Organization"
-          description="Organizations with two or more tracked projects. Each wedge takes the colour of the ecosystem category that organization works in most, sized by how many projects it maintains. Click one to open its projects."
+          description="Organizations with two or more tracked projects. Each wedge takes the color of the ecosystem category that organization works in most, sized by how many projects it maintains. Click one to open its projects."
         >
           <OrganizationSunburst categoryColors={filters.category_colors} />
         </Panel>
@@ -50,7 +51,7 @@ export default async function OrganizationsPage() {
         <Panel
           className="panel--viz"
           title="Organizations by Sub-Category"
-          description="The 81 technical sub-categories, sized by how many organizations work in each and coloured by their parent ecosystem category. Click a sub-category to see the organizations behind it, and filter by country or organization type."
+          description="The 81 technical sub-categories, sized by how many organizations work in each and colored by their parent ecosystem category. Click a sub-category to see the organizations behind it, and filter by country or organization type."
         >
           <SubcategorySunburst
             categoryColors={filters.category_colors}
@@ -60,8 +61,8 @@ export default async function OrganizationsPage() {
 
         <Panel
           className="panel--viz"
-          title="Projects per Country"
-          description="Where the organizations behind these projects are based, shaded by how many projects they list between them. Countries are joined on their ISO 3166-1 alpha-3 code."
+          title="Where the Organizations Are"
+          description="Every organization behind these projects, by the country it records. Shade the map by projects or by organizations; countries are joined on their ISO 3166-1 alpha-3 code."
         >
           <OrganizationsMap />
         </Panel>

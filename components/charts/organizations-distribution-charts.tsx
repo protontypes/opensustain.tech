@@ -138,6 +138,7 @@ export function TopOrganizationsChart() {
           clickNote="Click to open the organization"
           emptyMessage="No organizations match the current filters."
           exportName="top-organizations"
+          label={`Bar chart: top ${rows.length} organizations by listed projects`}
           labelColumn="organization"
           exportParts={[`top-${topN}`, filters.country, filters.type]}
         />
@@ -206,6 +207,7 @@ export function TopCountriesChart() {
           labelWidth={180}
           emptyMessage="No organizations match the current filters."
           exportName="organizations-by-country"
+          label={`Bar chart: top ${rows.length} countries by organization count`}
           labelColumn="country"
           exportParts={[`top-${topN}`, filters.country, filters.type]}
         />
@@ -248,6 +250,7 @@ export function ContinentsChart() {
         scale="linear"
         emptyMessage="No organizations match the current filters."
         exportName="organizations-by-continent"
+          label={`Bar chart: organizations by continent`}
         labelColumn="continent"
         exportParts={[filters.country, filters.type]}
       />
@@ -282,6 +285,7 @@ export function OrganizationTypesChart() {
         scale="linear"
         emptyMessage="No organizations match the current filters."
         exportName="organizations-by-type"
+          label={`Bar chart: organizations by type`}
         labelColumn="type"
         exportParts={[filters.country, filters.type]}
       />

@@ -84,6 +84,7 @@ export function CommitActivityChart() {
         rowHeight={52}
         scale="linear"
         exportName="commit-activity"
+          label={"Bar chart: projects active versus inactive in the last 365 days"}
         labelColumn="activity"
       />
       {active && total > 0 ? (
@@ -125,6 +126,7 @@ function BooleanField({
         rowHeight={48}
         scale="linear"
         exportName={field.replace(/_/g, "-")}
+          label={`Bar chart: projects publishing a ${field.replace(/_/g, " ")}`}
         labelColumn="present"
       />
     </Frame>
@@ -190,6 +192,7 @@ export function LicensesChart() {
           valueLabel="Projects"
           labelWidth={170}
           exportName="licenses"
+          label={`Bar chart: top ${rows.length} licenses by project count`}
           labelColumn="license"
           exportParts={[`top-${topN}`]}
         />
@@ -224,6 +227,7 @@ export function LanguagesChart() {
           valueLabel="Projects"
           labelWidth={170}
           exportName="languages"
+          label={`Bar chart: top ${rows.length} languages by project count`}
           labelColumn="language"
           exportParts={[`top-${topN}`]}
         />
@@ -258,6 +262,7 @@ export function PlatformsChart() {
           valueLabel="Projects"
           labelWidth={230}
           exportName="git-platforms"
+          label={`Bar chart: top ${rows.length} git platforms by project count`}
           labelColumn="platform"
           exportParts={[`top-${topN}`]}
         />
@@ -305,6 +310,7 @@ export function EcosystemsChart() {
           valueLabel="Entries"
           labelWidth={150}
           exportName="package-ecosystems"
+          label={`Bar chart: top ${rows.length} package ecosystems by entry count`}
           labelColumn="ecosystem"
           exportParts={[`top-${topN}`]}
         />

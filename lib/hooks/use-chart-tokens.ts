@@ -22,6 +22,7 @@ export type ChartTokens = {
   surface: string;
   tooltipBg: string;
   tooltipBorder: string;
+  tooltipShadow: string;
   /** Fill for "no value" — the map's countries with no organizations. */
   nullFill: string;
 };
@@ -36,6 +37,7 @@ const TOKEN_MAP: Record<keyof ChartTokens, string> = {
   surface: "--color-card-bg",
   tooltipBg: "--viz-tooltip-bg",
   tooltipBorder: "--viz-tooltip-border",
+  tooltipShadow: "--viz-tooltip-shadow",
   nullFill: "--viz-null",
 };
 
@@ -49,6 +51,7 @@ const FALLBACK: ChartTokens = {
   surface: "#ffffff",
   tooltipBg: "rgba(255, 255, 255, 0.96)",
   tooltipBorder: "rgba(230, 237, 243, 0.95)",
+  tooltipShadow: "0 14px 40px rgba(16, 22, 32, 0.14)",
   nullFill: "#cbd5e1",
 };
 

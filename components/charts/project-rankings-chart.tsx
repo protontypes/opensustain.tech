@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { EChartsOption } from "echarts";
 
-import { buildTooltip } from "@/lib/charts/tooltip";
+import {
+  buildTooltip,
+  tooltipChrome,
+} from "@/lib/charts/tooltip";
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
 import { formatCompactNumber, formatDecimal, formatNumber } from "@/lib/format";
 import { useChartTokens } from "@/lib/hooks/use-chart-tokens";
@@ -76,6 +79,11 @@ export function ProjectRankingsChart({
       .slice(0, topN);
   }, [payload, metric, category, topN, activeOnly]);
 
+  // A fixed grid gutter is wider than the whole chart box on a phone.
+  const [width, setWidth] = useState(0);
+  const gutter =
+    width > 0 ? Math.max(72, Math.min(210, width * 0.34)) : 210;
+
   const { chartRef, onExport } = useChartExport(
     "project-rankings",
     () => ({
@@ -101,13 +109,9 @@ export function ProjectRankingsChart({
     const ordered = [...top].reverse();
     return {
       animationDuration: 400,
-      grid: { left: 210, right: 72, top: 12, bottom: 32 },
+      grid: { left: gutter + 16, right: Math.min(72, gutter * 0.4), top: 12, bottom: 32 },
       tooltip: {
-        confine: true,
-        backgroundColor: tokens.tooltipBg,
-        borderColor: tokens.tooltipBorder,
-        borderWidth: 1,
-        extraCssText: "box-shadow:0 14px 40px rgba(16,22,32,.14);border-radius:12px",
+        ...tooltipChrome(tokens),
         formatter: (params: unknown) => {
           const record = (params as { data?: { record?: ProjectRankingRecord } })
             .data?.record;
@@ -172,7 +176,7 @@ export function ProjectRankingsChart({
         },
       ],
     };
-  }, [top, metric, tokens, payload]);
+  }, [top, metric, tokens, payload, gutter]);
 
   if (error) {
     return (
@@ -205,8 +209,7 @@ export function ProjectRankingsChart({
             >
               Active
             </button>
-            <ExportMenu onExport={onExport} />
-        </div>
+          </div>
 
           <label className="viz-field viz-field--select">
             <span className="viz-field__label">Rank by</span>
@@ -252,6 +255,8 @@ export function ProjectRankingsChart({
               ))}
             </select>
           </label>
+
+          <ExportMenu onExport={onExport} />
         </div>
       </div>
 
@@ -268,6 +273,8 @@ export function ProjectRankingsChart({
       ) : (
         <EChart
           instanceRef={chartRef}
+          onWidth={setWidth}
+        label={`Bar chart: top ${top.length} projects by ${payload?.metric_labels[metric] ?? metric}`}
           option={option}
           height={Math.max(360, top.length * 28 + 60)}
           onClick={(params) => {

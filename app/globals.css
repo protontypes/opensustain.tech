@@ -32,6 +32,7 @@
 
 /* --- Dark Theme Overrides --- */
 [data-theme="dark"] {
+  color-scheme: dark;
   --color-black: #f8fafc;
   --color-bg: #0b0f19;
   --color-bg-alt: #131b2e;
@@ -61,6 +62,9 @@
 }
 
 html {
+  /* Without this the browser paints its own widgets — select menus, scrollbars,
+     spinners, the text caret — in light colours whatever the theme. */
+  color-scheme: light;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
@@ -114,7 +118,7 @@ h4 {
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--color-link);
 }
 
 /* --- Typography — Body --- */
@@ -132,10 +136,20 @@ p {
   padding: 0 32px;
 }
 
+/*
+ * Only the home route opens with a .hero, which carries its own 80px. The other
+ * three began at the section heading, whose sole spacing is a bottom margin, so
+ * their eyebrow sat against the sticky header's border and the last panel met
+ * the footer with no gap.
+ */
 .page-shell {
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 32px 80px;
+}
+
+.page-shell > .section-heading:first-child {
+  padding-top: 64px;
 }
 
 /* --- Scrollbar --- */
@@ -275,7 +289,7 @@ p {
 }
 
 .header-github:hover {
-  color: var(--color-primary);
+  color: var(--color-link);
 }
 
 .site-nav-link {
@@ -293,7 +307,7 @@ p {
 }
 
 .site-nav-link:hover {
-  color: var(--color-primary);
+  color: var(--color-link);
   transform: none;
   background: none;
 }
@@ -349,7 +363,7 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--color-primary);
+  color: var(--color-link);
   margin-bottom: 16px;
 }
 
@@ -403,7 +417,7 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--color-primary);
+  color: var(--color-link);
 }
 
 .metric-value {
@@ -436,7 +450,13 @@ p {
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.panel:hover {
+/*
+ * Only a panel that is actually a link should move under the pointer. Applied
+ * to every panel it made whole charts jump as the mouse crossed them, and
+ * promised a click that most of them do not have.
+ */
+a.panel:hover,
+.panel--interactive:hover {
   transform: translateY(-4px);
   border-color: rgba(37, 99, 235, 0.25);
   box-shadow: 0 18px 44px rgba(16, 22, 32, 0.10);
@@ -525,7 +545,7 @@ p {
 }
 
 .inline-link:hover {
-  color: var(--color-primary);
+  color: var(--color-link);
   border-color: var(--color-primary);
   transform: translateY(-1px);
 }
@@ -533,20 +553,9 @@ p {
 /* ============================================================
    Leader List (Rankings)
    ============================================================ */
-.leader-list {
-  list-style: none;
-}
-
-.leader-item {
-  border-bottom: 1px solid var(--color-border);
-  padding: 16px 0;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
 
 .leader-rank {
-  color: var(--color-primary);
+  color: var(--color-link);
   font-family: var(--font-heading);
   font-size: 12px;
   font-weight: 700;
@@ -596,7 +605,7 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--color-primary);
+  color: var(--color-link);
   margin: 0 0 16px;
 }
 
@@ -686,11 +695,15 @@ p {
   color: #ffffff;
 }
 
+/*
+ * --color-footer-bg is dark in both themes, so ink keyed to a token that flips
+ * drops to 3.3:1 on the light theme. Fixed, like the ink on a category swatch.
+ */
 .site-footer a {
   font-family: var(--font-heading);
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: #94a3b8;
   transition: color 0.15s ease;
 }
 
@@ -722,7 +735,8 @@ p {
 .footer-copyright {
   font-family: var(--font-body);
   font-size: 14px;
-  color: var(--color-text-secondary);
+  /* Fixed for the same reason as .site-footer a — the ground never flips. */
+  color: #94a3b8;
 }
 
 .footer-nav {
@@ -784,15 +798,14 @@ p {
     gap: 16px;
   }
 
-  .site-nav,
+  .site-nav {
+    display: none;
+  }
+
   /* Padding stays symmetric so the wrapped message is still centred; 48px
      clears the absolutely-positioned close button on the right. */
   .community-bar__message {
     font-size: 13px;
-  }
-
-  .nav-toggle {
-    display: inline-flex;
   }
 
   .container,
@@ -854,6 +867,10 @@ p {
   --viz-label-on-tint: #101620;
   --viz-label-halo: rgba(255, 255, 255, 0.75);
 
+  /* Read by useChartTokens for every ECharts axis. It was referenced there and
+     never defined here, so the charts fell back to a light literal in both
+     themes and the dark gridlines stayed pale. */
+  --viz-grid-line: rgba(230, 237, 243, 0.7);
   --viz-tooltip-bg: rgba(255, 255, 255, 0.96);
   --viz-tooltip-border: rgba(230, 237, 243, 0.95);
   --viz-tooltip-shadow: 0 14px 40px rgba(16, 22, 32, 0.14);
@@ -878,6 +895,7 @@ p {
   --viz-null: #334155;
   --viz-label-on-tint: #f8fafc;
   --viz-label-halo: rgba(11, 15, 25, 0.75);
+  --viz-grid-line: rgba(30, 41, 59, 0.9);
   --viz-tooltip-bg: rgba(17, 24, 39, 0.96);
   --viz-tooltip-border: rgba(30, 41, 59, 0.95);
   --viz-tooltip-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
@@ -984,7 +1002,7 @@ p {
   padding: 2px 0;
   font: inherit;
   letter-spacing: inherit;
-  color: var(--color-primary);
+  color: var(--color-link);
   cursor: pointer;
 }
 
@@ -1128,8 +1146,10 @@ p {
 }
 
 /* An export control with nothing beside it sits at the right of its own row. */
+/* .viz-toolbar is `flex-direction: column`, so the cross axis is the one that
+   moves a lone control to the right. */
 .viz-toolbar--trailing {
-  justify-content: flex-end;
+  align-items: flex-end;
   border-bottom: none;
   padding-bottom: 0;
   margin-bottom: 0;
@@ -1167,7 +1187,7 @@ p {
 
 .viz-menu__list button:hover {
   background: var(--color-bg-alt);
-  color: var(--color-primary);
+  color: var(--color-link);
 }
 
 /* ============================================================
@@ -1330,7 +1350,7 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--color-primary);
+  color: var(--color-link);
 }
 
 /*
@@ -1380,7 +1400,7 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--color-primary);
+  color: var(--color-link);
   border-bottom: 1px solid currentColor;
   padding-bottom: 2px;
 }
@@ -1446,7 +1466,7 @@ p {
 
 .viz-chip:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-link);
 }
 
 .viz-chip[aria-pressed="true"] {
@@ -1515,7 +1535,7 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--color-primary);
+  color: var(--color-link);
   margin-bottom: 10px;
 }
 
@@ -1537,7 +1557,7 @@ p {
 }
 
 .viz-link:hover {
-  color: var(--color-primary);
+  color: var(--color-link);
 }
 
 .viz-colorbar__track {
@@ -1608,7 +1628,7 @@ p {
 }
 
 .viz-legend__row:hover {
-  color: var(--color-primary);
+  color: var(--color-link);
 }
 
 .viz-legend__name {
@@ -1734,7 +1754,7 @@ p {
 }
 
 .viz-tooltip__status--active {
-  color: var(--color-primary);
+  color: var(--color-link);
 }
 
 .viz-tooltip__description {
@@ -1755,7 +1775,7 @@ p {
 
 .viz-tooltip__row--active dt,
 .viz-tooltip__row--active dd {
-  color: var(--color-primary);
+  color: var(--color-link);
   font-weight: 700;
 }
 
@@ -1907,17 +1927,20 @@ p {
   pointer-events: none;
 }
 
-.content-section {
-  padding: 60px 0;
-}
-
 .section-heading {
   max-width: 68ch;
   margin-bottom: 40px;
 }
 
+.section-heading h1,
 .section-heading h2 {
   margin-bottom: 16px;
+}
+
+/* The route title is an h1 but not the hero, so it keeps the 40px it has
+   always rendered at rather than inheriting the hero's 64px. */
+.section-heading h1 {
+  font-size: 40px;
 }
 
 .panel-header {
@@ -1953,6 +1976,7 @@ p {
 
 /* Top-projects list — was a wall of inline styles on every row. */
 .leader-list {
+  list-style: none;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   column-gap: 56px;
@@ -1972,7 +1996,7 @@ p {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--color-primary);
+  color: var(--color-link);
   margin-bottom: 4px;
 }
 
@@ -2013,7 +2037,7 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--color-primary);
+  color: var(--color-link);
   flex: none;
 }
 
@@ -2143,16 +2167,26 @@ p {
 }
 
 .mobile-nav__link[aria-current="page"] {
-  color: var(--color-primary);
+  color: var(--color-link);
   font-weight: 700;
 }
 
 .site-nav-link[aria-current="page"] {
-  color: var(--color-primary);
+  color: var(--color-link);
   font-weight: 700;
 }
 
 @media (max-width: 768px) {
+  /*
+   * These live here, after the base .nav-toggle and .mobile-nav rules. The
+   * override was in the ≤768px block at the top of the file, which the base
+   * `display: none` at the bottom then beat on source order — so the hamburger
+   * was hidden at every width and the mobile menu could not be opened at all.
+   */
+  .nav-toggle {
+    display: inline-flex;
+  }
+
   .mobile-nav.is-open {
     display: flex;
   }

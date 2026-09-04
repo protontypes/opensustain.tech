@@ -6,7 +6,10 @@ import { useTheme } from "@/lib/hooks/use-theme";
 
 import type { EChartsOption } from "echarts";
 
-import { buildTooltip } from "@/lib/charts/tooltip";
+import {
+  buildTooltip,
+  tooltipChrome,
+} from "@/lib/charts/tooltip";
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
 import { formatDecimal, formatNumber } from "@/lib/format";
 import {
@@ -118,12 +121,7 @@ export function ProjectsOverTimeChart({
       },
       grid: { left: 210, right: 28, top: 64, bottom: 44 },
       tooltip: {
-        confine: true,
-        backgroundColor: tokens.tooltipBg,
-        borderColor: tokens.tooltipBorder,
-        borderWidth: 1,
-        extraCssText:
-          "box-shadow:0 14px 40px rgba(16,22,32,.14);border-radius:12px",
+        ...tooltipChrome(tokens),
         formatter: (params: unknown) => {
           const record = (params as { data?: { record?: ProjectsOverTimeRecord } })
             .data?.record;
@@ -244,6 +242,7 @@ export function ProjectsOverTimeChart({
       ) : (
         <EChart
           instanceRef={chartRef}
+          label={`Scatter chart: ${records.length} projects by age and sub-category`}
           option={option}
           height={Math.max(520, 18 * subCategoryCount + 260)}
           onClick={(params) => {

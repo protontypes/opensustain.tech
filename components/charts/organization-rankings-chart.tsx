@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { EChartsOption } from "echarts";
 
-import { buildTooltip } from "@/lib/charts/tooltip";
+import {
+  buildTooltip,
+  tooltipChrome,
+} from "@/lib/charts/tooltip";
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
 import { formatDecimal, formatNumber } from "@/lib/format";
 import {
@@ -103,6 +106,11 @@ export function OrganizationRankingsChart({
       .slice(0, topN);
   }, [payload, category, topN, filters]);
 
+  // A fixed grid gutter is wider than the whole chart box on a phone.
+  const [width, setWidth] = useState(0);
+  const gutter =
+    width > 0 ? Math.max(72, Math.min(240, width * 0.34)) : 240;
+
   const { chartRef, onExport } = useChartExport(
     "organization-rankings",
     () => ({
@@ -128,14 +136,9 @@ export function OrganizationRankingsChart({
     const ordered = [...top].reverse();
     return {
       animationDuration: 400,
-      grid: { left: 240, right: 76, top: 12, bottom: 32 },
+      grid: { left: gutter + 16, right: Math.min(76, gutter * 0.4), top: 12, bottom: 32 },
       tooltip: {
-        confine: true,
-        backgroundColor: tokens.tooltipBg,
-        borderColor: tokens.tooltipBorder,
-        borderWidth: 1,
-        extraCssText:
-          "box-shadow:0 14px 40px rgba(16,22,32,.14);border-radius:12px",
+        ...tooltipChrome(tokens),
         formatter: (params: unknown) => {
           const record = (
             params as { data?: { record?: OrganizationRankingRecord } }
@@ -182,7 +185,7 @@ export function OrganizationRankingsChart({
       yAxis: {
         type: "category",
         data: ordered.map((record) => record.organization_name),
-        axisLabel: { width: 200, overflow: "truncate", color: tokens.ink },
+        axisLabel: { width: gutter, overflow: "truncate", color: tokens.ink },
         axisLine: { lineStyle: { color: tokens.border } },
         axisTick: { show: false },
       },
@@ -214,7 +217,7 @@ export function OrganizationRankingsChart({
         },
       ],
     };
-  }, [top, category, palette, tokens]);
+  }, [top, category, palette, tokens, gutter]);
 
   if (error) {
     return (
@@ -275,6 +278,8 @@ export function OrganizationRankingsChart({
       ) : (
         <EChart
           instanceRef={chartRef}
+          onWidth={setWidth}
+        label={`Bar chart: top ${top.length} organizations by ${category === ALL ? "total score" : `${category} score`}`}
           option={option}
           height={Math.max(360, top.length * 28 + 60)}
           onClick={(params) => {

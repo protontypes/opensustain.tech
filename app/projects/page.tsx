@@ -23,6 +23,7 @@ export default async function ProjectsPage() {
   return (
     <main className="page-shell">
       <SectionHeading
+        as="h1"
         eyebrow="Projects"
         title="Project Analytics"
         description="Detailed insights into project rankings, lifecycle trends, and community attributes across the climate tech ecosystem."
@@ -38,7 +39,7 @@ export default async function ProjectsPage() {
 
         <Panel
           title="Projects Over Time"
-          description="Project age against sub-category, with each bubble sized by the metric you choose and coloured by ecosystem category."
+          description="Project age against sub-category, with each bubble sized by the metric you choose and colored by ecosystem category."
         >
           <ProjectsOverTimeChart
             categoryColors={filters.category_colors}

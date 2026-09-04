@@ -336,6 +336,7 @@ export function SubcategorySunburst({
                 laid={laid}
                 size={size}
                 zoomDepth={focusNode.depth}
+              label={"Sunburst: sub-categories, opening to the organizations working in each"}
                 fills={fills}
                 centreFill={
                   zoomed && focusNode.category

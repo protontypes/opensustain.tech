@@ -107,7 +107,7 @@ export default async function HomePage() {
             value={formatNumber(summary.medians.total_commits)}
           />
           <MetricStat
-            label="Dev. Distribution"
+            label="Development Distribution"
             value={formatDecimal(summary.medians.dds, 3)}
           />
         </div>
@@ -118,7 +118,7 @@ export default async function HomePage() {
           <Panel
             className="panel--viz"
             title="Ecosystem Sunburst"
-            description="Every project in the open sustainability landscape, nested by category and sub-category. Colour encodes the metric you choose; click a ring to zoom in."
+            description="Every project in the open sustainability landscape, nested by category and sub-category. Color encodes the metric you choose; click a ring to zoom in."
           >
             <EcosystemSunburst />
           </Panel>

@@ -6,6 +6,7 @@ import { formatNumber } from "@/lib/format";
 import type { RankingMetricId } from "@/lib/types";
 import { categoryColor } from "@/lib/sunburst/color";
 import { METRIC_ORDER } from "@/lib/sunburst/types";
+import { ExportMenu } from "../export-menu";
 import type { ActivityFilter, SunburstNode } from "@/lib/sunburst/types";
 
 type Props = {
@@ -42,8 +43,6 @@ export function SunburstToolbar({
   onExport,
 }: Props) {
   const [draft, setDraft] = useState(query);
-  const [exportOpen, setExportOpen] = useState(false);
-  const exportRef = useRef<HTMLDivElement | null>(null);
 
   // Held in a ref so the debounce depends only on what the user typed. Keying
   // it on the callback identity restarted the timer on every parent render,
@@ -60,26 +59,6 @@ export function SunburstToolbar({
   useEffect(() => {
     setDraft((current) => (query === "" && current !== "" ? "" : current));
   }, [query]);
-
-  useEffect(() => {
-    if (!exportOpen) return;
-    const close = (event: MouseEvent) => {
-      if (!exportRef.current?.contains(event.target as Node)) {
-        setExportOpen(false);
-      }
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      event.stopPropagation();
-      setExportOpen(false);
-    };
-    document.addEventListener("mousedown", close);
-    document.addEventListener("keydown", onKey, true);
-    return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("keydown", onKey, true);
-    };
-  }, [exportOpen]);
 
   return (
     <div className="viz-toolbar">
@@ -140,7 +119,7 @@ export function SunburstToolbar({
         </div>
 
         <label className="viz-field viz-field--select">
-          <span className="viz-field__label">Colour by</span>
+          <span className="viz-field__label">Color by</span>
           <select
             value={metric}
             onChange={(event) =>
@@ -174,38 +153,7 @@ export function SunburstToolbar({
           Reset
         </button>
 
-        <div className="viz-menu" ref={exportRef}>
-          <button
-            type="button"
-            className="viz-button"
-            aria-expanded={exportOpen}
-            aria-controls="viz-export-options"
-            onClick={() => setExportOpen((open) => !open)}
-          >
-            Export
-          </button>
-          {exportOpen ? (
-            <div
-              className="viz-menu__list"
-              id="viz-export-options"
-              role="group"
-              aria-label="Export format"
-            >
-              {(["png", "svg", "csv"] as const).map((kind) => (
-                <button
-                  key={kind}
-                  type="button"
-                  onClick={() => {
-                    setExportOpen(false);
-                    onExport(kind);
-                  }}
-                >
-                  {kind.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </div>
+        <ExportMenu formats={["png", "svg", "csv"]} onExport={onExport} />
       </div>
     </div>
   );

@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { EChartsOption } from "echarts";
 
-import { buildTooltip } from "@/lib/charts/tooltip";
+import {
+  buildTooltip,
+  tooltipChrome,
+} from "@/lib/charts/tooltip";
 import { analyticsPayloadUrl } from "@/lib/data/contracts";
 import { formatNumber } from "@/lib/format";
 import { useChartTokens } from "@/lib/hooks/use-chart-tokens";
@@ -15,8 +18,8 @@ import { useChartExport } from "@/lib/charts/use-chart-export";
 
 import { EChart } from "./echart";
 import { ExportMenu } from "./export-menu";
+import { TopNField } from "./top-n-field";
 
-const TOP_N_CHOICES = [50, 100, 200, 400];
 
 /** The sequential ramp, read from the design tokens rather than hardcoded. */
 function rampFor(): string[] {
@@ -59,6 +62,11 @@ export function TopicsHeatmapChart({
     };
   }, []);
 
+  // A fixed grid gutter is wider than the whole chart box on a phone.
+  const [width, setWidth] = useState(0);
+  const gutter =
+    width > 0 ? Math.max(72, Math.min(210, width * 0.34)) : 210;
+
   const { chartRef, onExport } = useChartExport(
     "topics-heatmap",
     () => {
@@ -100,14 +108,9 @@ export function TopicsHeatmapChart({
     }
 
     return {
-      grid: { left: 210, right: 24, top: 12, bottom: 90 },
+      grid: { left: gutter + 16, right: 24, top: 12, bottom: 90 },
       tooltip: {
-        confine: true,
-        backgroundColor: tokens.tooltipBg,
-        borderColor: tokens.tooltipBorder,
-        borderWidth: 1,
-        extraCssText:
-          "box-shadow:0 14px 40px rgba(16,22,32,.14);border-radius:12px",
+        ...tooltipChrome(tokens),
         formatter: (params: unknown) => {
           const point = params as { value?: [number, number, number] };
           const [x, y] = point.value ?? [0, 0, 0];
@@ -163,7 +166,7 @@ export function TopicsHeatmapChart({
         },
       ],
     };
-  }, [payload, topN, tokens, ramp]);
+  }, [payload, topN, tokens, ramp, gutter]);
 
   if (error) {
     return (
@@ -177,19 +180,14 @@ export function TopicsHeatmapChart({
     <div className="viz-root">
       <div className="viz-toolbar">
         <div className="viz-toolbar__controls">
-          <label className="viz-field viz-field--select">
-            <span className="viz-field__label">Topics</span>
-            <select
-              value={topN}
-              onChange={(event) => setTopN(Number(event.target.value))}
-            >
-              {TOP_N_CHOICES.map((choice) => (
-                <option key={choice} value={choice}>
-                  Top {choice} topics
-                </option>
-              ))}
-            </select>
-          </label>
+          {/* Its own list was labelled "Topics" where every other chart says
+              "Show", and stopped at 400 of the 500 topics. */}
+          <TopNField
+            value={topN}
+            onChange={setTopN}
+            max={payload?.topics.length ?? 0}
+            noun="topics"
+          />
           <ExportMenu onExport={onExport} />
         </div>
       </div>
@@ -201,6 +199,8 @@ export function TopicsHeatmapChart({
       ) : (
         <EChart
           instanceRef={chartRef}
+          onWidth={setWidth}
+        label={`Heatmap: how often each of the top ${topN} topics appears in each sub-category`}
           option={option}
           height={Math.max(560, payload.sub_categories.length * 14 + 220)}
         />

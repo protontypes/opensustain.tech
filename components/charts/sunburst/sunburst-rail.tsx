@@ -53,8 +53,8 @@ export function SunburstColorBar({
             Equal-count bands across the {formatNumber(bins.covered)} projects
             that report this metric, shaded{" "}
             {hueLabel
-              ? `within ${hueLabel}'s colour`
-              : "within each category's own colour"}
+              ? `within ${hueLabel}'s color`
+              : "within each category's own color"}
             .
           </p>
         </>

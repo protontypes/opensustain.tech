@@ -41,6 +41,8 @@ type Props = {
   matches: Set<string> | null;
   selectedId: string | null;
   focusedIndex: number;
+  /** All three sunbursts share this renderer, so each names itself. */
+  label: string;
   reducedMotion: boolean;
   handleRef: RefObject<SunburstSvgHandle | null>;
   onHover: (node: SunburstNode | null, x: number, y: number) => void;
@@ -57,6 +59,7 @@ export function SunburstSvg({
   matches,
   selectedId,
   focusedIndex,
+  label,
   reducedMotion,
   handleRef,
   onHover,
@@ -372,7 +375,7 @@ export function SunburstSvg({
       height={size}
       viewBox={`${-outerRadius} ${-outerRadius} ${size} ${size}`}
       role="tree"
-      aria-label="Open source sustainability ecosystem, by category and sub-category"
+      aria-label={label}
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
       onClick={handleClick}

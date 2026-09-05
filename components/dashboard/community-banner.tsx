@@ -32,7 +32,7 @@ export function CommunityBanner() {
         {/* One span, so the sentence keeps real word spaces and wraps inside
             itself; as bare text nodes each run becomes its own flex item. */}
         <span>
-          Don&rsquo;t know where to start? Ask our{" "}
+          Ask our{" "}
           <a href={communityDiscordUrl} target="_blank" rel="noreferrer">
             Community
           </a>

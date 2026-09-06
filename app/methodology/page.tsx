@@ -29,7 +29,6 @@ export default async function MethodologyPage() {
     <main className="page-shell">
       <SectionHeading
         as="h1"
-        eyebrow="Methodology"
         title="What this dashboard is, and what it cannot tell you"
         description="Every chart here reads one nightly snapshot of a public dataset. These are its sources, its definitions, and the places it is known to be wrong or incomplete — stated here rather than left for a reader to discover."
       />

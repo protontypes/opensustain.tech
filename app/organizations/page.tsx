@@ -31,7 +31,6 @@ export default async function OrganizationsPage() {
     <main className="page-shell">
       <SectionHeading
         as="h1"
-        eyebrow="Organizations"
         title="Ecosystem Organizations"
         description="Analyze the geographic distribution, hierarchy, and sustainability impact of organizations contributing to open-source climate tech."
       />

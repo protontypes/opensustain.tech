@@ -25,7 +25,6 @@ export default async function TopicsPage() {
     <main className="page-shell">
       <SectionHeading
         as="h1"
-        eyebrow="Topics"
         title="Topic & Keyword Analysis"
         description="Explore the most frequent terms and thematic clusters extracted from project documentation and README files."
       />

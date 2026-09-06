@@ -52,7 +52,6 @@ export default async function HomePage() {
   return (
     <main className="page-shell">
       <section className="hero">
-        <p className="section-eyebrow">Overview</p>
         <h1>Open Source <span className="curved-underline">Sustainability</span> Analytics</h1>
         <p className="hero-copy">
           Tracking the health, community engagement, and technological trends

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { LegacyAnchorRedirect } from "@/components/seo/legacy-anchor-redirect";
 import { MetricCard } from "@/components/ui/metric-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { loadFilters, loadSummary } from "@/lib/data";
@@ -32,6 +33,9 @@ export default async function HomePage() {
 
   return (
     <main className="page-shell">
+      <LegacyAnchorRedirect
+        subCategoriesByCategory={filters.sub_categories_by_category}
+      />
       <section className="hero">
         <h1>
           Open <span className="curved-underline">Sustainable</span> Technology

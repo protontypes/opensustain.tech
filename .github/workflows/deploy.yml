@@ -1,0 +1,87 @@
+name: Deploy to GitHub Pages
+
+# Four ways this site gets (re)built and deployed:
+#   - push to main:            a code change on this repo.
+#   - repository_dispatch:     an upstream data source changed. See
+#                               docs/migration/README.md for the two sibling
+#                               repos this is meant to receive dispatches
+#                               from ("ost-readme-updated" from
+#                               open-sustainable-technology when README.md
+#                               changes, "analytics-data-updated" from
+#                               opensustain.analytics when it republishes
+#                               web/public/data/*.json) — those repos don't
+#                               fire these yet; see the patches in that
+#                               directory for how to wire them up.
+#   - schedule:                a weekly safety net in case a dispatch is
+#                               missed, dropped, or not wired up yet.
+#   - workflow_dispatch:       a manual run.
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [ost-readme-updated, analytics-data-updated]
+  schedule:
+    # Monday 06:00 UTC. scripts/fetch-data.mjs re-pulls README.md and the
+    # analytics payloads on every build regardless of trigger, so this alone
+    # keeps the site from drifting more than a week behind either source even
+    # if both dispatches above are never wired up.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment at a time; let a newer push/dispatch supersede an
+# in-flight one rather than queuing behind it.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        # Runs scripts/fetch-data.mjs first (see the "build" script in
+        # package.json): pulls README.md + the analytics JSON + projects.csv
+        # fresh on every run, three-tier fallback if any source is
+        # unreachable, then `next build` with `output: "export"`.
+        run: pnpm build
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

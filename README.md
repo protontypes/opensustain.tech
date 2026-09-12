@@ -50,14 +50,13 @@ pnpm typecheck
 | `/organizations` | Organization geography, hierarchy, and rankings |
 | `/topics` | Keyword and topic analysis |
 | `/methodology` | Where the data comes from and its known limits |
-| `/blog`, `/blog/[slug]` | *Not built yet* |
-| `/about` | *Not built yet* |
-| `/presentations` | *Not built yet* |
-| `/privacy-policy` | *Not built yet* |
+| `/blog`, `/blog/[slug]` | Blog, migrated from the old mkdocs site |
+| `/about` | Team + GitHub contributors |
+| `/presentations` | Talks and conference appearances |
+| `/privacy-policy` | Privacy policy |
 
-All routes are registered in `lib/navigation.ts`, including the four not
-built yet — a page landing at exactly the path already wired up there is
-enough to make it navigable.
+All routes are registered in `lib/navigation.ts`; a page landing at exactly
+the path wired up there is enough to make it navigable.
 
 ## Data
 

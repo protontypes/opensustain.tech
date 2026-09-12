@@ -3,8 +3,15 @@
 
    Scoped to this route only — kept out of app/globals.css so this feature
    never conflicts with whatever else is landing in the shared design-system
-   file at the same time. Built entirely from tokens that file already
-   defines (--color-*, --font-*), not new ones.
+   file at the same time. Built entirely from tokens (--color-*, --font-*),
+   composed with color-mix() for translucency rather than hardcoded rgba().
+
+   Two literals are deliberate, not tokens: the play glyph's #ffffff and the
+   scrim it sits in (var(--color-scrim), added to globals.css) both have to
+   stay fixed regardless of theme, since they overlay an arbitrary photo
+   thumbnail rather than the page background — using a themed ink token
+   (e.g. --color-black, which flips to near-white in dark mode) here would
+   make the icon disappear into its own backdrop in dark mode.
    ============================================================ */
 
 .presentations-grid {
@@ -63,13 +70,17 @@ a.presentation-card:hover .presentation-card__thumb img {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(16, 22, 32, 0.15);
+  background: color-mix(in srgb, var(--color-scrim) 15%, transparent);
 }
 
 .presentation-card__play svg {
   width: 52px;
   height: 52px;
-  filter: drop-shadow(0 2px 8px rgba(16, 22, 32, 0.4));
+  filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--color-scrim) 40%, transparent));
+}
+
+.presentation-card__play-bg {
+  fill: color-mix(in srgb, var(--color-scrim) 55%, transparent);
 }
 
 .presentation-card__meta {

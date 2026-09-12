@@ -30,6 +30,21 @@
    */
   --color-wordmark: #1878cf;
   --color-footer-bg: #101620;
+  /*
+   * A fixed dark scrim for overlays on arbitrary photographic thumbnails
+   * (e.g. the presentations play-button backdrop). Deliberately not
+   * redefined under [data-theme="dark"], same rationale as --color-primary
+   * above: it sits on a photo, not the page background, so it must read the
+   * same dark regardless of theme rather than flipping like --color-black.
+   */
+  --color-scrim: #101620;
+  /*
+   * Attention/TODO badges (e.g. the About page's placeholder-data marker).
+   * Amber on both themes for a consistent "unfinished" signal; contrast
+   * checked against each theme's --color-card-bg it sits on.
+   */
+  --color-warning: #b45309;
+  --color-warning-bg: rgba(180, 83, 9, 0.08);
   --font-heading: 'Space Grotesk', system-ui, sans-serif;
   --font-body: 'Georgia', serif;
   --container-max-width: 1100px;
@@ -48,6 +63,8 @@
   --color-silver: #1e293b;
   --color-header-bg: rgba(11, 15, 25, 0.9);
   --color-banner-bg: #131b2e;
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgba(251, 191, 36, 0.1);
   --color-link: #60a5fa;
   --color-wordmark: #4d8ff0;
   --color-footer-bg: #0b0f19;
@@ -940,8 +957,18 @@ a.panel:hover {
     display: none;
   }
 
-  /* Padding stays symmetric so the wrapped message is still centred; 48px
-     clears the absolutely-positioned close button on the right. */
+  /* Padding stays symmetric so the wrapped message is still centred; the
+     close button's offset drops to 0 so a 44px side gutter still clears its
+     44px tap target (was 56px, sized for the desktop 8px offset — plenty at
+     desktop widths but cramped at 400px). */
+  .community-bar {
+    padding: 10px 44px;
+  }
+
+  .community-bar__close {
+    right: 0;
+  }
+
   .community-bar__message {
     font-size: 13px;
   }

@@ -109,23 +109,9 @@
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: 6px;
-  border: 1px dashed #b45309;
-  color: #b45309;
-  background: rgba(180, 83, 9, 0.08);
-}
-
-[data-theme="dark"] .todo {
-  border-color: #fbbf24;
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .todo {
-    border-color: #fbbf24;
-    color: #fbbf24;
-    background: rgba(251, 191, 36, 0.1);
-  }
+  border: 1px dashed var(--color-warning);
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
 }
 
 .sectionNote {

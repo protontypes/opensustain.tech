@@ -35,7 +35,18 @@ export default async function BlogIndexPage() {
           <ul className={styles.grid}>
             {yearPosts.map((post) => (
               <li key={post.slug}>
-                <Link href={routes.blogPost(post.slug)} className={styles.card}>
+                {/*
+                 * `.card` is an <article>, not a <Link>: PostAuthors below
+                 * renders its own <a> per author, and nesting that inside a
+                 * whole-card <Link> is invalid HTML5 (browsers' parsing
+                 * splits the outer link into duplicate tab-stops around each
+                 * icon). Instead the title's <Link> gets a `::after` stretch
+                 * (see .cardTitleLink) that covers the whole `.card` box, so
+                 * clicking/tapping anywhere still opens the post, while the
+                 * real author links stay above it (z-index) as their own
+                 * single, correctly-targeted tab-stops.
+                 */}
+                <article className={styles.card}>
                   {post.image ? (
                     // Static export + third-party/local blog images: plain
                     // <img>, same reasoning as components/ui/avatar.tsx.
@@ -43,7 +54,11 @@ export default async function BlogIndexPage() {
                     <img className={styles.cardImage} src={post.image} alt="" loading="lazy" />
                   ) : null}
                   <div className={styles.cardBody}>
-                    <h3 className={styles.cardTitle}>{post.title}</h3>
+                    <h3 className={styles.cardTitle}>
+                      <Link href={routes.blogPost(post.slug)} className={styles.cardTitleLink}>
+                        {post.title}
+                      </Link>
+                    </h3>
                     <p className={styles.cardExcerpt}>{post.excerpt}</p>
                     <div className={styles.cardMeta}>
                       <time className={styles.cardDate} dateTime={post.date}>
@@ -52,7 +67,7 @@ export default async function BlogIndexPage() {
                       <PostAuthors authors={post.authors} />
                     </div>
                   </div>
-                </Link>
+                </article>
               </li>
             ))}
           </ul>

@@ -49,7 +49,7 @@ export default function PresentationsPage() {
                           cx="12"
                           cy="12"
                           r="11"
-                          fill="rgba(16, 22, 32, 0.55)"
+                          className="presentation-card__play-bg"
                         />
                         <path d="M10 8.2v7.6c0 .55.6.9 1.08.62l6.3-3.8a.72.72 0 0 0 0-1.24l-6.3-3.8A.72.72 0 0 0 10 8.2Z" />
                       </svg>

@@ -30,6 +30,7 @@
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -43,6 +44,22 @@
 .card:hover {
   transform: translateY(-2px);
   border-color: rgba(37, 99, 235, 0.3);
+}
+
+.cardTitleLink {
+  color: inherit;
+}
+
+/*
+ * Stretches the title link over the whole `.card` (its nearest positioned
+ * ancestor) so the entire tile stays clickable/tappable without the card
+ * itself being an <a> — see the comment in app/blog/page.tsx for why.
+ */
+.cardTitleLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
 
 .cardImage {
@@ -114,6 +131,11 @@
 }
 
 .cardMeta :global(.blog-authors__icon) {
+  /* Above .cardTitleLink::after's stretched overlay (z-index: 1), so each
+     author's own link stays independently clickable/focusable instead of
+     being covered by the whole-card link. */
+  position: relative;
+  z-index: 2;
   display: inline-flex;
   color: var(--color-text-secondary);
 }

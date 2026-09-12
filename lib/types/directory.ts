@@ -7,6 +7,13 @@ export type DirectoryProject = {
   subcategory: string | null;
   /** "csv" when data/projects.csv had a matching row; "readme" otherwise. */
   source: "csv" | "readme";
+  /**
+   * The project's own site, from the CSV's `homepage` column — distinct from
+   * `url`, which is whatever link the README lists (usually, but not always,
+   * the source repo). Present only when source === "csv" and the crawler
+   * found one; many projects have no separate homepage from their repo.
+   */
+  homepage: string | null;
   stars: number | null;
   language: string | null;
   license: string | null;

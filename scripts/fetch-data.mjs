@@ -262,6 +262,11 @@ const CSV_METRIC_FIELDS = [
   "platform",
   "latest_commit_activity",
   "project_created_at",
+  // The project's own site, separate from whichever link the README happens
+  // to point at (usually its repo). Powers the directory card's "Homepage"
+  // link. String, so it takes the `raw || null` branch below like the other
+  // non-numeric fields.
+  "homepage",
 ];
 
 function numberOrNull(value) {

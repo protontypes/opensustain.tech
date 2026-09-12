@@ -81,10 +81,13 @@ threw away the CSV's metrics for 97.3% of projects to accommodate the other
    never used to add or drop a project the README doesn't list, or to
    reorder categories.
 2. For each README entry, look up its CSV row by URL (falling back to name).
-   Found → attach `stars`, `language`, `license`, `contributors`,
+   Found → attach `homepage`, `stars`, `language`, `license`, `contributors`,
    `total_commits`, `downloads_last_month`, `score`, `platform`,
    `latest_commit_activity`, `project_created_at`, and prefer the CSV's
    `description` (fuller than most README one-liners). Tag `source: "csv"`.
+   `homepage` is the project's own site from the CSV, distinct from `url`
+   (whatever link the README happens to point at — usually, but not always,
+   the repo); the directory card links to both when they differ.
 3. Not found → keep the entry with only what the README itself has (name,
    url, description, category, subcategory). Tag `source: "readme"`, every
    metrics field `null`.
@@ -121,6 +124,7 @@ them, with no fabricated numbers.
         subcategory: string | null;
         source: "csv" | "readme";
         // present only when source === "csv":
+        homepage: string | null;
         stars: number | null;
         language: string | null;
         license: string | null;

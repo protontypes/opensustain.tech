@@ -373,9 +373,15 @@ async function fetchDirectory() {
     fallbackPath: null,
   });
 
-  if (readmeText === null) {
-    // Neither a live README nor a sibling checkout — fall all the way back
-    // to the committed, already-joined snapshot.
+  if (readmeText === null || projectsCsvText === null) {
+    // Missing either input produces a materially worse directory.json than
+    // what's already sitting in the repo: no README means no project list at
+    // all to build from; no CSV means every one of ~2,753 entries would
+    // render with zero metrics (source: "readme") even though most of them
+    // really do have a CSV row — CSV was just unreachable this run. Either
+    // way, the committed snapshot (built from both, sampled down) is the
+    // better fallback than building a degraded join from whichever half
+    // came through.
     const fallback = await readLocal(path.join(FALLBACK_DIR, "directory.json"));
     if (fallback !== null) {
       console.log("[fetch-data] directory.json: committed fallback snapshot (public/data/fallback/directory.json)");
@@ -386,7 +392,7 @@ async function fetchDirectory() {
     return;
   }
 
-  const directory = buildDirectory(readmeText, projectsCsvText ?? "");
+  const directory = buildDirectory(readmeText, projectsCsvText);
   console.log(
     `[fetch-data] directory.json: built ${directory.totals.projects} projects ` +
       `(${directory.totals.matched_from_csv} from CSV, ${directory.totals.readme_only} README-only) ` +

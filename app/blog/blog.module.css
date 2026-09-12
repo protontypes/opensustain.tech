@@ -1,0 +1,128 @@
+/*
+ * Styles for the /blog index only. Scoped via CSS Modules so nothing here
+ * can collide with another route's classes; the couple of rules that style
+ * markup produced outside this module (PostAuthors' plain classNames, used
+ * by both this page and the post page) are declared with :global() so they
+ * stay co-located with the rest of the blog's CSS instead of living in the
+ * shared globals.css.
+ */
+
+.year {
+  margin-top: 56px;
+}
+
+.year:first-child {
+  margin-top: 0;
+}
+
+.yearTitle {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-card-bg);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.cardImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--color-bg-alt);
+}
+
+.cardBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+}
+
+.cardTitle {
+  font-size: 18px;
+  margin-bottom: 0;
+}
+
+.cardExcerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.cardMeta {
+  margin-top: auto;
+  padding-top: 8px;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.cardDate {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/*
+ * PostAuthors (components/blog/post-authors.tsx) renders plain, unscoped
+ * classNames — CSS Modules can only guarantee no collisions for classes it
+ * hashes, so a shared cross-page component can't hand out module-scoped
+ * names. Scoped here under .cardMeta, the local ancestor everywhere this
+ * runs on the index page; post.module.css declares the same rules under its
+ * own local ancestor for the post page, since per-route CSS chunking means
+ * this file's output isn't guaranteed to load there.
+ */
+.cardMeta :global(.blog-authors) {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  margin: 0;
+}
+
+.cardMeta :global(.blog-authors__item) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.cardMeta :global(.blog-authors__icon) {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+}
+
+.cardMeta :global(.blog-authors__icon:hover) {
+  color: var(--color-link);
+}
+
+.cardMeta :global(.blog-authors__sep) {
+  margin-left: 6px;
+  color: var(--color-text-secondary);
+}

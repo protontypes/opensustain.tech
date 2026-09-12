@@ -1,0 +1,122 @@
+/*
+ * Styles for a single /blog/<slug> post. Scoped via CSS Modules; the
+ * :global() blocks target markup this route doesn't control directly —
+ * PostAuthors' plain classNames and the raw HTML (<figure>, <iframe>)
+ * embedded in the migrated markdown bodies (see content/blog/*.md and the
+ * attr_list conversion note in lib/blog/posts.ts's rendering step).
+ */
+
+.article {
+  max-width: 72ch;
+  margin: 0 auto;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.header {
+  padding-bottom: 32px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.date {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* PostAuthors renders plain (unscoped) classNames — see
+   components/blog/post-authors.tsx — so these are also declared in
+   blog.module.css, each scoped under that file's own local ancestor class. */
+.meta :global(.blog-authors) {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  margin: 0;
+}
+
+.meta :global(.blog-authors__item) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.meta :global(.blog-authors__icon) {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+}
+
+.meta :global(.blog-authors__icon:hover) {
+  color: var(--color-link);
+}
+
+.meta :global(.blog-authors__sep) {
+  margin-left: 6px;
+  color: var(--color-text-secondary);
+}
+
+/* The post's own OG image, shown again inline at the top of the article
+   when the source had a clear "hero" image (most posts' first figure). */
+.coverImage {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  margin: 32px 0;
+}
+
+.body {
+  margin-top: 32px;
+}
+
+/* Ported mkdocs `<figure markdown="span"> ![](img){: width=".." }
+   <figcaption>...</figcaption> </figure>` blocks — converted at migration
+   time (see content/blog/*.md) into plain <figure><img/><figcaption/>
+   blocks, styled here. */
+.body :global(.blog-figure) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 32px 0;
+}
+
+.body :global(.blog-figure img) {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+}
+
+.body :global(.blog-figure figcaption) {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* Flourish / Our World in Data embeds kept from the original posts. */
+.body :global(iframe) {
+  max-width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}

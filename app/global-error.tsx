@@ -27,7 +27,7 @@ export default function GlobalError({
       >
         <div style={{ maxWidth: "42ch", padding: 32, textAlign: "center" }}>
           <h1 style={{ fontSize: 28, margin: "0 0 12px" }}>
-            OpenSustain Analytics could not start
+            OpenSustain.Tech could not start
           </h1>
           <p style={{ margin: "0 0 24px", lineHeight: 1.6, color: "#4e6a9a" }}>
             Something failed before the page could render.

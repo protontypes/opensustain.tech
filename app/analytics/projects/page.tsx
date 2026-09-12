@@ -16,7 +16,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { loadFilters } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "Projects",
+  title: "Project Analytics",
   description:
     "Rank 2,691 open-source climate and sustainability projects by nine metrics, track how the ecosystem has grown, and see the licences, languages and registries behind them.",
 };

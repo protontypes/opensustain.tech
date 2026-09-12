@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunburst";
@@ -7,6 +8,7 @@ import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { snapshotOf } from "@/lib/data/snapshot";
 import { loadFilters, loadProjectRankings, loadSummary } from "@/lib/data";
+import { routes } from "@/lib/navigation";
 import {
   formatCompactNumber,
   formatDecimal,
@@ -14,28 +16,45 @@ import {
   formatPercent,
 } from "@/lib/format";
 
+export const metadata: Metadata = {
+  title: "Analytics",
+  description:
+    "Dashboards on the open-source climate and sustainability ecosystem: project rankings and lifecycle trends, contributing organizations, and the topics and keywords that recur across it.",
+};
+
+// This page is the landing spot the header's "Analytics" link points at —
+// an overview plus cards into the four dashboards below it, rather than a
+// second copy of any one of them. See DATA_CONTRACT.md / the site-shell
+// report for why /projects itself is not one of these cards: it's the OST
+// project directory now, not the project-rankings dashboard linked here.
 const routeCards = [
   {
-    href: "/projects",
-    title: "Projects",
+    href: routes.analyticsProjects,
+    title: "Project Analytics",
     description:
       "Detailed insights into project rankings, lifecycle trends, and community attributes.",
   },
   {
-    href: "/organizations",
+    href: routes.organizations,
     title: "Organizations",
     description:
       "Analyze the geographic distribution and hierarchy of contributing organizations.",
   },
   {
-    href: "/topics",
+    href: routes.topics,
     title: "Topics",
     description:
       "Explore the most frequent terms and thematic clusters extracted from documentation.",
   },
+  {
+    href: routes.methodology,
+    title: "Methodology",
+    description:
+      "Where the data comes from, how each metric is defined, and what this dashboard cannot tell you.",
+  },
 ];
 
-export default async function HomePage() {
+export default async function AnalyticsPage() {
   const [summary, filters, projectRankings] = await Promise.all([
     loadSummary(),
     loadFilters(),

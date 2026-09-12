@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { Snapshot } from "@/lib/data/snapshot";
+import { footerNavigation, routes, socialLinks } from "@/lib/navigation";
 
 export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
   return (
@@ -16,7 +17,7 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
                 width={200}
                 height={200}
               />
-              OpenSustain.Analytics
+              OpenSustain.Tech
             </span>
             {/* The year comes from the data, not the visitor's clock. */}
             <p className="footer-copyright">
@@ -27,7 +28,8 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
                 rel="noreferrer"
               >
                 CC BY 4.0
-              </a>
+              </a>{" "}
+              · <Link href={routes.privacyPolicy}>Privacy Policy</Link>
             </p>
             <p className="footer-copyright">
               Data snapshot of{" "}
@@ -38,13 +40,20 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
               </a>
               .
             </p>
+            <nav className="footer-social" aria-label="Social">
+              {socialLinks.map((link) => (
+                <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+                  {link.label}
+                </a>
+              ))}
+            </nav>
           </div>
           <nav className="footer-nav" aria-label="Footer">
-            <Link href="/">Overview</Link>
-            <Link href="/projects">Projects</Link>
-            <Link href="/organizations">Organizations</Link>
-            <Link href="/topics">Topics</Link>
-            <Link href="/methodology">Methodology</Link>
+            {footerNavigation.map((item) => (
+              <Link key={item.href} href={item.href}>
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
       </div>

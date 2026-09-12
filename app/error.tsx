@@ -39,7 +39,7 @@ export default function RouteError({
           Try again
         </button>
         <Link className="viz-button" href="/">
-          Go to the overview
+          Go to the homepage
         </Link>
       </div>
 

@@ -8,15 +8,35 @@ import { loadSnapshot } from "@/lib/data/snapshot";
 
 import "./globals.css";
 
+const SITE_URL = "https://opensustain.tech";
+// Adapted from open-sustainable-technology/docs/meta_tags.md, the mkdocs
+// site's own description and social-preview image.
+const SITE_DESCRIPTION =
+  "Open technology projects sustaining stable climate, energy supply, biodiversity and vital natural resources.";
+
 export const metadata: Metadata = {
-  // Every route shared one title, so four different pages were indistinguishable
-  // in a tab strip, in browser history and in a shared link.
+  metadataBase: new URL(SITE_URL),
+  // Every route shared one title on the old analytics-only app, so four
+  // different pages were indistinguishable in a tab strip, in browser
+  // history and in a shared link. Kept per-route here too.
   title: {
-    default: "OpenSustain Analytics",
-    template: "%s · OpenSustain Analytics",
+    default: "OpenSustain.Tech",
+    template: "%s · OpenSustain.Tech",
   },
-  description:
-    "Visualizing the open-source sustainability ecosystem. Insights into project health, community engagement, and technological trends in climate-tech.",
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: "OpenSustain.Tech",
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: "OpenSustain.Tech",
+    images: ["/images/earth.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OpenSustain.Tech",
+    description: SITE_DESCRIPTION,
+    images: ["/images/earth.png"],
+  },
 };
 
 export default async function RootLayout({
@@ -54,6 +74,28 @@ export default async function RootLayout({
                     document.documentElement.classList.add('community-dismissed');
                   }
                 } catch (e) {}
+              })();
+            `,
+          }}
+        />
+        {/*
+          Umami, same site ID mkdocs used (docs/overrides/main.html), gated
+          the same way that override gated it — config.extra.analytics.
+          production_url in config.site_url — so a localhost/preview/staging
+          copy of this static export never reports as opensustain.tech
+          traffic. A build-time env check can't do this: `next build`
+          freezes one static output that could get served from any host.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                if (window.location.hostname !== 'opensustain.tech') return;
+                var s = document.createElement('script');
+                s.defer = true;
+                s.src = 'https://cloud.umami.is/script.js';
+                s.setAttribute('data-website-id', '6c3cf2c8-549d-4add-b7dc-5f25fd17c90b');
+                document.head.appendChild(s);
               })();
             `,
           }}

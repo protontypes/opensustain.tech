@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { primaryNavigation } from "@/lib/navigation";
+import { externalNavigation, ostGithubUrl, primaryNavigation, routes } from "@/lib/navigation";
 
 export function SiteHeader() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -58,7 +58,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Link className="site-mark" href="/">
+        <Link className="site-mark" href={routes.home}>
           {/* Decorative: the wordmark beside it already names the site, so an
               alt here would make a screen reader say it twice. */}
           <img
@@ -68,7 +68,7 @@ export function SiteHeader() {
             width={200}
             height={200}
           />
-          <span className="site-mark__word">OpenSustain.Analytics</span>
+          <span className="site-mark__word">OpenSustain.Tech</span>
         </Link>
 
         <div className="header-right">
@@ -83,10 +83,21 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
+            {externalNavigation.map((item) => (
+              <a
+                key={item.href}
+                className="site-nav-link"
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {item.label}
+              </a>
+            ))}
           </nav>
 
           <a
-            href="https://github.com/OpenSustainTech"
+            href={ostGithubUrl}
             target="_blank"
             rel="noreferrer"
             className="header-github"
@@ -135,6 +146,17 @@ export function SiteHeader() {
           >
             {item.label}
           </Link>
+        ))}
+        {externalNavigation.map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            target="_blank"
+            rel="noreferrer"
+            className="mobile-nav__link"
+          >
+            {item.label}
+          </a>
         ))}
       </nav>
     </header>

@@ -55,7 +55,7 @@ export const team: TeamMember[] = [
     givenName: "Salam",
     fullName: "Abdul Salam Issahaku",
     role: "Software Developer",
-    bio: "Software developer based in Accra, Ghana, building the OpenSustain.tech website and analytics dashboard.",
+    bio: "Builds open digital infrastructure at the intersection of sustainability, AI, and data interoperability.",
     avatarUrl: "https://avatars.githubusercontent.com/u/60816007?v=4",
     links: [
       { label: "GitHub", url: "https://github.com/AbdulSalam416" },

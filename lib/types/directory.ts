@@ -24,6 +24,17 @@ export type DirectoryProject = {
   platform: string | null;
   latest_commit_activity: string | null;
   project_created_at: string | null;
+  /**
+   * The next three feed the project overlay. Optional, because a
+   * directory.json built before they existed (an older fallback snapshot)
+   * does not carry them.
+   */
+  /** The owner's avatar (GitHub's `<owner>.png`). */
+  avatar_url?: string | null;
+  /** The repository's topics, as the crawler recorded them. */
+  keywords?: string[];
+  /** Sponsorship pages: GitHub Sponsors, Open Collective, ... */
+  funding_links?: string[];
 };
 
 export type DirectorySubcategory = {

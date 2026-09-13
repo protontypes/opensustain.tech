@@ -269,6 +269,12 @@ const CSV_METRIC_FIELDS = [
   "homepage",
 ];
 
+/** A comma-separated CSV cell ("climate, python, remote-sensing") as a de-duplicated list. */
+function splitList(value) {
+  if (!value) return [];
+  return [...new Set(value.split(",").map((part) => part.trim()).filter(Boolean))];
+}
+
 function numberOrNull(value) {
   if (value === undefined || value === null || value === "") return null;
   const n = Number(value);
@@ -326,6 +332,11 @@ function buildDirectory(readmeText, projectsCsvText) {
           ? numberOrNull(raw)
           : raw || null;
       }
+      // For the directory's project overlay: the owner's avatar, the
+      // repository's topics, and where to sponsor it.
+      project.avatar_url = row.avatar_url || null;
+      project.keywords = splitList(row.keywords);
+      project.funding_links = splitList(row.funding_links);
     }
 
     if (!categories.has(entry.category)) {

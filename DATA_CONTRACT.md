@@ -87,7 +87,9 @@ threw away the CSV's metrics for 97.3% of projects to accommodate the other
    `description` (fuller than most README one-liners). Tag `source: "csv"`.
    `homepage` is the project's own site from the CSV, distinct from `url`
    (whatever link the README happens to point at — usually, but not always,
-   the repo); the directory card links to both when they differ.
+   the repo); the project overlay links to both when they differ. The
+   overlay also shows `avatar_url`, `keywords` (the repository's topics) and
+   `funding_links`, the last two split from the CSV's comma-separated cells.
 3. Not found → keep the entry with only what the README itself has (name,
    url, description, category, subcategory). Tag `source: "readme"`, every
    metrics field `null`.
@@ -135,6 +137,9 @@ them, with no fabricated numbers.
         platform: string | null;
         latest_commit_activity: string | null;
         project_created_at: string | null;
+        avatar_url: string | null;
+        keywords: string[];
+        funding_links: string[];
       }>;
     }>;
   }>;

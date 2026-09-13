@@ -1,11 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { param, useUrlState } from "@/lib/hooks/use-url-state";
 import { useDirectory } from "@/lib/data/use-directory";
 import { formatCompactNumber, formatNumber } from "@/lib/format";
 import type { DirectoryPayload, DirectoryProject } from "@/lib/types/directory";
+
+import { ProjectDialog } from "./project-dialog";
+import { formatMonthYear } from "./project-format";
 
 /**
  * Search/filter over ~2,753 projects.
@@ -21,7 +24,8 @@ import type { DirectoryPayload, DirectoryProject } from "@/lib/types/directory";
  */
 function matchesQuery(project: DirectoryProject, query: string): boolean {
   if (!query) return true;
-  const haystack = `${project.name} ${project.description}`.toLowerCase();
+  // Topics are searched too, so a topic chip in the overlay finds its siblings.
+  const haystack = `${project.name} ${project.description} ${(project.keywords ?? []).join(" ")}`.toLowerCase();
   return haystack.includes(query);
 }
 
@@ -34,95 +38,126 @@ const ALL = "all";
  * here. */
 const PAGE_SIZE = 60;
 
-function normalizeForCompare(url: string | null | undefined): string {
-  if (!url) return "";
-  return url
-    .trim()
-    .replace(/\/+$/, "")
-    .replace(/^https?:\/\/(www\.)?/i, "")
-    .toLowerCase();
-}
-
-function isGithubUrl(url: string): boolean {
-  return /^https?:\/\/(www\.)?github\.com\//i.test(url);
-}
-
-function formatMonthYear(iso: string): string | null {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" }).format(date);
-}
+type View = "grid" | "list";
 
 /** Flattens the category/subcategory tree into one README-ordered list —
  * every project already carries its own `category`/`subcategory`, so nothing
  * downstream needs the nesting. */
-function flattenProjects(data: DirectoryPayload): DirectoryProject[] {
+function flattenProjects(data: DirectoryProject[] | DirectoryPayload): DirectoryProject[] {
+  if (Array.isArray(data)) return data;
   return data.categories.flatMap((cat) => cat.subcategories.flatMap((sub) => sub.projects));
 }
 
-function ProjectCard({ project }: { project: DirectoryProject }) {
-  const activity = project.latest_commit_activity ? formatMonthYear(project.latest_commit_activity) : null;
-  const hasDistinctHomepage =
-    project.homepage && normalizeForCompare(project.homepage) !== normalizeForCompare(project.url);
-  const repoIsGithub = isGithubUrl(project.url);
+/**
+ * Opens the project overlay. A real button, stretched over its card or row by
+ * `::after`, so the whole card is the click target while keyboard and
+ * screen-reader users meet one named control per project.
+ */
+function OpenButton({
+  project,
+  onOpen,
+}: {
+  project: DirectoryProject;
+  onOpen: (project: DirectoryProject) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="directory-open"
+      aria-haspopup="dialog"
+      onClick={() => onOpen(project)}
+    >
+      {project.name}
+    </button>
+  );
+}
+
+function ProjectCard({
+  project,
+  onOpen,
+}: {
+  project: DirectoryProject;
+  onOpen: (project: DirectoryProject) => void;
+}) {
+  const activity = formatMonthYear(project.latest_commit_activity);
 
   return (
-    <li className="directory-card">
-      <a className="directory-card__name" href={project.url} target="_blank" rel="noreferrer">
-        {project.name}
-      </a>
-      <p className="directory-card__description">{project.description}</p>
-      <div className="directory-card__meta">
-        {project.subcategory ? (
-          <span className="directory-badge">{project.subcategory}</span>
-        ) : null}
-        {project.language ? (
-          <span className="directory-badge">{project.language}</span>
-        ) : null}
-        {project.license ? (
-          <span className="directory-badge">{project.license}</span>
-        ) : null}
-        {typeof project.stars === "number" ? (
-          <span className="directory-badge directory-badge--stat">
-            <i className="fa-solid fa-star" aria-hidden="true" /> {formatCompactNumber(project.stars)}
-          </span>
-        ) : null}
-        {activity ? (
-          <span className="directory-badge directory-badge--stat" title="Latest commit activity">
-            <i className="fa-solid fa-code-commit" aria-hidden="true" /> {activity}
-          </span>
-        ) : null}
-        {project.source === "readme" ? (
-          <span
-            className="directory-badge directory-badge--pending"
-            title="Recently added to the directory; metrics not yet synced."
-          >
-            Recently added
-          </span>
-        ) : null}
-      </div>
-      <div className="directory-card__links">
-        <a
-          className="directory-card__link"
-          href={project.url}
-          target="_blank"
-          rel="noreferrer"
+    <li>
+      <article className="directory-card">
+        <h3 className="directory-card__title">
+          <OpenButton project={project} onOpen={onOpen} />
+        </h3>
+        <p className="directory-card__description">{project.description}</p>
+        <div className="directory-card__meta">
+          {project.subcategory ? (
+            <span className="directory-badge">{project.subcategory}</span>
+          ) : null}
+          {project.language ? (
+            <span className="directory-badge">{project.language}</span>
+          ) : null}
+          {typeof project.stars === "number" ? (
+            <span className="directory-badge directory-badge--stat">
+              <i className="fa-solid fa-star" aria-hidden="true" /> {formatCompactNumber(project.stars)}
+            </span>
+          ) : null}
+          {activity ? (
+            <span className="directory-badge directory-badge--stat" title="Latest commit activity">
+              <i className="fa-solid fa-code-commit" aria-hidden="true" /> {activity}
+            </span>
+          ) : null}
+          {project.source === "readme" ? (
+            <span
+              className="directory-badge directory-badge--pending"
+              title="Recently added to the directory; metrics not yet synced."
+            >
+              Recently added
+            </span>
+          ) : null}
+        </div>
+      </article>
+    </li>
+  );
+}
+
+function ProjectRow({
+  project,
+  onOpen,
+}: {
+  project: DirectoryProject;
+  onOpen: (project: DirectoryProject) => void;
+}) {
+  const activity = formatMonthYear(project.latest_commit_activity);
+
+  return (
+    <li>
+      <article className="directory-row">
+        <div className="directory-row__main">
+          <h3 className="directory-row__title">
+            <OpenButton project={project} onOpen={onOpen} />
+          </h3>
+          <p className="directory-row__description">{project.description}</p>
+        </div>
+        <span className="directory-row__cell directory-row__cell--sub">
+          {project.subcategory ?? ""}
+        </span>
+        <span className="directory-row__cell directory-row__cell--lang">
+          {project.language ?? ""}
+        </span>
+        <span className="directory-row__cell directory-row__cell--stat">
+          {typeof project.stars === "number" ? (
+            <>
+              <i className="fa-solid fa-star" aria-hidden="true" />
+              <span className="visually-hidden">Stars:</span> {formatCompactNumber(project.stars)}
+            </>
+          ) : null}
+        </span>
+        <span
+          className="directory-row__cell directory-row__cell--activity"
+          title="Latest commit activity"
         >
-          <i className={repoIsGithub ? "fa-brands fa-github" : "fa-solid fa-code-branch"} aria-hidden="true" />
-          {repoIsGithub ? "GitHub" : "Source"}
-        </a>
-        {hasDistinctHomepage ? (
-          <a
-            className="directory-card__link"
-            href={project.homepage as string}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
-            Homepage
-          </a>
-        ) : null}
-      </div>
+          {activity ?? (project.source === "readme" ? "Recently added" : "")}
+        </span>
+      </article>
     </li>
   );
 }
@@ -135,6 +170,11 @@ export function ProjectDirectory() {
   const [category, setCategory] = useState(ALL);
   const [subcategory, setSubcategory] = useState(ALL);
   const [page, setPage] = useState(1);
+  const [view, setView] = useState<View>("grid");
+  const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
+  // True while the open overlay has its own history entry, so closing it can
+  // step back instead of leaving a duplicate entry behind.
+  const pushedOverlay = useRef(false);
 
   // The URL wins over these defaults, and over Back/Forward — same pattern
   // as the analytics charts' `useUrlState` usage.
@@ -145,6 +185,10 @@ export function ProjectDirectory() {
     setSubcategory(param(params, "sub", ALL));
     const pageParam = Number(param(params, "page", "1"));
     setPage(Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1);
+    setView(param(params, "view", "grid") === "list" ? "list" : "grid");
+    const project = params.get("project");
+    setSelectedUrl(project);
+    if (!project) pushedOverlay.current = false;
   }, [params]);
 
   /** Updates one or more filters, writes them to the address bar, and resets
@@ -178,7 +222,49 @@ export function ProjectDirectory() {
     [write],
   );
 
+  const chooseView = useCallback(
+    (next: View) => {
+      setView(next);
+      write({ view: next === "list" ? "list" : null });
+    },
+    [write],
+  );
+
+  // Its own history entry, so Back closes the overlay rather than leaving the
+  // page — and the address can be shared to open straight onto a project.
+  const openProject = useCallback(
+    (project: DirectoryProject) => {
+      pushedOverlay.current = true;
+      write({ project: project.url }, "push");
+    },
+    [write],
+  );
+
+  const closeProject = useCallback(() => {
+    if (pushedOverlay.current) {
+      pushedOverlay.current = false;
+      window.history.back();
+    } else {
+      write({ project: null });
+    }
+  }, [write]);
+
+  const searchKeyword = useCallback(
+    (keyword: string) => {
+      pushedOverlay.current = false;
+      write({ project: null });
+      applyFilters({ q: keyword, cat: ALL });
+    },
+    [write, applyFilters],
+  );
+
   const allProjects = useMemo(() => (data ? flattenProjects(data) : []), [data]);
+
+  const projectsByUrl = useMemo(
+    () => new Map(allProjects.map((project) => [project.url, project])),
+    [allProjects],
+  );
+  const selectedProject = selectedUrl ? (projectsByUrl.get(selectedUrl) ?? null) : null;
 
   const categories = useMemo(() => data?.categories.map((c) => c.name) ?? [], [data]);
 
@@ -226,7 +312,7 @@ export function ProjectDirectory() {
           <span className="viz-field__label">Search</span>
           <input
             type="search"
-            placeholder="Search by name or description…"
+            placeholder="Search by name, description or topic…"
             value={query}
             onChange={(event) => applyFilters({ q: event.target.value })}
           />
@@ -267,14 +353,45 @@ export function ProjectDirectory() {
         <p className="panel-description">No projects match “{query}”. Try a different search or filter.</p>
       ) : (
         <>
-          <p className="directory-range" aria-live="polite">
-            Showing {formatNumber(rangeStart)}–{formatNumber(rangeEnd)} of {formatNumber(filtered.length)}
-          </p>
-          <ul className="directory-grid">
-            {visible.map((project) => (
-              <ProjectCard key={project.url || project.name} project={project} />
-            ))}
-          </ul>
+          <div className="directory-toolbar">
+            <p className="directory-range" aria-live="polite">
+              Showing {formatNumber(rangeStart)}–{formatNumber(rangeEnd)} of {formatNumber(filtered.length)}
+            </p>
+            <div className="viz-segmented directory-view-toggle" role="group" aria-label="Layout">
+              <button
+                type="button"
+                aria-pressed={view === "grid"}
+                aria-label="Grid view"
+                title="Grid view"
+                onClick={() => chooseView("grid")}
+              >
+                <i className="fa-solid fa-grip" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                aria-pressed={view === "list"}
+                aria-label="List view"
+                title="List view"
+                onClick={() => chooseView("list")}
+              >
+                <i className="fa-solid fa-list" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+
+          {view === "grid" ? (
+            <ul className="directory-grid">
+              {visible.map((project) => (
+                <ProjectCard key={project.url || project.name} project={project} onOpen={openProject} />
+              ))}
+            </ul>
+          ) : (
+            <ul className="directory-list">
+              {visible.map((project) => (
+                <ProjectRow key={project.url || project.name} project={project} onOpen={openProject} />
+              ))}
+            </ul>
+          )}
 
           {totalPages > 1 ? (
             <nav className="directory-pagination" aria-label="Project directory pages">
@@ -301,6 +418,8 @@ export function ProjectDirectory() {
           ) : null}
         </>
       )}
+
+      <ProjectDialog project={selectedProject} onClose={closeProject} onKeyword={searchKeyword} />
     </div>
   );
 }

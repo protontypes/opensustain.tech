@@ -1,11 +1,9 @@
 /**
  * Every route on opensustain.tech, in one place.
  *
- * This is the file downstream page work should never need to touch: routes
- * for pages that don't exist yet (blog, about, presentations, privacy
- * policy) are registered here already, so a page landing at exactly the
- * right path is enough to make it navigable — no edit here required. Adding
- * a genuinely new route is the one reason to come back to this file.
+ * A page landing at exactly a path registered here is enough to make it
+ * navigable. Adding a genuinely new route is the one reason to come back to
+ * this file.
  */
 
 export const routes = {
@@ -30,31 +28,43 @@ export const routes = {
   topics: "/topics",
   methodology: "/methodology",
 
-  // Not built yet — other agents create pages at exactly these paths.
+  // Media: articles and talks, one header entry with a tab per route (see
+  // components/media/media-tabs.tsx). Articles keep the /blog path so every
+  // old mkdocs /blog/<slug>/ URL still resolves; the old /presentations URL
+  // is a redirect stub to `talks`. `talks` is a static segment, so it wins
+  // over /blog/[slug] — never publish a post with the slug "talks".
   blog: "/blog",
   blogPost: (slug: string) => `/blog/${slug}` as const,
+  talks: "/blog/talks",
   about: "/about",
-  presentations: "/presentations",
   privacyPolicy: "/privacy-policy",
 } as const;
+
+/** Shared under the "Media" heading on both of its tabs, /blog and /blog/talks. */
+export const MEDIA_DESCRIPTION =
+  "Articles and conference talks from the OpenSustain.tech community on open source, climate technology and environmental sustainability.";
 
 /** Header navigation, in display order. */
 export const primaryNavigation = [
   { href: routes.projects, label: "Projects" },
   { href: routes.analytics, label: "Analytics" },
-  { href: routes.blog, label: "Blog" },
-  { href: routes.presentations, label: "Presentations" },
+  { href: routes.blog, label: "Media" },
   { href: routes.about, label: "About" },
 ] as const;
 
-/** Header links that leave the site, appended after primaryNavigation. */
-export const externalNavigation = [
-  {
-    href: "https://github.com/protontypes/open-sustainable-technology/blob/main/CONTRIBUTING.md",
-    label: "Contribute",
-  },
-  { href: "https://climatetriage.com/", label: "ClimateTriage" },
-] as const;
+/** The header's one call to action, rendered as a button, not a nav link. */
+export const contributeLink = {
+  href: "https://github.com/protontypes/open-sustainable-technology/blob/main/CONTRIBUTING.md",
+  label: "Contribute",
+} as const;
+
+export const climateTriageLink = {
+  href: "https://climatetriage.com/",
+  label: "ClimateTriage",
+} as const;
+
+/** Both ways to act on the ecosystem off-site, as the homepage hero lists them. */
+export const externalNavigation = [contributeLink, climateTriageLink] as const;
 
 /** Footer link columns. */
 export const footerNavigation = [
@@ -63,8 +73,8 @@ export const footerNavigation = [
   { href: routes.organizations, label: "Organizations" },
   { href: routes.topics, label: "Topics" },
   { href: routes.methodology, label: "Methodology" },
-  { href: routes.blog, label: "Blog" },
-  { href: routes.presentations, label: "Presentations" },
+  { href: routes.blog, label: "Articles" },
+  { href: routes.talks, label: "Talks" },
   { href: routes.about, label: "About" },
 ] as const;
 

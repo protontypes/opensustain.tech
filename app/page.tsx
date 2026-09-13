@@ -22,9 +22,9 @@ const exploreCards = [
   },
   {
     href: routes.blog,
-    title: "Blog",
+    title: "Media",
     description:
-      "Community writing on open source, climate technology, and the ecosystem this directory tracks.",
+      "Community articles and recorded conference talks on open source, climate technology, and the ecosystem this directory tracks.",
   },
 ];
 

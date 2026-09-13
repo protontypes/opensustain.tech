@@ -2,17 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PostAuthors } from "@/components/blog/post-authors";
+import { MediaTabs } from "@/components/media/media-tabs";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { formatBlogDate } from "@/lib/blog/format-date";
 import { groupByYear, loadAllPosts } from "@/lib/blog/posts";
-import { routes } from "@/lib/navigation";
+import { MEDIA_DESCRIPTION, routes } from "@/lib/navigation";
 
 import styles from "./blog.module.css";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Articles",
   description:
-    "Writing from the OpenSustain.tech community on open source, climate technology and environmental sustainability.",
+    "Articles from the OpenSustain.tech community on open source, climate technology and environmental sustainability.",
 };
 
 export default async function BlogIndexPage() {
@@ -21,11 +22,8 @@ export default async function BlogIndexPage() {
 
   return (
     <main className="page-shell">
-      <SectionHeading
-        as="h1"
-        title="Blog"
-        description="Writing from the OpenSustain.tech community on open source, climate technology and environmental sustainability."
-      />
+      <SectionHeading as="h1" title="Media" description={MEDIA_DESCRIPTION} />
+      <MediaTabs active="articles" />
 
       {years.map(([year, yearPosts]) => (
         <section key={year} className={styles.year} aria-labelledby={`blog-year-${year}`}>

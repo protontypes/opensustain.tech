@@ -20,7 +20,7 @@ const paths: string[] = [
   routes.topics,
   routes.methodology,
   routes.blog,
-  routes.presentations,
+  routes.talks,
   routes.about,
   routes.privacyPolicy,
 ];

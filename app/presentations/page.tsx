@@ -1,90 +1,25 @@
 import type { Metadata } from "next";
 
-import { SectionHeading } from "@/components/ui/section-heading";
-import { presentations } from "@/lib/presentations";
+import { RedirectStub } from "@/components/seo/redirect-stub";
+import { routes } from "@/lib/navigation";
 
-import "./presentations.css";
+// Presentations had their own header entry until they moved under Media as
+// the Talks tab, next to articles. This keeps the old mkdocs-era URL, and
+// any link to this site's own /presentations page, landing on the talks.
+const DESTINATION = `${routes.talks}/`;
 
 export const metadata: Metadata = {
-  title: "Presentations",
-  description:
-    "Talks and conference appearances where Open Sustainable Technology has shown the contribution of open source to environmental sustainability.",
+  title: "Moved",
+  robots: { index: false, follow: true },
+  alternates: { canonical: DESTINATION },
 };
 
-export default function PresentationsPage() {
+export default function PresentationsRedirectPage() {
   return (
-    <main className="page-shell">
-      <SectionHeading
-        as="h1"
-        title="Presentations"
-        description="Open Sustainable Technology has participated in numerous conferences and other events to showcase the vital contribution of open source to environmental sustainability."
-      />
-
-      <ul className="presentations-grid">
-        {presentations.map((presentation) => (
-          <li key={presentation.url}>
-            <a
-              className="panel presentation-card"
-              href={presentation.url}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <div
-                className={
-                  presentation.thumbnailUrl
-                    ? "presentation-card__thumb"
-                    : "presentation-card__thumb presentation-card__thumb--placeholder"
-                }
-              >
-                {presentation.thumbnailUrl ? (
-                  <>
-                    <img
-                      src={presentation.thumbnailUrl}
-                      alt=""
-                      loading="lazy"
-                    />
-                    <span className="presentation-card__play" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" fill="#ffffff">
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="11"
-                          className="presentation-card__play-bg"
-                        />
-                        <path d="M10 8.2v7.6c0 .55.6.9 1.08.62l6.3-3.8a.72.72 0 0 0 0-1.24l-6.3-3.8A.72.72 0 0 0 10 8.2Z" />
-                      </svg>
-                    </span>
-                  </>
-                ) : (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13.5 10.5 21 3m0 0h-5.5M21 3v5.5M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"
-                    />
-                  </svg>
-                )}
-              </div>
-
-              <p className="presentation-card__meta">
-                {presentation.event} · {presentation.year}
-              </p>
-              <h3 className="presentation-card__title">{presentation.title}</h3>
-
-              <span className="inline-link presentation-card__cta">
-                {presentation.youtubeId ? "Watch the talk" : "View details"}
-                {" ↗"}
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </main>
+    <RedirectStub
+      to={DESTINATION}
+      destinationLabel="Talks"
+      reason="Presentations now live under Media, alongside articles."
+    />
   );
 }

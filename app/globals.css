@@ -354,6 +354,55 @@ p {
   background: none;
 }
 
+.site-nav-link--external {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.site-nav-link--external i {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* Contribute: the one action the header asks visitors to take, set apart as
+   a button instead of competing with the route links as more text. Same
+   fill/hover pair as .viz-button--primary. */
+.site-nav-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  margin-left: 28px;
+  padding: 0 16px;
+  border: 1px solid var(--color-primary);
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.site-nav-cta:hover {
+  background: var(--color-green);
+  border-color: var(--color-green);
+  color: #101620;
+}
+
+.site-nav-cta:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+/* Below 768px the mobile menu lists Contribute with everything else. */
+@media (max-width: 768px) {
+  .site-nav-cta {
+    display: none;
+  }
+}
+
 /* --- Theme Toggle --- */
 .theme-toggle {
   display: inline-flex;

@@ -1,5 +1,5 @@
 /**
- * Talks and conference appearances, for the /presentations route.
+ * Talks and conference appearances, for the Talks tab at /blog/talks.
  *
  * Source of truth: open-sustainable-technology/docs/presentations.md (a
  * sibling checkout, not part of this repo, so it isn't available at build

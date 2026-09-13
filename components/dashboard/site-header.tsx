@@ -4,7 +4,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { externalNavigation, ostGithubUrl, primaryNavigation, routes } from "@/lib/navigation";
+import {
+  climateTriageLink,
+  contributeLink,
+  ostGithubUrl,
+  primaryNavigation,
+  routes,
+} from "@/lib/navigation";
+
+// A section stays highlighted on its sub-pages: Media on /blog/talks and on
+// every post, Analytics on /analytics/projects. trailingSlash: true means the
+// pathname can arrive as "/blog/" as well as "/blog".
+function isActive(pathname: string, href: string): boolean {
+  const path = pathname.replace(/\/+$/, "") || "/";
+  return path === href || path.startsWith(`${href}/`);
+}
 
 export function SiteHeader() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -78,23 +92,30 @@ export function SiteHeader() {
                 key={item.href}
                 className="site-nav-link"
                 href={item.href}
-                aria-current={pathname === item.href ? "page" : undefined}
+                aria-current={isActive(pathname, item.href) ? "page" : undefined}
               >
                 {item.label}
               </Link>
             ))}
-            {externalNavigation.map((item) => (
-              <a
-                key={item.href}
-                className="site-nav-link"
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {item.label}
-              </a>
-            ))}
+            <a
+              className="site-nav-link site-nav-link--external"
+              href={climateTriageLink.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {climateTriageLink.label}
+              <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+            </a>
           </nav>
+
+          <a
+            className="site-nav-cta"
+            href={contributeLink.href}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {contributeLink.label}
+          </a>
 
           <a
             href={ostGithubUrl}
@@ -142,12 +163,12 @@ export function SiteHeader() {
             key={item.href}
             href={item.href}
             className="mobile-nav__link"
-            aria-current={pathname === item.href ? "page" : undefined}
+            aria-current={isActive(pathname, item.href) ? "page" : undefined}
           >
             {item.label}
           </Link>
         ))}
-        {externalNavigation.map((item) => (
+        {[climateTriageLink, contributeLink].map((item) => (
           <a
             key={item.href}
             href={item.href}

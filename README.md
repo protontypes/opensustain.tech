@@ -50,9 +50,9 @@ pnpm typecheck
 | `/organizations` | Organization geography, hierarchy, and rankings |
 | `/topics` | Keyword and topic analysis |
 | `/methodology` | Where the data comes from and its known limits |
-| `/blog`, `/blog/[slug]` | Blog, migrated from the old mkdocs site |
+| `/blog`, `/blog/[slug]` | Media → Articles: the blog, migrated from the old mkdocs site |
+| `/blog/talks` | Media → Talks: conference talks and appearances (`/presentations` redirects here) |
 | `/about` | Team + GitHub contributors |
-| `/presentations` | Talks and conference appearances |
 | `/privacy-policy` | Privacy policy |
 
 All routes are registered in `lib/navigation.ts`; a page landing at exactly

@@ -55,7 +55,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     <main className="page-shell">
       <article className={styles.article}>
         <Link href={routes.blog} className={`inline-link ${styles.back}`}>
-          ← Blog
+          ← All articles
         </Link>
 
         <header className={styles.header}>

@@ -44,11 +44,12 @@ export default async function HomePage() {
           A directory and analysis of the open-source ecosystem in climate
           change, sustainable energy, biodiversity, and natural resources.
         </p>
-        <div className="hero-badges">
-          <span>{filters.categories.length} categories</span>
-          <span>{filters.sub_categories.length} subcategories</span>
-          <span>{formatNumber(summary.totals.organizations)} organizations</span>
-        </div>
+        {/*
+         * The categories/subcategories/organizations counts used to repeat
+         * here as a small inline line, directly duplicating the four stat
+         * tiles right below — the same numbers shown twice in a row. Removed
+         * so each one appears exactly once, in the tiles.
+         */}
         <p className="hero-scope">
           Community-maintained on GitHub —{" "}
           {externalNavigation.map((link, index) => (

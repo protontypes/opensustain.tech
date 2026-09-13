@@ -76,10 +76,14 @@ export default async function AnalyticsPage() {
           Tracking the health, community engagement, and technological trends
           across the open-source climate-tech ecosystem.
         </p>
+        {/*
+         * "active" used to be a third badge here, repeating the Active tile's
+         * own hint text below almost verbatim. Categories/sub-categories stay
+         * — they appear nowhere else on this page.
+         */}
         <div className="hero-badges">
           <span>{filters.categories.length} categories</span>
           <span>{filters.sub_categories.length} sub-categories</span>
-          <span>{formatPercent(activeRate)} active</span>
         </div>
         {/* Scope and provenance in one line, so a reader arriving from a link
             knows what this covers and how current it is. */}

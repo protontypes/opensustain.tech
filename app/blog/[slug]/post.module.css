@@ -75,15 +75,23 @@
 }
 
 /* The post's own OG image, shown again inline at the top of the article
-   when the source had a clear "hero" image (most posts' first figure). */
+   when the source had a clear "hero" image (most posts' first figure). A
+   step of --color-bg-alt behind it, same as the /blog index cards, so a
+   white-background screenshot doesn't bleed straight into the page. */
+.coverImageWrap {
+  padding: 10px;
+  border-radius: 20px;
+  background: var(--color-bg-alt);
+  margin: 32px 0;
+}
+
 .coverImage {
   display: block;
   width: 100%;
   max-height: 420px;
   object-fit: cover;
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid var(--color-border);
-  margin: 32px 0;
 }
 
 .body {

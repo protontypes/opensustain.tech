@@ -69,8 +69,13 @@ export default async function BlogPostPage({ params }: PageProps) {
         </header>
 
         {post.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img className={styles.coverImage} src={post.image} alt="" />
+          // Same mat treatment as the /blog index cards (see blog.module.css'
+          // .cardImageWrap): a step of background behind the image so a
+          // white-background screenshot doesn't bleed straight into the page.
+          <div className={styles.coverImageWrap}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className={styles.coverImage} src={post.image} alt="" />
+          </div>
         ) : null}
 
         <div

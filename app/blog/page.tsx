@@ -48,10 +48,20 @@ export default async function BlogIndexPage() {
                  */}
                 <article className={styles.card}>
                   {post.image ? (
-                    // Static export + third-party/local blog images: plain
-                    // <img>, same reasoning as components/ui/avatar.tsx.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img className={styles.cardImage} src={post.image} alt="" loading="lazy" />
+                    // A mat behind the image, not the image bled to the
+                    // card's own edge: several posts' cover images are
+                    // screenshots with a plain white background, which
+                    // otherwise sit directly against the card's ground with
+                    // no visible border in dark mode — reading as a broken
+                    // image rather than a thumbnail. See wordcloud-image in
+                    // globals.css for the same treatment on the same
+                    // problem elsewhere on the site.
+                    <div className={styles.cardImageWrap}>
+                      {/* Static export + third-party/local blog images: plain
+                          <img>, same reasoning as components/ui/avatar.tsx. */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className={styles.cardImage} src={post.image} alt="" loading="lazy" />
+                    </div>
                   ) : null}
                   <div className={styles.cardBody}>
                     <h3 className={styles.cardTitle}>

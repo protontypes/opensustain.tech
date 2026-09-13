@@ -62,11 +62,25 @@
   z-index: 1;
 }
 
+/*
+ * The mat: a step of --color-bg-alt (not the card's own --color-card-bg,
+ * so it reads as a distinct surface) plus a little padding, so the image
+ * — cropped to floor(16:9) inside it — always sits inset from the card's
+ * edge instead of bleeding straight into it.
+ */
+.cardImageWrap {
+  padding: 10px;
+  background: var(--color-bg-alt);
+}
+
 .cardImage {
+  display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
 }
 
 .cardBody {

@@ -72,6 +72,13 @@
   color: var(--color-text-secondary);
 }
 
+.bio {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
 .links {
   display: flex;
   flex-wrap: wrap;

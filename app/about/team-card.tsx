@@ -51,6 +51,12 @@ export function TeamCard({ member }: { member: TeamMember }) {
         <span className={styles.todo}>TODO: role</span>
       )}
 
+      {member.bio ? (
+        <p className={styles.bio}>{member.bio}</p>
+      ) : (
+        <span className={styles.todo}>TODO: bio</span>
+      )}
+
       {member.links.length > 0 ? (
         <div className={styles.links}>
           {member.links.map((link) => (

@@ -46,7 +46,7 @@ export const MEDIA_DESCRIPTION =
 
 /** Header navigation, in display order. */
 export const primaryNavigation = [
-  { href: routes.projects, label: "Projects" },
+  { href: routes.projects, label: "Directory" },
   { href: routes.analytics, label: "Analytics" },
   { href: routes.blog, label: "Media" },
   { href: routes.about, label: "About" },
@@ -68,7 +68,7 @@ export const externalNavigation = [contributeLink, climateTriageLink] as const;
 
 /** Footer link columns. */
 export const footerNavigation = [
-  { href: routes.projects, label: "Projects" },
+  { href: routes.projects, label: "Directory" },
   { href: routes.analytics, label: "Analytics" },
   { href: routes.organizations, label: "Organizations" },
   { href: routes.topics, label: "Topics" },

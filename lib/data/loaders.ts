@@ -47,6 +47,13 @@ const payloadRequiredKeys: {
     "records",
   ],
   projectAttributes: ["generated_at", "top_n_default", "commit_activity", "fields"],
+  projectAttributeRecords: [
+    "generated_at",
+    "source_generated_at",
+    "top_n_default",
+    "coverage",
+    "records",
+  ],
   organizationsOverview: [
     "generated_at",
     "countries",

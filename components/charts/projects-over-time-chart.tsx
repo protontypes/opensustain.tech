@@ -26,6 +26,7 @@ import { useChartExport } from "@/lib/charts/use-chart-export";
 
 import { EChart } from "./echart";
 import { ExportMenu } from "./export-menu";
+import { useProjectFilters } from "./project-filters";
 
 /**
  * Bubble radius, normalised against the points actually on screen.
@@ -33,7 +34,7 @@ import { ExportMenu } from "./export-menu";
  * The previous curve clamped at 28px, so every project above 178 drew as the
  * identical maximum dot — 1,623 of 2,691 points for Total Commits, where a
  * project with 131,014 commits and one with 2,699 were the same circle. Scaling
- * to the filtered maximum keeps the range legible whichever metric and category
+ * to the filtered maximum keeps the range legible whichever metric and filters
  * are selected, which is what Plotly's `size_max` does in the reference.
  */
 function makeSymbolSize(max: number) {
@@ -50,9 +51,10 @@ export function ProjectsOverTimeChart({
 }) {
   const [payload, setPayload] = useState<ProjectsOverTimePayload | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [category, setCategory] = useState("all");
   const [sizeMetric, setSizeMetric] =
     useState<BubbleSizeMetricId>("contributors");
+  // Categories and sub-categories come from the page's filter bar.
+  const filters = useProjectFilters();
   const tokens = useChartTokens();
   const theme = useTheme();
   // Same hues as the sunbursts, resolved to literals for the canvas renderer.
@@ -81,10 +83,12 @@ export function ProjectsOverTimeChart({
 
   const records = useMemo(() => {
     if (!payload) return [];
-    return category === "all"
-      ? payload.records
-      : payload.records.filter((record) => record.category === category);
-  }, [payload, category]);
+    return filters.active
+      ? payload.records.filter((record) =>
+          filters.matches(record.category, record.sub_category),
+        )
+      : payload.records;
+  }, [payload, filters]);
 
   // The last ECharts chart on a fixed gutter: 210px of a 360px phone.
   const [width, setWidth] = useState(0);
@@ -113,11 +117,11 @@ export function ProjectsOverTimeChart({
         record.url,
       ]),
     }),
-    [category === "all" ? null : category, String(sizeMetric)],
+    [filters.exportPart, String(sizeMetric)],
   );
 
   const option: EChartsOption = useMemo(() => {
-    // Normalised per view, so switching metric or category rescales the dots.
+    // Normalised per view, so switching metric or filters rescales the dots.
     const sizeFor = makeSymbolSize(
       records.reduce(
         (best, record) => Math.max(best, record.size_metrics[sizeMetric] ?? 0),
@@ -233,21 +237,6 @@ export function ProjectsOverTimeChart({
       <div className="viz-toolbar">
         <div className="viz-toolbar__controls">
           <label className="viz-field viz-field--select">
-            <span className="viz-field__label">Category</span>
-            <select
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-            >
-              <option value="all">All categories</option>
-              {categories.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="viz-field viz-field--select">
             <span className="viz-field__label">Bubble size</span>
             <select
               value={sizeMetric}
@@ -271,6 +260,10 @@ export function ProjectsOverTimeChart({
       {!payload ? (
         <div className="viz-state" aria-busy="true" aria-live="polite">
           <p className="viz-state__label">Loading project lifecycles…</p>
+        </div>
+      ) : records.length === 0 ? (
+        <div className="viz-state">
+          <p className="viz-state__label">No projects match these filters.</p>
         </div>
       ) : (
         <EChart

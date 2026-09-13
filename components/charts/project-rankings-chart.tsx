@@ -25,6 +25,7 @@ import { param, useUrlState } from "@/lib/hooks/use-url-state";
 
 import { EChart } from "./echart";
 import { ExportMenu } from "./export-menu";
+import { useProjectFilters } from "./project-filters";
 
 // Streamlit reaches 300; capping at 100 put a third of its range out of
 // reach. The payload states its own default, which was ignored for a 25.
@@ -43,16 +44,13 @@ function formatMetric(metric: RankingMetricId, value: number) {
   return formatNumber(value);
 }
 
-export function ProjectRankingsChart({
-  categories,
-}: {
-  categories: string[];
-}) {
+export function ProjectRankingsChart() {
   const [payload, setPayload] = useState<ProjectRankingsPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [metric, setMetric] = useState<RankingMetricId>("total_score_combined");
-  const [category, setCategory] = useState("all");
   const [topN, setTopN] = useState(25);
+  // Categories and sub-categories come from the page's filter bar.
+  const filters = useProjectFilters();
   // Seeded from the payload once it lands, since these fetch client-side.
   const seeded = useRef(false);
   const { params, write } = useUrlState();
@@ -61,7 +59,6 @@ export function ProjectRankingsChart({
   const setAndRecord = useCallback(
     (patch: {
       rank?: RankingMetricId;
-      cat?: string;
       top?: number;
       active?: boolean;
     }) => {
@@ -69,10 +66,6 @@ export function ProjectRankingsChart({
       if (patch.rank !== undefined) {
         setMetric(patch.rank);
         url.rank = patch.rank === "total_score_combined" ? null : patch.rank;
-      }
-      if (patch.cat !== undefined) {
-        setCategory(patch.cat);
-        url.cat = patch.cat === "all" ? null : patch.cat;
       }
       if (patch.top !== undefined) {
         seeded.current = true;
@@ -92,11 +85,9 @@ export function ProjectRankingsChart({
   useEffect(() => {
     if (!params) return;
     const rank = params.get("rank");
-    const cat = params.get("cat");
     const top = Number(params.get("top"));
     const active = params.get("active");
     if (rank) setMetric(rank as RankingMetricId);
-    if (cat) setCategory(cat);
     if (Number.isFinite(top) && top > 0) {
       seeded.current = true;
       setTopN(top);
@@ -140,8 +131,8 @@ export function ProjectRankingsChart({
     if (!payload) return [];
     return payload.records
       .filter((record) => (activeOnly ? record.is_active_last_365d : true))
-      .filter((record) => category === "all" || record.category === category);
-  }, [payload, activeOnly, category]);
+      .filter((record) => filters.matches(record.category, record.sub_category));
+  }, [payload, activeOnly, filters]);
 
   const coverage = useMemo(
     () => metricCoverage(eligible, (record) => metricValue(record, metric)),
@@ -177,7 +168,7 @@ export function ProjectRankingsChart({
     }),
     [
       metric,
-      category === "all" ? null : category,
+      filters.exportPart,
       `top-${topN}`,
       activeOnly && "active-only",
     ],
@@ -298,21 +289,6 @@ export function ProjectRankingsChart({
           </label>
 
           <label className="viz-field viz-field--select">
-            <span className="viz-field__label">Category</span>
-            <select
-              value={category}
-              onChange={(event) => setAndRecord({ cat: event.target.value })}
-            >
-              <option value="all">All categories</option>
-              {categories.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="viz-field viz-field--select">
             <span className="viz-field__label">Show</span>
             <select
               value={topN}
@@ -367,7 +343,7 @@ export function ProjectRankingsChart({
               ? `None of these ${formatNumber(eligible.length)} projects report ${
                   payload.metric_labels[metric] ?? metric
                 }.`
-              : "No projects match these filters. Try “All” or a different category."}
+              : "No projects match these filters. Try “All”, or widen the filters above."}
           </p>
         </div>
       ) : (

@@ -9,6 +9,7 @@ import {
   LicensesChart,
   PlatformsChart,
 } from "@/components/charts/project-attributes-charts";
+import { ProjectFiltersProvider } from "@/components/charts/project-filters";
 import { ProjectRankingsChart } from "@/components/charts/project-rankings-chart";
 import { ProjectsOverTimeChart } from "@/components/charts/projects-over-time-chart";
 import { Panel } from "@/components/ui/panel";
@@ -36,18 +37,23 @@ export default async function ProjectsPage() {
         description="Detailed insights into project rankings, lifecycle trends, and community attributes across the climate tech ecosystem."
       />
 
+      <ProjectFiltersProvider
+        categories={filters.categories}
+        subCategoriesByCategory={filters.sub_categories_by_category}
+        categoryColors={filters.category_colors}
+      >
       <div className="stack">
         <Panel
           title="Project Rankings"
-          description="Rank every tracked project by any of nine metrics, filtered by category and activity. Click a bar to open its repository."
+          description="Rank every tracked project by any of nine metrics, active or all. Click a bar to open its repository."
         >
-          <ProjectRankingsChart categories={filters.categories} />
+          <ProjectRankingsChart />
         </Panel>
 
         <Panel
           title="Projects Over Time"
           description="Project age against sub-category, with each bubble sized by the metric you choose and colored by ecosystem category."
-          notes="Age is measured from the first commit, so a repository migrated from elsewhere reads as younger than the work in it. Bubble area is scaled to the largest value currently shown, so it rescales when you change metric or category."
+          notes="Age is measured from the first commit, so a repository migrated from elsewhere reads as younger than the work in it. Bubble area is scaled to the largest value currently shown, so it rescales when you change the metric or the filters."
         >
           <ProjectsOverTimeChart
             categoryColors={filters.category_colors}
@@ -109,6 +115,7 @@ export default async function ProjectsPage() {
         </Panel>
 
       </div>
+      </ProjectFiltersProvider>
     </main>
   );
 }

@@ -36,13 +36,15 @@ function load<T>(key: AnalyticsPayloadKey): Promise<T> {
 
 export type PayloadState<T> = { data: T | null; error: string | null };
 
-export function useAnalyticsPayload<T>(key: AnalyticsPayloadKey): PayloadState<T> {
+/** Pass `null` to hold off fetching until the payload is actually needed. */
+export function useAnalyticsPayload<T>(key: AnalyticsPayloadKey | null): PayloadState<T> {
   const [state, setState] = useState<PayloadState<T>>({
     data: null,
     error: null,
   });
 
   useEffect(() => {
+    if (!key) return;
     let cancelled = false;
     load<T>(key)
       .then((data) => !cancelled && setState({ data, error: null }))

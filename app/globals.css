@@ -637,10 +637,11 @@ a.panel:hover {
  * its four organisation tabs; this page is those four at once, so the bar sits
  * above every chart instead of being copied into each one.
  */
-/* One bar drives seven charts down a ~5,000px page, so it has to stay in
-   reach — otherwise a filtered chart far below has no visible cause and no
-   control to clear it. 76px clears the sticky header. */
-.org-filters {
+/* The filter bar on /organizations and /analytics/projects. One bar drives
+   every chart down a ~5,000px page, so it has to stay in reach — otherwise a
+   filtered chart far below has no visible cause and no control to clear it.
+   76px clears the sticky header. */
+.page-filters {
   position: sticky;
   top: 76px;
   z-index: 900;
@@ -656,14 +657,14 @@ a.panel:hover {
   border-radius: 12px;
 }
 
-.org-filters__fields {
+.page-filters__fields {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 16px;
 }
 
-.org-filters__note {
+.page-filters__note {
   font-family: var(--font-heading);
   font-size: 13px;
   font-weight: 500;

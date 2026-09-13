@@ -180,6 +180,38 @@ export interface ProjectAttributesPayload {
   fields: Record<ProjectAttributeField, CountRecord[]>;
 }
 
+export interface ProjectAttributeValues {
+  code_of_conduct: string;
+  contributing_guide: string;
+  license: string;
+  language: string;
+  platform: string;
+  /** Every comma-separated entry, repeats included, as the pipeline counts them. */
+  ecosystems: string[];
+}
+
+export interface ProjectAttributeRecord {
+  category: string;
+  sub_category: string;
+  active: boolean;
+  /** Null when the project has no row in the projects.csv this was built from. */
+  attributes: ProjectAttributeValues | null;
+}
+
+/** One row per ranked project; see scripts/fetch-data.mjs. */
+export interface ProjectAttributeRecordsPayload {
+  generated_at: IsoDateString;
+  source_generated_at: IsoDateString;
+  top_n_default: number;
+  coverage: {
+    projects: number;
+    with_attributes: number;
+    /** Whether recounting every record reproduces project-attributes.json. */
+    matches_aggregate: boolean;
+  };
+  records: ProjectAttributeRecord[];
+}
+
 export interface OrganizationCountryRecord {
   iso_alpha: string;
   country_name: string;
@@ -369,6 +401,7 @@ export interface AnalyticsPayloadMap {
   projectRankings: ProjectRankingsPayload;
   projectsOverTime: ProjectsOverTimePayload;
   projectAttributes: ProjectAttributesPayload;
+  projectAttributeRecords: ProjectAttributeRecordsPayload;
   organizationsOverview: OrganizationsOverviewPayload;
   organizationRankings: OrganizationRankingsPayload;
   projectsByOrganization: ProjectsByOrganizationPayload;

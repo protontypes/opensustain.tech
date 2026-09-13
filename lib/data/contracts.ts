@@ -9,6 +9,8 @@ export const analyticsPayloadFiles: {
   projectRankings: "project-rankings.json",
   projectsOverTime: "projects-over-time.json",
   projectAttributes: "project-attributes.json",
+  // Built by this repo's scripts/fetch-data.mjs, not the analytics pipeline.
+  projectAttributeRecords: "project-attribute-records.json",
   organizationsOverview: "organizations-overview.json",
   organizationRankings: "organization-rankings.json",
   projectsByOrganization: "projects-by-organization.json",

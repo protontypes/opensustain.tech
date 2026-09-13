@@ -365,17 +365,11 @@ function buildDirectory(readmeText, projectsCsvText) {
   };
 }
 
-async function fetchDirectory() {
+async function fetchDirectory(projectsCsvText) {
   const readmeText = await resolve("README.md", {
     remoteUrl: OST_README_REMOTE_URL,
     localPath: path.join(OST_README_REPO_LOCAL_PATH, "README.md"),
     fallbackPath: null, // no raw-README fallback; directory.json's own fallback covers this tier
-  });
-
-  const projectsCsvText = await resolve("projects.csv", {
-    remoteUrl: ANALYTICS_DATA_CSV_REMOTE_BASE ? `${ANALYTICS_DATA_CSV_REMOTE_BASE}/projects.csv` : null,
-    localPath: path.join(ANALYTICS_REPO_LOCAL_PATH, "data", "projects.csv"),
-    fallbackPath: null,
   });
 
   if (readmeText === null || projectsCsvText === null) {
@@ -408,10 +402,150 @@ async function fetchDirectory() {
 
 // ---------------------------------------------------------------------------
 
+// 4. Rankings + CSV → public/data/project-attribute-records.json
+// ---------------------------------------------------------------------------
+//
+// project-attributes.json only carries totals (694 MIT, 936 Python, ...), so
+// the /analytics/projects filters cannot narrow it. This writes one row of
+// those same attributes per ranked project, for the page to recount over
+// whichever categories are selected.
+
+/**
+ * pandas' default `na_values`. The pipeline reads projects.csv with a bare
+ * `pd.read_csv`, so any of these cell values is missing to it and counts as
+ * "Unknown" in project-attributes.json.
+ */
+const PANDAS_NA_VALUES = new Set([
+  "", "#N/A", "#N/A N/A", "#NA", "-1.#IND", "-1.#QNAN", "-NaN", "-nan",
+  "1.#IND", "1.#QNAN", "<NA>", "N/A", "NA", "NULL", "NaN", "None", "n/a",
+  "nan", "null",
+]);
+
+const ATTRIBUTE_FIELDS = ["code_of_conduct", "contributing_guide", "license", "language", "platform"];
+
+/** `count_series_values` in build_analytics_payloads.py: missing or blank is "Unknown". */
+function attributeLabel(raw) {
+  if (raw === undefined || raw === null || PANDAS_NA_VALUES.has(raw)) return "Unknown";
+  return String(raw).trim() || "Unknown";
+}
+
+/**
+ * The pipeline splits `ecosystems` on "," and counts every part — repeats,
+ * and the empty part after each value's trailing comma, included.
+ */
+function ecosystemLabels(raw) {
+  if (raw === undefined || raw === null || PANDAS_NA_VALUES.has(raw)) return ["Unknown"];
+  return String(raw).split(",").map((part) => part.trim() || "Unknown");
+}
+
+function countLabels(labels) {
+  const counts = new Map();
+  for (const label of labels) counts.set(label, (counts.get(label) ?? 0) + 1);
+  return counts;
+}
+
+function buildProjectAttributeRecords(rankings, aggregate, projectsCsvText) {
+  // Rankings `url` is the pipeline's `git_url`, stripped; unique per project.
+  const byUrl = new Map();
+  for (const row of parseCsvRows(projectsCsvText)) {
+    const url = (row.git_url ?? "").trim();
+    if (url && !byUrl.has(url)) byUrl.set(url, row);
+  }
+
+  const records = rankings.records.map((project) => {
+    const row = byUrl.get(project.url);
+    let attributes = null;
+    if (row) {
+      attributes = Object.fromEntries(ATTRIBUTE_FIELDS.map((field) => [field, attributeLabel(row[field])]));
+      attributes.ecosystems = ecosystemLabels(row.ecosystems);
+    }
+    return {
+      category: project.category,
+      sub_category: project.sub_category,
+      active: project.is_active_last_365d,
+      attributes,
+    };
+  });
+
+  // Recount the whole set and hold it against the pipeline's own totals. They
+  // agree exactly when projects.csv is the snapshot the payloads were built
+  // from; a newer CSV (the upstream bot updates it monthly, the payloads are
+  // rebuilt by hand) drops projects and shifts values.
+  const described = records.filter((record) => record.attributes !== null);
+  let matchesAggregate = Boolean(aggregate) && described.length === records.length;
+  for (const field of [...ATTRIBUTE_FIELDS, "ecosystems"]) {
+    if (!matchesAggregate) break;
+    const ours = countLabels(
+      described.flatMap((record) =>
+        field === "ecosystems" ? record.attributes.ecosystems : [record.attributes[field]],
+      ),
+    );
+    const theirs = aggregate.fields[field] ?? [];
+    matchesAggregate =
+      theirs.length === ours.size && theirs.every((entry) => ours.get(entry.label) === entry.count);
+  }
+
+  return {
+    generated_at: new Date().toISOString(),
+    source_generated_at: rankings.generated_at,
+    top_n_default: aggregate?.top_n_default ?? 30,
+    coverage: {
+      projects: records.length,
+      with_attributes: described.length,
+      matches_aggregate: matchesAggregate,
+    },
+    records,
+  };
+}
+
+async function fetchProjectAttributeRecords(projectsCsvText) {
+  const target = path.join(DATA_DIR, "project-attribute-records.json");
+  const rankingsText = await readLocal(path.join(DATA_DIR, "project-rankings.json"));
+  const aggregateText = await readLocal(path.join(DATA_DIR, "project-attributes.json"));
+
+  if (projectsCsvText === null || rankingsText === null) {
+    const fallback = await readLocal(path.join(FALLBACK_DIR, "project-attribute-records.json"));
+    if (fallback !== null) {
+      console.log("[fetch-data] project-attribute-records.json: committed fallback snapshot");
+      await writeFile(target, fallback, "utf-8");
+    } else {
+      console.warn("[fetch-data] project-attribute-records.json: no source available at all");
+    }
+    return;
+  }
+
+  const payload = buildProjectAttributeRecords(
+    JSON.parse(rankingsText),
+    aggregateText ? JSON.parse(aggregateText) : null,
+    projectsCsvText,
+  );
+  const { projects, with_attributes, matches_aggregate } = payload.coverage;
+  console.log(
+    `[fetch-data] project-attribute-records.json: ${with_attributes} of ${projects} ranked projects found in projects.csv`,
+  );
+  if (!matches_aggregate) {
+    console.warn(
+      "[fetch-data] project-attribute-records.json: recounting it does not reproduce " +
+        "project-attributes.json, so projects.csv is a different snapshot from the payloads. " +
+        "Filtered attribute charts will count the projects they can and say how many they left out.",
+    );
+  }
+  await writeFile(target, JSON.stringify(payload), "utf-8");
+}
+
+// ---------------------------------------------------------------------------
+
 async function main() {
   await mkdir(DATA_DIR, { recursive: true });
   await fetchAnalyticsPayloads();
-  await fetchDirectory();
+  // Read once: the directory and the attribute records both join against it.
+  const projectsCsvText = await resolve("projects.csv", {
+    remoteUrl: ANALYTICS_DATA_CSV_REMOTE_BASE ? `${ANALYTICS_DATA_CSV_REMOTE_BASE}/projects.csv` : null,
+    localPath: path.join(ANALYTICS_REPO_LOCAL_PATH, "data", "projects.csv"),
+    fallbackPath: null,
+  });
+  await fetchDirectory(projectsCsvText);
+  await fetchProjectAttributeRecords(projectsCsvText);
 }
 
 main().catch((error) => {

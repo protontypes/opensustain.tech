@@ -142,8 +142,8 @@ export function OrganizationFiltersProvider({
 
   return (
     <Context.Provider value={value}>
-      <div className="org-filters">
-        <div className="org-filters__fields">
+      <div className="page-filters">
+        <div className="page-filters__fields">
           <label className="viz-field viz-field--select">
             <span className="viz-field__label">Country</span>
             <select
@@ -186,7 +186,7 @@ export function OrganizationFiltersProvider({
           </button>
         </div>
 
-        <p className="org-filters__note" role="status">
+        <p className="page-filters__note" role="status">
           {value.active
             ? "Every chart below is filtered."
             : "Filters apply to every chart on this page."}

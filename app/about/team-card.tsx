@@ -21,29 +21,26 @@ export function TeamCard({ member }: { member: TeamMember }) {
 
   return (
     <li className={styles.teamCard}>
-      <div className={styles.avatarRow}>
-        {member.avatarUrl ? (
-          // Static export has no image optimizer to route this through.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            className={styles.avatar}
-            src={member.avatarUrl}
-            alt=""
-            width={56}
-            height={56}
-          />
-        ) : (
-          <div className={styles.avatarPlaceholder} aria-hidden="true">
-            {initials(displayName)}
-          </div>
-        )}
-        <div>
-          <p className={styles.name}>{displayName}</p>
-          {member.fullName === null ? (
-            <span className={styles.todo}>TODO: full name</span>
-          ) : null}
+      {member.avatarUrl ? (
+        // Static export has no image optimizer to route this through.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          className={styles.avatar}
+          src={member.avatarUrl}
+          alt=""
+          width={72}
+          height={72}
+        />
+      ) : (
+        <div className={styles.avatarPlaceholder} aria-hidden="true">
+          {initials(displayName)}
         </div>
-      </div>
+      )}
+
+      <p className={styles.name}>{displayName}</p>
+      {member.fullName === null ? (
+        <span className={styles.todo}>TODO: full name</span>
+      ) : null}
 
       {member.role ? (
         <p className={styles.role}>{member.role}</p>

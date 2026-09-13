@@ -67,7 +67,7 @@ export default async function AboutPage() {
 
         <Panel
           title="Team"
-          description="Every field marked TODO below is genuinely unknown to this build, not left blank by mistake — see lib/data/team.ts to fill one in."
+          description="The people building and maintaining OpenSustain.tech."
         >
           <ul className={styles.teamGrid}>
             {team.map((member) => (

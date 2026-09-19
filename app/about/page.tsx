@@ -78,7 +78,7 @@ export default async function AboutPage() {
 
         <Panel
           title="Contributors"
-          description={`Everyone who has sent a pull request to ${ostRepoSlug}, pulled from GitHub at build time.`}
+          description={`Everyone who has sent a pull request to ${ostRepoSlug}.`}
         >
           {source === "fallback" ? (
             <p className={styles.sectionNote}>

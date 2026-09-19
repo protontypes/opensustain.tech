@@ -1,3 +1,5 @@
+import { withBasePath } from "@/lib/base-path";
+
 type RedirectStubProps = {
   /** Where this URL now lives. Absolute (external) or root-relative. */
   to: string;
@@ -29,9 +31,12 @@ export function RedirectStub({
   reason,
   external = false,
 }: RedirectStubProps) {
+  // A plain <meta>/<a>, not a <Link>, so an internal target needs the base
+  // path added by hand; external URLs pass through unchanged.
+  const href = withBasePath(to);
   return (
     <main className="page-shell">
-      <meta httpEquiv="refresh" content={`0; url=${to}`} />
+      <meta httpEquiv="refresh" content={`0; url=${href}`} />
       <div className="section-heading">
         <p className="section-eyebrow">Moved</p>
         <h1>This page has moved</h1>
@@ -42,7 +47,7 @@ export function RedirectStub({
       <div className="error-actions">
         <a
           className="viz-button viz-button--primary"
-          href={to}
+          href={href}
           {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
         >
           Continue to {destinationLabel}

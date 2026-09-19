@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { withBasePath } from "@/lib/base-path";
 import {
   climateTriageLink,
   contributeLink,
@@ -77,7 +78,7 @@ export function SiteHeader() {
               alt here would make a screen reader say it twice. */}
           <img
             className="site-mark__logo"
-            src="/images/logo.png"
+            src={withBasePath("/images/logo.png")}
             alt=""
             width={200}
             height={200}

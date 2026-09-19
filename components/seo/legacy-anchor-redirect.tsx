@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { withBasePath } from "@/lib/base-path";
 import {
   buildLegacyAnchorMap,
   legacyAnchorTargetToPath,
@@ -36,7 +37,7 @@ export function LegacyAnchorRedirect({
     ];
     if (!target) return;
 
-    window.location.replace(legacyAnchorTargetToPath(target));
+    window.location.replace(withBasePath(legacyAnchorTargetToPath(target)));
   }, [subCategoriesByCategory]);
 
   return null;

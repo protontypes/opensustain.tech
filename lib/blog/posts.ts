@@ -6,6 +6,8 @@ import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 
+import { BASE_PATH } from "../base-path";
+
 /**
  * The OpenSustain.tech blog, migrated from the old mkdocs site's
  * docs/blog/*.md. Source markdown (frontmatter + body) lives in
@@ -77,7 +79,11 @@ async function renderMarkdown(content: string): Promise<string> {
     // pass through instead of being stripped.
     .use(remarkHtml, { sanitize: false })
     .process(content);
-  return processed.toString();
+  // Posts reference their images root-relatively (/images/blog/...), which
+  // misses a base path when the site is served from a subpath.
+  return processed
+    .toString()
+    .replace(/(\s(?:src|href)=")\/(?!\/)/g, `$1${BASE_PATH}/`);
 }
 
 async function readPost(slug: string): Promise<BlogPost> {

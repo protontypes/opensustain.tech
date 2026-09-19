@@ -1,3 +1,5 @@
+import { withBasePath } from "../base-path";
+
 /**
  * Public URL of the project directory payload.
  *
@@ -6,4 +8,4 @@
  * loaders.ts, so a client component importing just the URL doesn't pull
  * Node built-ins into the browser bundle.
  */
-export const directoryUrl = "/data/directory.json";
+export const directoryUrl = withBasePath("/data/directory.json");

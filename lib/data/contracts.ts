@@ -1,3 +1,4 @@
+import { withBasePath } from "../base-path";
 import type { AnalyticsPayloadMap } from "../types/analytics";
 
 export const analyticsPayloadFiles: {
@@ -29,5 +30,5 @@ export type AnalyticsPayloadKey = keyof typeof analyticsPayloadFiles;
  * without pulling `node:fs` into the browser bundle.
  */
 export function analyticsPayloadUrl(key: AnalyticsPayloadKey): string {
-  return `/data/${analyticsPayloadFiles[key]}`;
+  return withBasePath(`/data/${analyticsPayloadFiles[key]}`);
 }

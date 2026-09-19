@@ -22,6 +22,8 @@ import type {
 
 import { useChartExport } from "@/lib/charts/use-chart-export";
 
+import { withBasePath } from "@/lib/base-path";
+
 import { EChart, registerMap } from "./echart";
 import { ExportMenu } from "./export-menu";
 import { useOrganizationFilters } from "./organization-filters";
@@ -31,7 +33,7 @@ import { useOrganizationFilters } from "./organization-filters";
 echarts.use([GeoComponent, MapChart]);
 
 const MAP_NAME = "world";
-const MAP_URL = "/geo/world-110m.json";
+const MAP_URL = withBasePath("/geo/world-110m.json");
 type Metric = "total_projects" | "organization_count";
 
 const METRICS: { id: Metric; label: string; noun: string }[] = [

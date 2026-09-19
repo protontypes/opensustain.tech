@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { withBasePath } from "@/lib/base-path";
 import type { Snapshot } from "@/lib/data/snapshot";
 import { footerNavigation, routes, socialLinks } from "@/lib/navigation";
 
@@ -12,7 +13,7 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
             <span className="footer-logo">
               <img
                 className="footer-logo__mark"
-                src="/images/logo.png"
+                src={withBasePath("/images/logo.png")}
                 alt=""
                 width={200}
                 height={200}

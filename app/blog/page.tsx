@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PostAuthors } from "@/components/blog/post-authors";
 import { MediaTabs } from "@/components/media/media-tabs";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { withBasePath } from "@/lib/base-path";
 import { formatBlogDate } from "@/lib/blog/format-date";
 import { groupByYear, loadAllPosts } from "@/lib/blog/posts";
 import { MEDIA_DESCRIPTION, routes } from "@/lib/navigation";
@@ -58,7 +59,7 @@ export default async function BlogIndexPage() {
                       {/* Static export + third-party/local blog images: plain
                           <img>, same reasoning as components/ui/avatar.tsx. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className={styles.cardImage} src={post.image} alt="" loading="lazy" />
+                      <img className={styles.cardImage} src={withBasePath(post.image)} alt="" loading="lazy" />
                     </div>
                   ) : null}
                   <div className={styles.cardBody}>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PostAuthors } from "@/components/blog/post-authors";
+import { withBasePath } from "@/lib/base-path";
 import { formatBlogDate } from "@/lib/blog/format-date";
 import { blogSlugs, loadPost } from "@/lib/blog/posts";
 import { routes } from "@/lib/navigation";
@@ -74,7 +75,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           // white-background screenshot doesn't bleed straight into the page.
           <div className={styles.coverImageWrap}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className={styles.coverImage} src={post.image} alt="" />
+            <img className={styles.coverImage} src={withBasePath(post.image)} alt="" />
           </div>
         ) : null}
 

@@ -55,13 +55,12 @@ git add -A
 git commit -m "ci: notify opensustain.tech on README changes; retire mkdocs gh-deploy"
 ```
 
-## `opensustain.analytics`: the `payload-builder` branch, not a patch
+## `opensustain.analytics`: committed to `main`, not a patch
 
 The analytics payloads used to be committed under `web/public/data/` of the
-Next.js app that lived in that repo. With the app moved here, that repo's
-upstream has neither the app nor the builder, so the change is a pull
-request rather than a patch: the `payload-builder` branch of the
-`AbdulSalam416/opensustain.analytics` fork, which adds
+Next.js app that lived in that repo. With the app moved here, upstream had
+neither the app nor the builder, so rather than a patch the builder and its
+workflow are committed directly to `opensustain.analytics`' `main`:
 
 - `scripts/build_analytics_payloads.py` — builds the 13 JSON payloads from
   `data/*.csv`, now into `data/payloads/` (gitignored) by default.

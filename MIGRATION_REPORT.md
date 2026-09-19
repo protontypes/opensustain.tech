@@ -310,10 +310,10 @@ been run automatically.
    then commit and open a PR. This deletes that repo's old `mkdocs gh-deploy`
    workflow (`publish.yml`) and adds a workflow that notifies
    `opensustain.tech` whenever `README.md` changes.
-6. Open a PR from the `payload-builder` branch of the
-   `opensustain.analytics` fork to upstream. It adds the payload builder
-   (writing to `data/payloads/`), `make build-json`, and a workflow that
-   publishes the payloads to a `data` branch and notifies `opensustain.tech`.
+6. Push the payload builder straight to `opensustain.analytics`' `main`:
+   the builder (writing to `data/payloads/`), `make build-json`, and a
+   workflow that publishes the payloads to a `data` branch and notifies
+   `opensustain.tech`.
    This replaced the earlier `0001-opensustain-analytics-publish-web-data.patch`
    once the Next.js app moved out of that repo. Details:
    `docs/migration/README.md`.

@@ -13,7 +13,7 @@ import { TeamCard } from "./team-card";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Open technology projects sustaining stable climate, energy supply, biodiversity and vital natural resources — who's behind OpenSustain.tech.",
+    "Open technology projects sustaining stable climate, energy supply, biodiversity and vital natural resources; who's behind OpenSustain.tech.",
 };
 
 const ostRepoSlug = ostGithubUrl.replace("https://github.com/", "");
@@ -35,7 +35,7 @@ export default async function AboutPage() {
             <p>
               Open Sustainable Technology finds, lists, and shares open
               source projects that preserve or analyze the natural systems we
-              depend on — a stable climate, clean water, fertile soil, and
+              depend on; a stable climate, clean water, fertile soil, and
               healthy ecosystems. What began as a community-maintained list
               has grown into the directory and analytics on this site:
               thousands of projects across renewable energy, emissions,
@@ -52,7 +52,7 @@ export default async function AboutPage() {
                 protontypes
               </a>{" "}
               and a global community of contributors who research, verify,
-              and add projects — anyone can{" "}
+              and add projects; anyone can{" "}
               <a
                 href={`${ostGithubUrl}/blob/main/CONTRIBUTING.md`}
                 target="_blank"
@@ -82,7 +82,7 @@ export default async function AboutPage() {
         >
           {source === "fallback" ? (
             <p className={styles.sectionNote}>
-              Showing a committed snapshot from an earlier build — the live
+              Showing a committed snapshot from an earlier build; the live
               GitHub contributors list could not be fetched this time (no
               network, or the unauthenticated rate limit). Set a{" "}
               <code>GITHUB_TOKEN</code> environment variable to fetch the

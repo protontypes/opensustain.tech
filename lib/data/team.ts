@@ -47,7 +47,10 @@ export const team: TeamMember[] = [
     avatarUrl: "https://avatars.githubusercontent.com/u/6413976?v=4",
     links: [
       { label: "GitHub", url: "https://github.com/Ly0n" },
-      { label: "LinkedIn", url: "https://www.linkedin.com/in/tobias-augspurger/" },
+      {
+        label: "LinkedIn",
+        url: "https://www.linkedin.com/in/tobias-augspurger/",
+      },
     ],
   },
   {
@@ -55,7 +58,7 @@ export const team: TeamMember[] = [
     givenName: "Salam",
     fullName: "Abdul Salam Issahaku",
     role: "Software Developer",
-    bio: "Builds open digital infrastructure at the intersection of sustainability, AI, and data interoperability.",
+    bio: "Builds open digital infrastructure at the intersection of sustainability, AI, and data interoperability. He maintains OpenSustain Analytics and co-originated Open Traceability, a framework for verifiable environmental claims.",
     avatarUrl: "https://avatars.githubusercontent.com/u/60816007?v=4",
     links: [
       { label: "GitHub", url: "https://github.com/AbdulSalam416" },
@@ -72,7 +75,7 @@ export const team: TeamMember[] = [
     fullName: "Andrew Nesbitt",
     role: "Creator of ecosyste.ms & Libraries.io",
     bio: "Open source metadata specialist behind ecosyste.ms, the open dataset and API that powers OpenSustain.tech's project and organization data. Previously built Libraries.io and worked at GitHub and Tidelift.",
-    avatarUrl: "https://avatars.githubusercontent.com/u/272751?v=4",
+    avatarUrl: "https://avatars.githubusercontent.com/u/1060?v=4",
     links: [
       { label: "GitHub", url: "https://github.com/andrewnez" },
       { label: "Website", url: "https://nesbitt.io/" },

@@ -46,10 +46,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # No `version:` here: the action reads the exact pnpm version from
+      # package.json's `packageManager` field, and fails if both are set.
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -66,6 +66,10 @@ jobs:
         # fresh on every run, three-tier fallback if any source is
         # unreachable, then `next build` with `output: "export"`.
         run: pnpm build
+        env:
+          # The /about contributors grid calls the GitHub API at build time;
+          # authenticated, it is not subject to the anonymous rate limit.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

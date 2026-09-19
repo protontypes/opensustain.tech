@@ -19,7 +19,7 @@ export default async function ProjectsPage() {
       <SectionHeading
         as="h1"
         title="Project Directory"
-        description={`${formatNumber(directory.totals.projects)} open-source projects across ${directory.totals.categories} categories and ${directory.totals.subcategories} subcategories — climate change, sustainable energy, biodiversity and natural resources.`}
+        description={`${formatNumber(directory.totals.projects)} open-source projects across ${directory.totals.categories} categories and ${directory.totals.subcategories} subcategories; climate change, sustainable energy, biodiversity and natural resources.`}
       />
       <ProjectDirectory />
     </main>

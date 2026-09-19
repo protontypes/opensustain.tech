@@ -30,7 +30,7 @@ export default async function MethodologyPage() {
       <SectionHeading
         as="h1"
         title="What this dashboard is, and what it cannot tell you"
-        description="Every chart here reads one nightly snapshot of a public dataset. These are its sources, its definitions, and the places it is known to be wrong or incomplete — stated here rather than left for a reader to discover."
+        description="Every chart here reads one nightly snapshot of a public dataset. These are its sources, its definitions, and the places it is known to be wrong or incomplete."
       />
 
       <div className="stack">
@@ -42,8 +42,8 @@ export default async function MethodologyPage() {
                 OpenSustain.tech
               </a>
               , a curated index of open-source work in environmental
-              sustainability. Repository and package metrics — contributors,
-              commits, downloads, dependents, the score — come from{" "}
+              sustainability. Repository and package metrics; contributors,
+              commits, downloads, dependents, the score; come from{" "}
               <a href="https://ecosyste.ms/" target="_blank" rel="noreferrer">
                 Ecosyste.ms
               </a>
@@ -156,7 +156,7 @@ export default async function MethodologyPage() {
             <p>
               The source lists a package registry once per package rather than
               once per project, so a project publishing several packages to PyPI
-              is counted several times — the ecosystem chart&rsquo;s axis reads
+              is counted several times; the ecosystem chart&rsquo;s axis reads
               &ldquo;entries&rdquo; for that reason. Every non-empty value in the
               source also ends with a trailing comma, which the pipeline&rsquo;s
               split turns into one empty bucket per project; this site drops that
@@ -173,7 +173,7 @@ export default async function MethodologyPage() {
             <h3>Citations and downloads are sparse</h3>
             <p>
               Both depend on a project having been registered somewhere that
-              records them — a DOI or Zenodo deposit for citations, a package
+              records them; a DOI or Zenodo deposit for citations, a package
               registry for downloads. A zero means &ldquo;not recorded&rdquo;
               far more often than it means &ldquo;no impact&rdquo;, so neither
               should be read as a ranking of importance.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useTheme } from "@/lib/hooks/use-theme";
 
@@ -10,7 +10,7 @@ import {
   buildTooltip,
   tooltipChrome,
 } from "@/lib/charts/tooltip";
-import { analyticsPayloadUrl } from "@/lib/data/contracts";
+import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
 import { formatDecimal, formatNumber } from "@/lib/format";
 import {
   resolveCategoryColors,
@@ -49,8 +49,9 @@ export function ProjectsOverTimeChart({
   categoryColors: Record<string, string>;
   categories: string[];
 }) {
-  const [payload, setPayload] = useState<ProjectsOverTimePayload | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Shared with the Ecosystem Growth chart over the same records: one fetch.
+  const { data: payload, error } =
+    useAnalyticsPayload<ProjectsOverTimePayload>("projectsOverTime");
   const [sizeMetric, setSizeMetric] =
     useState<BubbleSizeMetricId>("contributors");
   // Categories and sub-categories come from the page's filter bar.
@@ -62,24 +63,6 @@ export function ProjectsOverTimeChart({
     () => resolveCategoryColors(categories, categoryColors),
     [categories, categoryColors, theme],
   );
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch(analyticsPayloadUrl("projectsOverTime"))
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json() as Promise<ProjectsOverTimePayload>;
-      })
-      .then((data) => !cancelled && setPayload(data))
-      .catch((cause: unknown) => {
-        if (!cancelled) {
-          setError(cause instanceof Error ? cause.message : "Unknown error");
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const records = useMemo(() => {
     if (!payload) return [];

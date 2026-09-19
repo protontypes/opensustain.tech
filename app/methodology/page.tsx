@@ -112,6 +112,54 @@ export default async function MethodologyPage() {
         </Panel>
 
         <Panel
+          title="Ecosystem health views"
+          description="Three charts on Project Analytics describe the ecosystem as a whole rather than rank the projects in it. All three are computed in the browser from the same project records as the rest of that page, and follow its filters."
+          notes="A per-year commit trend is not shown: the project data records each repository's first commit, latest commit and lifetime commit total, but not when the commits in between were made."
+        >
+          <dl className="definition-list">
+            <div className="definition-list__item">
+              <dt>Ecosystem Growth</dt>
+              <dd>
+                Each project is placed in the year of its first commit, estimated
+                as the data snapshot&rsquo;s date minus the project&rsquo;s age,
+                and the chart counts how many had started by the end of each
+                year. The estimate reads a repository migrated from elsewhere as
+                younger than the work in it; projects with no recorded first
+                commit are left out, and those started before 2005 are counted
+                in 2005. &ldquo;Active&rdquo; keeps only projects still
+                committing today, so the gap between the two curves is the tools
+                that have since gone quiet.
+              </dd>
+            </div>
+            <div className="definition-list__item">
+              <dt>Activity Pulse</dt>
+              <dd>
+                The share of projects in each category — or each sub-category,
+                once a single category is selected — with at least one commit in
+                the 365 days before the data snapshot, against the same share
+                for every tracked project. One commit is enough to count as
+                active, and a dormant project is not necessarily abandoned: some
+                tools are simply finished.
+              </dd>
+            </div>
+            <div className="definition-list__item">
+              <dt>Strength in Numbers</dt>
+              <dd>
+                Projects grouped by how many people have contributed to them, as
+                ecosyste.ms counts them for each repository, with the share that
+                has three or fewer. The count includes anyone with a single
+                commit, so it overstates how many people maintain a project day
+                to day, and a project with no recorded count is treated as
+                having one. The second view groups the same projects by
+                Development Distribution Score, the share of commits not made by
+                the most active contributor: 0 means one person made every
+                commit.
+              </dd>
+            </div>
+          </dl>
+        </Panel>
+
+        <Panel
           title="How much of the data is actually there"
           description="A metric reported by few projects is not a metric where most projects scored zero. Charts on this site leave unreported projects out rather than drawing them at zero, and say so when they do."
           notes="Share of the tracked projects reporting a non-zero value for each metric."

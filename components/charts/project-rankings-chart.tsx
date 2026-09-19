@@ -8,7 +8,7 @@ import {
   buildTooltip,
   tooltipChrome,
 } from "@/lib/charts/tooltip";
-import { analyticsPayloadUrl } from "@/lib/data/contracts";
+import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
 import { formatCompactNumber, formatDecimal, formatNumber } from "@/lib/format";
 import { useChartTokens } from "@/lib/hooks/use-chart-tokens";
 import { METRIC_ORDER } from "@/lib/sunburst/types";
@@ -45,8 +45,9 @@ function formatMetric(metric: RankingMetricId, value: number) {
 }
 
 export function ProjectRankingsChart() {
-  const [payload, setPayload] = useState<ProjectRankingsPayload | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Shared with the page's other charts over the same records: one fetch.
+  const { data: payload, error } =
+    useAnalyticsPayload<ProjectRankingsPayload>("projectRankings");
   const [metric, setMetric] = useState<RankingMetricId>("total_score_combined");
   const [topN, setTopN] = useState(25);
   // Categories and sub-categories come from the page's filter bar.
@@ -97,32 +98,13 @@ export function ProjectRankingsChart() {
   const [activeOnly, setActiveOnly] = useState(true);
   const tokens = useChartTokens();
 
+  // The pipeline tunes this; the literal above is only what shows while the
+  // payload is in flight.
   useEffect(() => {
-    let cancelled = false;
-    fetch(analyticsPayloadUrl("projectRankings"))
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json() as Promise<ProjectRankingsPayload>;
-      })
-      .then((data) => {
-        if (cancelled) return;
-        setPayload(data);
-        // The pipeline tunes this; the literal above is only what shows while
-        // the payload is in flight.
-        if (!seeded.current && data.default_top_n) {
-          seeded.current = true;
-          setTopN(data.default_top_n);
-        }
-      })
-      .catch((cause: unknown) => {
-        if (!cancelled) {
-          setError(cause instanceof Error ? cause.message : "Unknown error");
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (!payload || seeded.current || !payload.default_top_n) return;
+    seeded.current = true;
+    setTopN(payload.default_top_n);
+  }, [payload]);
 
   // Sparse metrics were drawn as zero: ranking by citations gave eighteen
   // empty bars out of twenty-five, which reads as "these projects scored zero"

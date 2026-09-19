@@ -9,6 +9,11 @@ import {
   LicensesChart,
   PlatformsChart,
 } from "@/components/charts/project-attributes-charts";
+import {
+  ActivityPulseChart,
+  EcosystemGrowthChart,
+  StrengthInNumbersChart,
+} from "@/components/charts/ecosystem-health-charts";
 import { ProjectFiltersProvider } from "@/components/charts/project-filters";
 import { ProjectRankingsChart } from "@/components/charts/project-rankings-chart";
 import { ProjectsOverTimeChart } from "@/components/charts/projects-over-time-chart";
@@ -51,6 +56,14 @@ export default async function ProjectsPage() {
         </Panel>
 
         <Panel
+          title="Ecosystem Growth"
+          description="How many tools existed, year by year — derived from each project's first commit."
+          notes="The start year is estimated from each project's age, so a repository migrated from elsewhere reads as younger than the work in it. Projects that started before 2005 are counted in 2005. “Active” keeps only projects still committing today."
+        >
+          <EcosystemGrowthChart />
+        </Panel>
+
+        <Panel
           title="Projects Over Time"
           description="Project age against sub-category, with each bubble sized by the metric you choose and colored by ecosystem category."
           notes="Age is measured from the first commit, so a repository migrated from elsewhere reads as younger than the work in it. Bubble area is scaled to the largest value currently shown, so it rescales when you change the metric or the filters."
@@ -61,11 +74,27 @@ export default async function ProjectsPage() {
           />
         </Panel>
 
+        <div className="two-column-grid">
+          <Panel
+            title="Recent Commit Activity"
+            description="Whether each tracked project has recorded a commit in the last 365 days."
+          >
+            <CommitActivityChart />
+          </Panel>
+
+          <Panel
+            title="Activity Pulse"
+            description="Which parts of the ecosystem are alive: the share of projects with a commit in the last 365 days, by category — or by sub-category once one category is selected."
+          >
+            <ActivityPulseChart />
+          </Panel>
+        </div>
+
         <Panel
-          title="Recent Commit Activity"
-          description="Whether each tracked project has recorded a commit in the last 365 days."
+          title="Strength in Numbers"
+          description="How many people stand behind each project. Contributor counts are the bus-factor view; the Development Distribution Score shows how evenly the commits are spread."
         >
-          <CommitActivityChart />
+          <StrengthInNumbersChart />
         </Panel>
 
         <div className="two-column-grid">

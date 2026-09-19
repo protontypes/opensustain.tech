@@ -1007,6 +1007,13 @@ a.panel:hover {
     display: none;
   }
 
+  /* The wordmark, repo link, theme toggle and hamburger, each spaced for a
+     desktop row, overflowed a 375px screen by 20px. */
+  .header-github,
+  .nav-toggle {
+    margin-left: 8px;
+  }
+
   /* Padding stays symmetric so the wrapped message is still centred; the
      close button's offset drops to 0 so a 44px side gutter still clears its
      44px tap target (was 56px, sized for the desktop 8px offset — plenty at
@@ -1038,8 +1045,10 @@ a.panel:hover {
     padding: 0 20px;
   }
 
+  /* 16, not the page-shell's 20: the header row is the widest thing on the
+     site at 375px, and this is what keeps it inside one. */
   .header-inner {
-    padding: 0 20px;
+    padding: 0 16px;
   }
 }
 

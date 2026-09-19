@@ -1,0 +1,50 @@
+/* Headline figures above a chart: label, value, and an optional hint. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stat {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-alt);
+}
+
+.statLabel {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-secondary);
+}
+
+.statValue {
+  margin: 4px 0 0;
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.statHint {
+  margin: 2px 0 0;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* The least active slice, named in the caption rather than drawn in red. */
+.caution {
+  font-weight: 700;
+  color: var(--color-warning);
+}

@@ -25,6 +25,8 @@ export type ChartTokens = {
   tooltipShadow: string;
   /** Fill for "no value" — the map's countries with no organizations. */
   nullFill: string;
+  /** The brand green, for the one point or bar a chart calls out. Never data. */
+  highlight: string;
 };
 
 const TOKEN_MAP: Record<keyof ChartTokens, string> = {
@@ -39,6 +41,7 @@ const TOKEN_MAP: Record<keyof ChartTokens, string> = {
   tooltipBorder: "--viz-tooltip-border",
   tooltipShadow: "--viz-tooltip-shadow",
   nullFill: "--viz-null",
+  highlight: "--color-green",
 };
 
 const FALLBACK: ChartTokens = {
@@ -53,6 +56,7 @@ const FALLBACK: ChartTokens = {
   tooltipBorder: "rgba(230, 237, 243, 0.95)",
   tooltipShadow: "0 14px 40px rgba(16, 22, 32, 0.14)",
   nullFill: "#cbd5e1",
+  highlight: "#47f6ad",
 };
 
 function read(): ChartTokens {

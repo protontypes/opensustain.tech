@@ -14,11 +14,12 @@
  *      (scripts/build_analytics_payloads.py) builds from data/projects.csv
  *      and data/organizations.csv. There is no released data feed for these
  *      yet — no tagged release, no dedicated "data" branch — so today this
- *      step reads them straight from a sibling checkout of that repo and
- *      copies them in. ANALYTICS_DATA_REMOTE_BASE is where they will come
- *      from once that exists: point it at the release-assets URL or raw.
- *      githubusercontent.com/<owner>/opensustain.analytics/<data-branch>/web/
- *      public/data and this script needs no other change.
+ *      step reads them from a sibling checkout of that repo, where
+ *      `make build-json` writes them to data/payloads/ (gitignored there),
+ *      and copies them in. ANALYTICS_DATA_REMOTE_BASE is where they will come
+ *      from once published: point it at raw.githubusercontent.com/<owner>/
+ *      opensustain.analytics/<data-branch> and this script needs no other
+ *      change.
  *
  *   2. data/projects.csv and data/organizations.csv from that same repo —
  *      the raw project/organization records, richer than the README's plain
@@ -170,7 +171,7 @@ async function fetchAnalyticsPayloads() {
   await mkdir(DATA_DIR, { recursive: true });
   for (const file of ANALYTICS_PAYLOAD_FILES) {
     const remoteUrl = ANALYTICS_DATA_REMOTE_BASE ? `${ANALYTICS_DATA_REMOTE_BASE}/${file}` : null;
-    const localPath = path.join(ANALYTICS_REPO_LOCAL_PATH, "web", "public", "data", file);
+    const localPath = path.join(ANALYTICS_REPO_LOCAL_PATH, "data", "payloads", file);
     const fallbackPath = path.join(FALLBACK_DIR, file);
     const text = await resolve(file, { remoteUrl, localPath, fallbackPath });
     if (text === null) continue;

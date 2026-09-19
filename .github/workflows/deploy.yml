@@ -8,10 +8,10 @@ name: Deploy to GitHub Pages
 #                               from ("ost-readme-updated" from
 #                               open-sustainable-technology when README.md
 #                               changes, "analytics-data-updated" from
-#                               opensustain.analytics when it republishes
-#                               web/public/data/*.json) — those repos don't
-#                               fire these yet; see the patches in that
-#                               directory for how to wire them up.
+#                               opensustain.analytics when it republishes its
+#                               payloads to its `data` branch) — those repos
+#                               don't fire these yet; see that README for how
+#                               to wire them up.
 #   - schedule:                a weekly safety net in case a dispatch is
 #                               missed, dropped, or not wired up yet.
 #   - workflow_dispatch:       a manual run.

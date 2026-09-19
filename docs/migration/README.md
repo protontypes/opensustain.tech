@@ -55,43 +55,32 @@ git add -A
 git commit -m "ci: notify opensustain.tech on README changes; retire mkdocs gh-deploy"
 ```
 
-## `0001-opensustain-analytics-publish-web-data.patch`
+## `opensustain.analytics`: the `payload-builder` branch, not a patch
 
-Applies to `opensustain.analytics`:
+The analytics payloads used to be committed under `web/public/data/` of the
+Next.js app that lived in that repo. With the app moved here, that repo's
+upstream has neither the app nor the builder, so the change is a pull
+request rather than a patch: the `payload-builder` branch of the
+`AbdulSalam416/opensustain.analytics` fork, which adds
 
-- **Adds** `.github/workflows/publish-web-data.yml` — publishes
-  `web/public/data/*.json` (the 13 analytics payloads
-  `scripts/build_analytics_payloads.py` regenerates from `data/*.csv`) to a
-  dedicated `data` branch using
+- `scripts/build_analytics_payloads.py` — builds the 13 JSON payloads from
+  `data/*.csv`, now into `data/payloads/` (gitignored) by default.
+- `make build-json` — runs it.
+- `.github/workflows/publish-payloads.yml` — after the existing
+  "Update OpenSustain Data" workflow refreshes the CSVs (and on pushes that
+  change the CSVs or the builder, and on demand), builds the payloads and
+  publishes them to a dedicated `data` branch with
   [`peaceiris/actions-gh-pages`](https://github.com/peaceiris/actions-gh-pages),
   then fires a `repository_dispatch` (`event_type: analytics-data-updated`)
-  to `opensustain.tech`. Runs after the existing `update_data.yml` workflow
-  finishes (which refreshes `data/*.csv` but doesn't regenerate or publish
-  the JSON — see that repo's `CLAUDE.md`, "Do not touch"), on any push to
-  `main` touching `web/public/data/**` directly, and on demand.
-- Does **not** touch `scripts/build_analytics_payloads.py`,
-  `web/public/data/*`, or `data/*.csv` themselves — only adds a step that
-  publishes what's already there. Consistent with that repo's own
-  "Do not touch" list.
-- Only publishes the JSON payloads, not `data/*.csv` — the CSVs already have
-  a distribution path (GitHub Releases on `open-sustainable-technology`,
-  which `update_data.yml` already pulls from). `opensustain.tech`'s
-  `scripts/fetch-data.mjs` has a separate `ANALYTICS_DATA_CSV_REMOTE_BASE`
-  placeholder for wiring that up later if a direct feed turns out to be
-  wanted.
+  to `opensustain.tech`. The dispatch is skipped if
+  `OST_TECH_DISPATCH_TOKEN` is not set.
 
-Once this is live, `opensustain.tech/scripts/fetch-data.mjs`'s
-`ANALYTICS_DATA_REMOTE_BASE` placeholder can point at
-`https://raw.githubusercontent.com/protontypes/opensustain.analytics/data/`.
-
-Apply from a checkout of `opensustain.analytics`:
-
-```sh
-git checkout -b publish-web-data
-git apply /path/to/opensustain.tech/docs/migration/0001-opensustain-analytics-publish-web-data.patch
-git add -A
-git commit -m "ci: publish web/public/data to a data branch and notify opensustain.tech"
-```
+Locally, `scripts/fetch-data.mjs` reads the payloads from a sibling checkout's
+`data/payloads/`, so run `make build-json` there first. Once the workflow has
+published to the `data` branch, point `ANALYTICS_DATA_REMOTE_BASE` in
+`scripts/fetch-data.mjs` at
+`https://raw.githubusercontent.com/protontypes/opensustain.analytics/data`
+and CI builds stop depending on the committed fallback snapshot.
 
 ## How these were generated and checked
 

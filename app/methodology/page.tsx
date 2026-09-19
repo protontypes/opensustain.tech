@@ -134,8 +134,8 @@ export default async function MethodologyPage() {
             <div className="definition-list__item">
               <dt>Activity Pulse</dt>
               <dd>
-                The share of projects in each category — or each sub-category,
-                once a single category is selected — with at least one commit in
+                The share of projects in each category; or each sub-category,
+                once a single category is selected; with at least one commit in
                 the 365 days before the data snapshot, against the same share
                 for every tracked project. One commit is enough to count as
                 active, and a dormant project is not necessarily abandoned: some

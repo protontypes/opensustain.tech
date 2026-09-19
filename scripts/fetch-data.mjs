@@ -12,19 +12,15 @@
  *   1. The 13 analytics JSON payloads (summary, filters, rankings, the
  *      sunburst tree, etc.) that opensustain.analytics' Python pipeline
  *      (scripts/build_analytics_payloads.py) builds from data/projects.csv
- *      and data/organizations.csv. There is no released data feed for these
- *      yet — no tagged release, no dedicated "data" branch — so today this
- *      step reads them from a sibling checkout of that repo, where
- *      `make build-json` writes them to data/payloads/ (gitignored there),
- *      and copies them in. ANALYTICS_DATA_REMOTE_BASE is where they will come
- *      from once published: point it at raw.githubusercontent.com/<owner>/
- *      opensustain.analytics/<data-branch> and this script needs no other
- *      change.
+ *      and data/organizations.csv. That repo's publish-payloads workflow
+ *      pushes them to its `data` branch after every CSV update, which is the
+ *      remote tier (ANALYTICS_DATA_REMOTE_BASE). The sibling-checkout tier
+ *      reads data/payloads/, where `make build-json` writes them locally.
  *
- *   2. data/projects.csv and data/organizations.csv from that same repo —
- *      the raw project/organization records, richer than the README's plain
- *      links (stars, language, license, activity, contributor counts, ...).
- *      Same fallback tiers; same "no remote yet" situation.
+ *   2. data/projects.csv and data/organizations.csv from that same repo's
+ *      main branch — the raw project/organization records, richer than the
+ *      README's plain links (stars, language, license, activity, contributor
+ *      counts, ...). Same fallback tiers.
  *
  *   3. open-sustainable-technology/README.md — the ~2,767-entry awesome list
  *      that is the actual source of truth for which projects exist and how
@@ -62,21 +58,21 @@ import { parse as parseCsv } from "csv-parse/sync";
 // ---------------------------------------------------------------------------
 
 /**
- * Base URL for the 13 pre-built analytics payloads, once opensustain.
- * analytics publishes them (a GitHub release's assets, or raw.
- * githubusercontent.com/<owner>/opensustain.analytics/<data-branch>/web/
- * public/data). Each file is fetched as `${ANALYTICS_DATA_REMOTE_BASE}/
- * ${filename}`. Left null today because neither exists yet; every fetch
- * below is then expected to fail fast and fall through to tier 2.
+ * The 13 analytics payloads, as opensustain.analytics' publish-payloads
+ * workflow pushes them to its `data` branch after every CSV update. Each file
+ * is fetched as `${ANALYTICS_DATA_REMOTE_BASE}/${filename}`. Set to null to
+ * build from a sibling checkout's data/payloads/ (`make build-json`) instead.
  */
-const ANALYTICS_DATA_REMOTE_BASE = null;
+const ANALYTICS_DATA_REMOTE_BASE =
+  "https://raw.githubusercontent.com/protontypes/opensustain.analytics/data";
 
 /**
- * Base URL for the raw project/organization CSVs, once published the same
- * way (`${ANALYTICS_DATA_CSV_REMOTE_BASE}/projects.csv`, `/organizations.csv`).
- * Also not published yet.
+ * The raw project/organization CSVs the payloads are built from
+ * (`${ANALYTICS_DATA_CSV_REMOTE_BASE}/projects.csv`, `/organizations.csv`),
+ * on opensustain.analytics' main branch, where the update bot commits them.
  */
-const ANALYTICS_DATA_CSV_REMOTE_BASE = null;
+const ANALYTICS_DATA_CSV_REMOTE_BASE =
+  "https://raw.githubusercontent.com/protontypes/opensustain.analytics/main/data";
 
 /** The OST README does have a real remote today. */
 const OST_README_REMOTE_URL =

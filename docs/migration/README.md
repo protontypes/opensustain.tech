@@ -74,12 +74,12 @@ workflow are committed directly to `opensustain.analytics`' `main`:
   to `opensustain.tech`. The dispatch is skipped if
   `OST_TECH_DISPATCH_TOKEN` is not set.
 
-Locally, `scripts/fetch-data.mjs` reads the payloads from a sibling checkout's
-`data/payloads/`, so run `make build-json` there first. Once the workflow has
-published to the `data` branch, point `ANALYTICS_DATA_REMOTE_BASE` in
-`scripts/fetch-data.mjs` at
+This is live: the workflow publishes to the `data` branch, and
+`scripts/fetch-data.mjs` reads the payloads from
 `https://raw.githubusercontent.com/protontypes/opensustain.analytics/data`
-and CI builds stop depending on the committed fallback snapshot.
+and the CSVs from that repo's `main`. A sibling checkout's `data/payloads/`
+(`make build-json`) is the fallback when those are unreachable, and the
+committed snapshot the last resort.
 
 ## How these were generated and checked
 

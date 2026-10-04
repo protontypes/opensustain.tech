@@ -294,22 +294,15 @@ been run automatically.
 3. Still in Settings -> Pages, add custom domain `opensustain.tech` and let
    GitHub run its DNS check (the exported build already ships the matching
    `CNAME` file at the repo root of `out/`, i.e. `public/CNAME` in source).
-4. Create the fine-grained `OST_TECH_DISPATCH_TOKEN` PAT (Contents:
-   read/write, scoped to the new `opensustain.tech` repo) and add it as a
-   secret of that exact name to **both**
-   `/home/abdul-salam/Devv/protontypes/open-sustainable-technology` and
-   `/home/abdul-salam/Devv/protontypes/opensustain.analytics` on GitHub
-   (Settings -> Secrets and variables -> Actions in each). Required before
-   the two patches below are useful (their new workflows fire a
-   `repository_dispatch` using this token).
-5. Review, then apply
-   `docs/migration/0001-open-sustainable-technology-notify-and-retire-mkdocs.patch`
-   to a checkout of `/home/abdul-salam/Devv/protontypes/open-sustainable-technology`
-   (`git checkout -b notify-opensustain-tech && git apply
-   /home/abdul-salam/Devv/protontypes/opensustain.tech/docs/migration/0001-open-sustainable-technology-notify-and-retire-mkdocs.patch`),
-   then commit and open a PR. This deletes that repo's old `mkdocs gh-deploy`
-   workflow (`publish.yml`) and adds a workflow that notifies
-   `opensustain.tech` whenever `README.md` changes.
+4. Create the fine-grained `OST_TECH_DISPATCH_TOKEN` PAT and add it to
+   `open-sustainable-technology` and `opensustain.analytics`. Superseded:
+   the token now needs access to both `opensustain.tech` and
+   `opensustain.analytics`; see `docs/migration/README.md` and the
+   "Per-merge data refresh" section of `TODO.md`.
+5. Superseded: the `0001-…-notify-and-retire-mkdocs.patch` this step applied
+   was replaced by `notify-downstream.yml` in `open-sustainable-technology`,
+   which also notifies `opensustain.analytics`. Retiring `publish.yml` is
+   deferred: it still deploys the live mkdocs site at `opensustain.tech`.
 6. Push the payload builder straight to `opensustain.analytics`' `main`:
    the builder (writing to `data/payloads/`), `make build-json`, and a
    workflow that publishes the payloads to a `data` branch and notifies

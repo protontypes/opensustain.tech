@@ -2,16 +2,14 @@ name: Deploy to GitHub Pages
 
 # Four ways this site gets (re)built and deployed:
 #   - push to main:            a code change on this repo.
-#   - repository_dispatch:     an upstream data source changed. See
-#                               docs/migration/README.md for the two sibling
-#                               repos this is meant to receive dispatches
-#                               from ("ost-readme-updated" from
+#   - repository_dispatch:     an upstream data source changed:
+#                               "ost-readme-updated" from
 #                               open-sustainable-technology when README.md
 #                               changes, "analytics-data-updated" from
 #                               opensustain.analytics when it republishes its
-#                               payloads to its `data` branch) — those repos
-#                               don't fire these yet; see that README for how
-#                               to wire them up.
+#                               payloads to its `data` branch. Both need the
+#                               OST_TECH_DISPATCH_TOKEN secret in the sending
+#                               repo; see docs/migration/README.md.
 #   - schedule:                a weekly safety net in case a dispatch is
 #                               missed, dropped, or not wired up yet.
 #   - workflow_dispatch:       a manual run.

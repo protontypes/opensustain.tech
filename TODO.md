@@ -184,6 +184,65 @@ Independent of feature parity. None of these are about the charts.
 
 ---
 
+## Per-merge data refresh
+
+Goal: a merged project PR in `open-sustainable-technology` (OST) reaches the
+site without waiting for the monthly release or the weekly rebuild. Flow and
+token setup: `docs/migration/README.md`.
+
+Two limits stay after this lands. Metrics come from ost.ecosyste.ms, so a new
+project shows on `/projects` within minutes but without metrics, and gets them
+on the first daily analytics run after ecosyste.ms lists it. And until
+`OST_TECH_DISPATCH_TOKEN` exists nothing is dispatched; the analytics still
+refresh daily and the site still rebuilds weekly.
+
+### Code
+
+- [x] **OST** — `release_dataset.py --csv-only` writes `projects.csv` and
+      `organizations.csv` and skips the Grist upload, so analytics builds its
+      CSVs from the same code. The monthly release is unchanged. Checked
+      against the live API: 2,824 projects and 1,371 organisations, same
+      columns as `data/*.csv` today. Branch `ci/notify-on-readme-change`
+- [x] **OST** — `notify-downstream.yml` sends `ost-readme-updated` to
+      `opensustain.analytics` and `opensustain.tech` whenever `README.md`
+      changes on `main`. Same branch
+- [x] **opensustain.analytics** — `update_data.yml` builds the CSVs with
+      `--csv-only` on `ost-readme-updated`, daily at 05:00 UTC, and on demand,
+      instead of downloading OST's monthly release. Branch
+      `ci/refresh-on-readme-change`
+- [x] **opensustain.analytics** — `publish-payloads.yml` declared
+      `DISPATCH_TOKEN` on the notify step itself, where that step's `if`
+      can't reliably see it, so the step could be skipped even with the
+      secret set. Moved to job-level `env`, as GitHub documents. Same branch
+- [x] **This repo** — `docs/migration/README.md` rewritten for the new flow;
+      the old OST patch is removed, since it also deleted `publish.yml`, which
+      still deploys the live site. Branch `ci/per-merge-data-refresh`
+
+### Manual
+
+- [ ] Open and merge the OST PR (`ci/notify-on-readme-change`). Merge it
+      before the analytics PR: `update_data.yml` runs OST's `main` copy of
+      `release_dataset.py` and fails without `--csv-only`
+- [ ] Open and merge the analytics PR (`ci/refresh-on-readme-change`)
+- [ ] Merge `ci/per-merge-data-refresh` here
+- [ ] Create a fine-grained PAT: resource owner **protontypes**, repositories
+      `opensustain.tech` and `opensustain.analytics`, **Contents: read and
+      write**. The org may have to allow or approve fine-grained tokens first
+- [ ] Add it as the `OST_TECH_DISPATCH_TOKEN` Actions secret in
+      `open-sustainable-technology` and in `opensustain.analytics`
+- [ ] Note the token's expiry date and rotate it before then; an expired
+      token stops the dispatches without failing anything
+- [ ] Verify: run "Update OpenSustain Data" by hand in analytics. It should
+      commit `data/*.csv`, then "Publish analytics payloads" should run with
+      its notify step executed (not skipped), then "Deploy to GitHub Pages"
+      here, triggered by `repository_dispatch`
+- [ ] Verify end to end on the next merged project PR: "Notify downstream
+      repos of README changes" runs in OST and both dispatches succeed
+- [ ] Later: once this repo takes over the `opensustain.tech` domain, delete
+      OST's `publish.yml` (mkdocs) so it stops deploying the old site
+
+---
+
 ## Done
 
 - [x] Ecosystem Overview — `/` (tab 1), rebuilt on D3 with search, export and

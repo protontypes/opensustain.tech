@@ -220,10 +220,14 @@ refresh daily and the site still rebuilds weekly.
 
 ### Manual
 
-- [ ] Open and merge the OST PR (`ci/notify-on-readme-change`). Merge it
-      before the analytics PR: `update_data.yml` runs OST's `main` copy of
-      `release_dataset.py` and fails without `--csv-only`
-- [ ] Open and merge the analytics PR (`ci/refresh-on-readme-change`)
+- [ ] OST PR #1665 (`ci/notify-on-readme-change`), left to the community
+- [ ] Analytics PR #15 (`ci/refresh-on-readme-change`). It can merge before
+      #1665 only with the `OST_REF` repo variable set to
+      `ci/notify-on-readme-change`: `update_data.yml` runs OST's
+      `release_dataset.py`, and `--csv-only` exists only on that branch
+- [ ] After #1665 merges, delete the `OST_REF` variable in analytics. If the
+      branch is deleted on merge while the variable still names it,
+      "Update OpenSustain Data" fails at checkout
 - [ ] Merge `ci/per-merge-data-refresh` here
 - [ ] Create a fine-grained PAT: resource owner **protontypes**, repositories
       `opensustain.tech` and `opensustain.analytics`, **Contents: read and

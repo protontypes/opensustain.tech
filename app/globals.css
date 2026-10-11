@@ -46,7 +46,7 @@
   --color-warning: #b45309;
   --color-warning-bg: rgba(180, 83, 9, 0.08);
   --font-heading: 'Space Grotesk', system-ui, sans-serif;
-  --font-body: 'Georgia', serif;
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
   --container-max-width: 1100px;
 }
 

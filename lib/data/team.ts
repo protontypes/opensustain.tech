@@ -1,17 +1,7 @@
 /**
  * The people behind OpenSustain.tech, for the /about page.
  *
- * This is intentionally the ONLY place this data lives — one small file a
- * human can fill in later, instead of placeholders scattered across JSX.
  *
- * Every field below is either exactly what was given (fullName, role, bio,
- * avatarUrl, links), or `null`/`[]` rendered by <TeamCard> as a visible
- * "TODO: ..." placeholder. Do not fill in a guess (a plausible-looking role,
- * a GitHub handle you think might be theirs, an avatar found by searching
- * their name) — replace `null`/`[]` only with a fact one of these people (or
- * someone who can confirm it, such as `protontypes`, the org that maintains
- * https://github.com/protontypes/open-sustainable-technology) has given
- * directly.
  */
 
 export type TeamLink = {
@@ -21,19 +11,12 @@ export type TeamLink = {
 };
 
 export type TeamMember = {
-  /** Stable key for React lists and anchors — not shown in the UI. */
-  id: string;
-  /** Exactly what was given about this person's name; never invented. */
+id: string;
   givenName: string;
-  /** Full name, only once known in full. Otherwise null -> "TODO: full name". */
   fullName: string | null;
-  /** Their role on the project. null -> "TODO: role". */
   role: string | null;
-  /** Short bio. null -> "TODO: bio". */
   bio: string | null;
-  /** Photo URL. null -> a placeholder avatar (initials) is rendered instead. */
   avatarUrl: string | null;
-  /** Profile links (GitHub/LinkedIn/site/...). Empty -> "TODO: links". */
   links: TeamLink[];
 };
 
@@ -58,7 +41,7 @@ export const team: TeamMember[] = [
     givenName: "Salam",
     fullName: "Abdul Salam Issahaku",
     role: "Software Developer",
-    bio: "Builds open digital infrastructure at the intersection of sustainability, AI, and data interoperability. He maintains OpenSustain Analytics and co-originated Open Traceability, a framework for verifiable environmental claims.",
+    bio: "Builds open digital infrastructure at the intersection of sustainability, AI, and data interoperability. He maintains OpenSustain Analytics and Open Traceability, a framework for verifiable environmental claims.",
     avatarUrl: "https://avatars.githubusercontent.com/u/60816007?v=4",
     links: [
       { label: "GitHub", url: "https://github.com/AbdulSalam416" },

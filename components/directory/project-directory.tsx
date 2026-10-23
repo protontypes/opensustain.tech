@@ -162,6 +162,94 @@ function ProjectRow({
   );
 }
 
+/** Grey bar standing in for one run of text; `width` is roughly the text's. */
+function Bar({ width }: { width: string }) {
+  return <span className="sk sk-text" style={{ width }} />;
+}
+
+// Six placeholder cards: two rows of three at the full container width, one
+// column of six on a phone. Widths vary so the grid reads as a page of
+// different projects rather than a pattern.
+const SKELETON_CARDS = [
+  { title: "58%", lines: ["100%", "94%", "62%"], badges: ["7.5em", "4.5em", "3.5em"] },
+  { title: "42%", lines: ["100%", "88%", "40%"], badges: ["6em", "4em", "3.5em", "4.5em"] },
+  { title: "66%", lines: ["100%", "96%", "74%"], badges: ["8.5em", "3.5em", "3.5em"] },
+  { title: "50%", lines: ["100%", "90%", "55%"], badges: ["6.5em", "5em", "3.5em"] },
+  { title: "72%", lines: ["100%", "84%", "30%"], badges: ["7em", "4em", "4em"] },
+  { title: "46%", lines: ["100%", "92%", "68%"], badges: ["9em", "4.5em", "3.5em", "4em"] },
+];
+
+/**
+ * What the directory looks like before its payload has arrived: the same
+ * controls, toolbar and card grid, with bars where the text will be. The
+ * sizes come from the directory's own classes, so when the data lands the
+ * cards replace the bars in place rather than the page jumping. Styles under
+ * "loading skeleton" in globals.css; the pattern is Plug Map's index.html.
+ */
+function DirectorySkeleton() {
+  return (
+    <>
+      <p className="visually-hidden" role="status">
+        Loading the project directory…
+      </p>
+      <div className="directory directory--loading" aria-busy="true" aria-hidden="true">
+        <div className="directory-controls">
+          <div className="viz-field viz-field--search">
+            <span className="viz-field__label">
+              <Bar width="3.5em" />
+            </span>
+            <span className="sk sk-field sk-field--search" />
+          </div>
+          <div className="viz-field viz-field--select">
+            <span className="viz-field__label">
+              <Bar width="5em" />
+            </span>
+            <span className="sk sk-field" />
+          </div>
+          <div className="viz-field viz-field--select">
+            <span className="viz-field__label">
+              <Bar width="6.5em" />
+            </span>
+            <span className="sk sk-field" />
+          </div>
+          <p className="directory-count">
+            <Bar width="10em" />
+          </p>
+        </div>
+
+        <div className="directory-toolbar">
+          <p className="directory-range">
+            <Bar width="12em" />
+          </p>
+          <span className="sk sk-toggle" />
+        </div>
+
+        <ul className="directory-grid">
+          {SKELETON_CARDS.map((card, index) => (
+            <li key={index}>
+              <article className="directory-card">
+                <div className="directory-card__title sk-lines">
+                  <Bar width={card.title} />
+                </div>
+                <p className="directory-card__description sk-lines">
+                  {card.lines.map((width, line) => (
+                    <Bar key={line} width={width} />
+                  ))}
+                </p>
+                <div className="directory-card__meta">
+                  {card.badges.map((width, badge) => (
+                    <span key={badge} className="sk sk-badge" style={{ width }} />
+                  ))}
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </>
+  );
+}
+
 export function ProjectDirectory() {
   const { data, error } = useDirectory();
   const { params, write } = useUrlState();
@@ -292,14 +380,19 @@ export function ProjectDirectory() {
 
   if (error) {
     return (
-      <p className="panel-description">
-        The project directory could not be loaded ({error}). Try reloading the page.
-      </p>
+      <div className="directory-error" role="alert">
+        <p className="panel-description">
+          The project directory could not be loaded ({error}).
+        </p>
+        <button type="button" className="viz-button" onClick={() => window.location.reload()}>
+          Try again
+        </button>
+      </div>
     );
   }
 
   if (!data) {
-    return <p className="panel-description">Loading the project directory…</p>;
+    return <DirectorySkeleton />;
   }
 
   const rangeStart = filtered.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;

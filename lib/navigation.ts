@@ -44,10 +44,23 @@ export const routes = {
 export const MEDIA_DESCRIPTION =
   "Articles and conference talks from the OpenSustain.tech community on open source, climate technology and environmental sustainability.";
 
-/** Header navigation, in display order. */
+/**
+ * The analytics dashboards, in the order the header's Analytics dropdown and
+ * the mobile menu list them. Overview comes first since it is where the
+ * section's own link always led.
+ */
+export const analyticsNavigation = [
+  { href: routes.analytics, label: "Overview", description: "Ecosystem totals and the sunburst" },
+  { href: routes.analyticsProjects, label: "Projects", description: "Rankings, growth and activity" },
+  { href: routes.organizations, label: "Organizations", description: "Who maintains what, and where" },
+  { href: routes.topics, label: "Topics", description: "Recurring keywords and themes" },
+  { href: routes.methodology, label: "Methodology", description: "Sources and metric definitions" },
+] as const;
+
+/** Header navigation, in display order. An item with `children` is a dropdown. */
 export const primaryNavigation = [
   { href: routes.projects, label: "Directory" },
-  { href: routes.analytics, label: "Analytics" },
+  { href: routes.analytics, label: "Analytics", children: analyticsNavigation },
   { href: routes.blog, label: "Media" },
   { href: routes.about, label: "About" },
 ] as const;
@@ -70,6 +83,7 @@ export const externalNavigation = [contributeLink, climateTriageLink] as const;
 export const footerNavigation = [
   { href: routes.projects, label: "Directory" },
   { href: routes.analytics, label: "Analytics" },
+  { href: routes.analyticsProjects, label: "Project Analytics" },
   { href: routes.organizations, label: "Organizations" },
   { href: routes.topics, label: "Topics" },
   { href: routes.methodology, label: "Methodology" },

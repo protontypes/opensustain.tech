@@ -88,4 +88,20 @@ export const team: TeamMember[] = [
       { label: "Website", url: "https://www.pierrevf.com" },
     ],
   },
+  {
+    id: "richard",
+    givenName: "Richard",
+    fullName: "Richard Littauer",
+    role: "Host, Sustain & OSS for Climate podcasts",
+    bio: "Open source maintainer and community builder. Main host of the Sustain podcast, with hundreds of conversations on what keeps open source going, and host of OSS for Climate, the podcast made in collaboration with OpenSustain.tech.",
+    avatarUrl: "https://avatars.githubusercontent.com/u/910753?v=4",
+    links: [
+      { label: "GitHub", url: "https://github.com/RichardLitt" },
+      {
+        label: "LinkedIn",
+        url: "https://www.linkedin.com/in/richard-littauer-130026138/",
+      },
+      { label: "Website", url: "https://burntfen.com" },
+    ],
+  },
 ];

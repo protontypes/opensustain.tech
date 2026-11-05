@@ -69,8 +69,9 @@ const ROOT_HINT = "Click a category to see its projects";
 type Props = {
   /**
    * "hero" is the home page's: the chart to play with, without the analysis
-   * controls (activity filter, color metric, reset, export) or the color bar,
-   * which only mean something to someone already reading the data closely.
+   * controls (activity filter, color metric, reset, export), the color bar or
+   * the category legend, which only mean something to someone already reading
+   * the data closely.
    */
   variant?: "full" | "hero";
 };
@@ -679,8 +680,11 @@ export function EcosystemSunburst({ variant = "full" }: Props) {
         />
       ) : null}
 
-      <div className={hero ? "viz-footer viz-footer--legend" : "viz-footer"}>
-        {hero ? null : (
+      {/* No color bar or legend on the hero: its ring labels its own
+          categories, and narrowing it from a second list did what clicking
+          the ring already does. */}
+      {hero ? null : (
+        <div className="viz-footer">
           <SunburstColorBar
             metric={view.metric}
             metricLabels={payload.metric_labels}
@@ -692,24 +696,24 @@ export function EcosystemSunburst({ variant = "full" }: Props) {
             }
             hueLabel={focusNode.kind === "root" ? null : focusNode.category}
           />
-        )}
-        <SunburstLegend
-          categories={filtered?.children ?? []}
-          isolated={view.isolated}
-          categoryColors={categoryColors}
-          onToggle={(name) =>
-            setView((current) => ({
-              ...current,
-              isolated: current.isolated.includes(name)
-                ? current.isolated.filter((item) => item !== name)
-                : [...current.isolated, name],
-              zoomPath: [],
-              selectedId: null,
-            }))
-          }
-          onClear={() => update({ isolated: [] })}
-        />
-      </div>
+          <SunburstLegend
+            categories={filtered?.children ?? []}
+            isolated={view.isolated}
+            categoryColors={categoryColors}
+            onToggle={(name) =>
+              setView((current) => ({
+                ...current,
+                isolated: current.isolated.includes(name)
+                  ? current.isolated.filter((item) => item !== name)
+                  : [...current.isolated, name],
+                zoomPath: [],
+                selectedId: null,
+              }))
+            }
+            onClear={() => update({ isolated: [] })}
+          />
+        </div>
+      )}
 
       <SunburstTooltip
         node={hover.node}

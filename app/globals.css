@@ -1947,10 +1947,6 @@ a.panel:hover .panel-title {
   min-width: 280px;
 }
 
-.viz-footer--legend {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 .viz-legend__chips {
   display: flex;
   flex-wrap: wrap;

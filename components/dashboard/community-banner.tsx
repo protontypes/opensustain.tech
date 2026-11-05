@@ -28,13 +28,12 @@ export function CommunityBanner() {
   return (
     <aside className="community-bar">
       <p className="community-bar__message">
-        <i className="fa-solid fa-bullhorn" aria-hidden="true" />
         {/* One span, so the sentence keeps real word spaces and wraps inside
             itself; as bare text nodes each run becomes its own flex item. */}
         <span>
-          Join our{" "}
+          OpenSustain.tech is a community project.{" "}
           <a href={communityDiscordUrl} target="_blank" rel="noreferrer">
-            Community
+            Join us on Discord
           </a>
         </span>
       </p>

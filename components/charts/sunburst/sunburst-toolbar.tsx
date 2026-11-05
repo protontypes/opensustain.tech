@@ -24,6 +24,8 @@ type Props = {
   onZoomTo: (index: number) => void;
   onReset: () => void;
   onExport: (kind: "png" | "svg" | "csv") => void;
+  /** Breadcrumb and search only, for the home page's hero chart. */
+  compact?: boolean;
 };
 
 export function SunburstToolbar({
@@ -41,6 +43,7 @@ export function SunburstToolbar({
   onZoomTo,
   onReset,
   onExport,
+  compact = false,
 }: Props) {
   const [draft, setDraft] = useState(query);
 
@@ -97,63 +100,77 @@ export function SunburstToolbar({
       </nav>
 
       <div className="viz-toolbar__controls">
-        <div
-          className="viz-segmented"
-          role="group"
-          aria-label="Project activity filter"
-        >
-          <button
-            type="button"
-            aria-pressed={activity === "all"}
-            onClick={() => onActivity("all")}
-          >
-            All <em>{formatNumber(totals.all)}</em>
-          </button>
-          <button
-            type="button"
-            aria-pressed={activity === "active"}
-            onClick={() => onActivity("active")}
-          >
-            Active <em>{formatNumber(totals.active)}</em>
-          </button>
-        </div>
+        {compact ? null : (
+          <>
+            <div
+              className="viz-segmented"
+              role="group"
+              aria-label="Project activity filter"
+            >
+              <button
+                type="button"
+                aria-pressed={activity === "all"}
+                onClick={() => onActivity("all")}
+              >
+                All <em>{formatNumber(totals.all)}</em>
+              </button>
+              <button
+                type="button"
+                aria-pressed={activity === "active"}
+                onClick={() => onActivity("active")}
+              >
+                Active <em>{formatNumber(totals.active)}</em>
+              </button>
+            </div>
 
-        <label className="viz-field viz-field--select">
-          <span className="viz-field__label">Color by</span>
-          <select
-            value={metric}
-            onChange={(event) =>
-              onMetric(event.target.value as RankingMetricId)
-            }
-          >
-            {METRIC_ORDER.map((id) => (
-              <option key={id} value={id}>
-                {metricLabels[id] ?? id}
-              </option>
-            ))}
-          </select>
-        </label>
+            <label className="viz-field viz-field--select">
+              <span className="viz-field__label">Color by</span>
+              <select
+                value={metric}
+                onChange={(event) =>
+                  onMetric(event.target.value as RankingMetricId)
+                }
+              >
+                {METRIC_ORDER.map((id) => (
+                  <option key={id} value={id}>
+                    {metricLabels[id] ?? id}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
 
         <label className="viz-field viz-field--search">
-          <span className="viz-field__label">Search</span>
+          <span className={compact ? "visually-hidden" : "viz-field__label"}>
+            Search
+          </span>
           <input
             type="search"
             value={draft}
-            placeholder="Name, description, sub-category"
+            placeholder={
+              compact
+                ? "Find a project by name or topic"
+                : "Name, description, sub-category"
+            }
             onChange={(event) => setDraft(event.target.value)}
           />
         </label>
 
-        <button
-          type="button"
-          className="viz-button"
-          onClick={onReset}
-          disabled={!canReset}
-        >
-          Reset
-        </button>
+        {compact ? null : (
+          <>
+            <button
+              type="button"
+              className="viz-button"
+              onClick={onReset}
+              disabled={!canReset}
+            >
+              Reset
+            </button>
 
-        <ExportMenu formats={["png", "svg", "csv"]} onExport={onExport} />
+            <ExportMenu formats={["png", "svg", "csv"]} onExport={onExport} />
+          </>
+        )}
       </div>
     </div>
   );

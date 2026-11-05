@@ -1,30 +1,38 @@
 import Link from "next/link";
 
+import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunburst";
 import { LegacyAnchorRedirect } from "@/components/seo/legacy-anchor-redirect";
-import { MetricCard } from "@/components/ui/metric-card";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { LinkList, type LinkListItem } from "@/components/ui/link-list";
 import { loadFilters, loadSummary } from "@/lib/data";
-import { formatCompactNumber, formatNumber } from "@/lib/format";
-import { externalNavigation, routes } from "@/lib/navigation";
+import { formatNumber } from "@/lib/format";
+import { climateTriageLink, contributeLink, routes } from "@/lib/navigation";
 
-const exploreCards = [
+/* The next places to go once the chart has done its job. */
+const furtherReading: LinkListItem[] = [
   {
     href: routes.projects,
-    title: "Project Directory",
+    title: "Project directory",
     description:
-      "Browse every open-source project in the ecosystem, grouped by category and subcategory, searchable by name and description.",
+      "Every project as a searchable list, filtered by category and subcategory.",
   },
   {
     href: routes.analytics,
     title: "Analytics",
     description:
-      "Dashboards on project health, contributing organizations, and the topics that recur across the ecosystem's documentation.",
+      "Project health, the organizations behind the work, and the topics that recur across it.",
   },
   {
     href: routes.blog,
-    title: "Media",
+    title: "Articles and talks",
     description:
-      "Community articles and recorded conference talks on open source, climate technology, and the ecosystem this directory tracks.",
+      "Writing and recorded talks from the community on open source and climate technology.",
+  },
+  {
+    href: climateTriageLink.href,
+    title: climateTriageLink.label,
+    description:
+      "Open issues across these projects that are ready for a first contribution.",
+    external: true,
   },
 ];
 
@@ -32,79 +40,58 @@ export default async function HomePage() {
   const [summary, filters] = await Promise.all([loadSummary(), loadFilters()]);
 
   return (
-    <main className="page-shell">
+    <main className="home">
       <LegacyAnchorRedirect
         subCategoriesByCategory={filters.sub_categories_by_category}
       />
-      <section className="hero">
-        <h1>
-          Open <span className="curved-underline">Sustainable</span> Technology
-        </h1>
-        <p className="hero-copy">
-          A directory and analysis of the open-source ecosystem in climate
-          change, sustainable energy, biodiversity, and natural resources.
-        </p>
-        {/*
-         * The categories/subcategories/organizations counts used to repeat
-         * here as a small inline line, directly duplicating the four stat
-         * tiles right below — the same numbers shown twice in a row. Removed
-         * so each one appears exactly once, in the tiles.
-         */}
-        <p className="hero-scope">
-          Community-maintained on GitHub —{" "}
-          {externalNavigation.map((link, index) => (
-            <span key={link.href}>
-              <a
-                className="inline-link"
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {link.label}
-              </a>
-              {index < externalNavigation.length - 1 ? " · " : ""}
-            </span>
-          ))}
-        </p>
-      </section>
-
-      <section className="metric-grid">
-        <MetricCard
-          label="Projects"
-          value={formatCompactNumber(summary.totals.projects)}
-          hint={`${formatNumber(summary.totals.projects)} tracked`}
-        />
-        <MetricCard
-          label="Organizations"
-          value={formatCompactNumber(summary.totals.organizations)}
-          hint="Maintaining these projects"
-        />
-        <MetricCard
-          label="Contributors"
-          value={formatCompactNumber(summary.totals.contributors)}
-          hint="Across the whole ecosystem"
-        />
-        <MetricCard
-          label="Categories"
-          value={String(filters.categories.length)}
-          hint={`${filters.sub_categories.length} subcategories`}
-        />
-      </section>
-
-      <section className="content-section">
-        <SectionHeading
-          eyebrow="Explore"
-          title="Start here"
-          description="Three ways into the ecosystem."
-        />
-        <div className="route-grid">
-          {exploreCards.map((card) => (
-            <Link key={card.href} href={card.href} className="panel route-card">
-              <h3 className="panel-title">{card.title}</h3>
-              <p className="panel-description">{card.description}</p>
+      <section className="home-hero" aria-labelledby="home-title">
+        <div className="home-hero__text">
+          <h1 id="home-title" className="home-title">
+            Open Sustainable Technology
+          </h1>
+          <p className="home-lede">
+            A map of the open-source projects working on climate change,
+            sustainable energy, biodiversity and natural resources.
+          </p>
+          {/*
+           * The totals as one sentence rather than a row of stat tiles: they
+           * describe the chart beside them, they are not the point of the page.
+           */}
+          <p className="home-facts">
+            {formatNumber(summary.totals.projects)} projects, maintained by{" "}
+            {formatNumber(summary.totals.organizations)} organizations and{" "}
+            {formatNumber(summary.totals.contributors)} contributors, sorted into{" "}
+            {filters.categories.length} categories and{" "}
+            {filters.sub_categories.length} subcategories.
+          </p>
+          <div className="home-actions">
+            <Link className="home-action home-action--primary" href={routes.projects}>
+              Browse the directory
             </Link>
-          ))}
+            <a
+              className="home-action"
+              href={contributeLink.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Add a project
+            </a>
+          </div>
         </div>
+        <div className="home-hero__chart">
+          <EcosystemSunburst variant="hero" />
+        </div>
+      </section>
+
+      <section className="split-section" aria-labelledby="home-more-title">
+        <h2 id="home-more-title" className="split-section__title">
+          Beyond the chart
+        </h2>
+        <LinkList items={furtherReading} />
+        <p className="split-section__note">
+          The list is maintained in the open on GitHub. Anyone can add a project
+          or correct an entry with a pull request.
+        </p>
       </section>
     </main>
   );

@@ -61,9 +61,23 @@ import {
 } from "./sunburst-rail";
 
 const MAX_CHART = 1040;
+const MAX_HERO_CHART = 760;
+/** Header, community bar, the hero's top padding and the chart's search row. */
+const HERO_CHROME = 220;
 const ROOT_HINT = "Click a category to see its projects";
 
-export function EcosystemSunburst() {
+type Props = {
+  /**
+   * "hero" is the home page's: the chart to play with, without the analysis
+   * controls (activity filter, color metric, reset, export) or the color bar,
+   * which only mean something to someone already reading the data closely.
+   */
+  variant?: "full" | "hero";
+};
+
+export function EcosystemSunburst({ variant = "full" }: Props) {
+  const hero = variant === "hero";
+  const maxChart = hero ? MAX_HERO_CHART : MAX_CHART;
   const [payload, setPayload] = useState<EcosystemSunburstPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<ViewState>(INITIAL_VIEW);
@@ -105,6 +119,21 @@ export function EcosystemSunburst() {
   const { ref: frameRef, width } = useElementSize<HTMLDivElement>();
   const reducedMotion = useReducedMotion();
   const theme = useTheme();
+
+  // Beside the home page's text column the whole ring has to fit on the first
+  // screen, or the thing to play with starts below the fold. Stacked under the
+  // text on a narrow screen it is already a scroll away, so width alone rules.
+  const [heroHeightCap, setHeroHeightCap] = useState(Infinity);
+  useEffect(() => {
+    if (!hero) return;
+    const measure = () =>
+      setHeroHeightCap(
+        window.innerWidth > 1024 ? window.innerHeight - HERO_CHROME : Infinity,
+      );
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [hero]);
 
   /**
    * Fetched on the client rather than passed down from the server component.
@@ -435,7 +464,10 @@ export function EcosystemSunburst() {
     [laid, payload, focusNode, view],
   );
 
-  const size = Math.max(280, Math.min(width || MAX_CHART, MAX_CHART));
+  const size = Math.max(
+    280,
+    Math.min(width || maxChart, maxChart, heroHeightCap),
+  );
   const canReset =
     view.zoomPath.length > 0 ||
     view.isolated.length > 0 ||
@@ -462,7 +494,13 @@ export function EcosystemSunburst() {
   if (!payload || !focusNode) {
     return (
       <div className="viz-state" aria-busy="true" aria-live="polite">
-        <div className="viz-skeleton" style={{ height: MAX_CHART }}>
+        <div
+          className="viz-skeleton"
+          // The hero's column is narrower than the chart's cap, so a fixed
+          // height would leave a gap under the loaded chart; the skeleton's
+          // own aspect-ratio sizes it from the column instead.
+          style={hero ? { maxWidth: maxChart } : { height: MAX_CHART }}
+        >
           <span className="viz-skeleton__ring viz-skeleton__ring--1" />
           <span className="viz-skeleton__ring viz-skeleton__ring--2" />
           <span className="viz-skeleton__ring viz-skeleton__ring--3" />
@@ -487,7 +525,9 @@ export function EcosystemSunburst() {
     "categories",
   )}`;
   const caption = [
-    fit.compact
+    // The hero's plate already carries the count, active-qualified; repeating
+    // it here unqualified read as a second, different total.
+    fit.compact && !hero
       ? focusNode.kind === "root"
         ? rootMeta
         : pluralize(focusNode.visibleLeaves, "project")
@@ -498,7 +538,7 @@ export function EcosystemSunburst() {
     .join(" · ");
 
   return (
-    <div className="viz-root">
+    <div className={hero ? "viz-root viz-root--hero" : "viz-root"}>
       <SunburstToolbar
         trail={trail}
         metric={view.metric}
@@ -514,6 +554,7 @@ export function EcosystemSunburst() {
         onZoomTo={handleZoomTo}
         onReset={handleReset}
         onExport={handleExport}
+        compact={hero}
       />
 
       <div className="viz-body" ref={frameRef}>
@@ -572,6 +613,26 @@ export function EcosystemSunburst() {
                   </span>
                   <span className="viz-hole__back">Back</span>
                 </button>
+              ) : hero ? (
+                <div className="viz-hole__button viz-hole__button--static">
+                  <span className="viz-hole__title">
+                    {/* The activity filter has no control here, so the count
+                        names it rather than disagreeing with the page's total. */}
+                    {pluralize(
+                      focusNode.visibleLeaves,
+                      view.activity === "active" ? "active project" : "project",
+                    )}
+                  </span>
+                  <span className="viz-hole__meta">
+                    {pluralize(
+                      focusNode.children.filter((child) => child.visibleLeaves > 0)
+                        .length,
+                      "category",
+                      "categories",
+                    )}
+                  </span>
+                  <span className="viz-hole__hint">{ROOT_HINT}</span>
+                </div>
               ) : (
                 <a
                   className="viz-hole__button"
@@ -618,18 +679,20 @@ export function EcosystemSunburst() {
         />
       ) : null}
 
-      <div className="viz-footer">
-        <SunburstColorBar
-          metric={view.metric}
-          metricLabels={payload.metric_labels}
-          bins={bins}
-          hue={
-            focusNode.kind === "root"
-              ? "var(--color-primary)"
-              : categoryColor(focusNode.category, categoryColors)
-          }
-          hueLabel={focusNode.kind === "root" ? null : focusNode.category}
-        />
+      <div className={hero ? "viz-footer viz-footer--legend" : "viz-footer"}>
+        {hero ? null : (
+          <SunburstColorBar
+            metric={view.metric}
+            metricLabels={payload.metric_labels}
+            bins={bins}
+            hue={
+              focusNode.kind === "root"
+                ? "var(--color-primary)"
+                : categoryColor(focusNode.category, categoryColors)
+            }
+            hueLabel={focusNode.kind === "root" ? null : focusNode.category}
+          />
+        )}
         <SunburstLegend
           categories={filtered?.children ?? []}
           isolated={view.isolated}

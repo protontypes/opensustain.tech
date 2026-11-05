@@ -76,20 +76,27 @@ export const climateTriageLink = {
   label: "ClimateTriage",
 } as const;
 
-/** Both ways to act on the ecosystem off-site, as the homepage hero lists them. */
-export const externalNavigation = [contributeLink, climateTriageLink] as const;
-
 /** Footer link columns. */
 export const footerNavigation = [
-  { href: routes.projects, label: "Directory" },
-  { href: routes.analytics, label: "Analytics" },
-  { href: routes.analyticsProjects, label: "Project Analytics" },
-  { href: routes.organizations, label: "Organizations" },
-  { href: routes.topics, label: "Topics" },
-  { href: routes.methodology, label: "Methodology" },
-  { href: routes.blog, label: "Articles" },
-  { href: routes.talks, label: "Talks" },
-  { href: routes.about, label: "About" },
+  {
+    heading: "Data",
+    links: [
+      { href: routes.projects, label: "Directory" },
+      { href: routes.analytics, label: "Analytics" },
+      { href: routes.analyticsProjects, label: "Project analytics" },
+      { href: routes.organizations, label: "Organizations" },
+      { href: routes.topics, label: "Topics" },
+      { href: routes.methodology, label: "Methodology" },
+    ],
+  },
+  {
+    heading: "Read",
+    links: [
+      { href: routes.blog, label: "Articles" },
+      { href: routes.talks, label: "Talks" },
+      { href: routes.about, label: "About" },
+    ],
+  },
 ] as const;
 
 /** opensustain.tech's social presence, listed in mkdocs.yml `extra.social`. */

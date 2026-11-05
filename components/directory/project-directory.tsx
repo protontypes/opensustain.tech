@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { param, useUrlState } from "@/lib/hooks/use-url-state";
 import { useDirectory } from "@/lib/data/use-directory";
-import { formatCompactNumber, formatNumber } from "@/lib/format";
+import { formatCompactNumber, formatNumber, pluralize } from "@/lib/format";
+import { categoryColor } from "@/lib/sunburst/color";
 import type { DirectoryPayload, DirectoryProject } from "@/lib/types/directory";
 
 import { ProjectDialog } from "./project-dialog";
@@ -32,13 +33,45 @@ function matchesQuery(project: DirectoryProject, query: string): boolean {
 /** "All categories" / "All subcategories" sentinel used both in state and the URL. */
 const ALL = "all";
 
-/** Cards per page. Keeps the DOM small regardless of how many of the ~2,753
+/** Rows per page. Keeps the DOM small regardless of how many of the ~2,753
  * projects match the current filters — the alternative to virtualizing the
  * list, and simpler given no virtualization library is already a dependency
  * here. */
 const PAGE_SIZE = 60;
 
-type View = "grid" | "list";
+/** Projects with no subcategory in the README are listed under this name. */
+const GENERAL = "General";
+
+type Group = {
+  key: string;
+  category: string;
+  subcategory: string;
+  projects: DirectoryProject[];
+};
+
+/**
+ * Runs of consecutive projects that share a subcategory. The list is already
+ * in README order, so a run is a whole subcategory — or, where a page break
+ * falls inside one, the part of it on this page.
+ */
+function groupBySubcategory(projects: DirectoryProject[]): Group[] {
+  const groups: Group[] = [];
+  for (const project of projects) {
+    const subcategory = project.subcategory ?? GENERAL;
+    const last = groups[groups.length - 1];
+    if (last && last.category === project.category && last.subcategory === subcategory) {
+      last.projects.push(project);
+    } else {
+      groups.push({
+        key: `${project.category}/${subcategory}`,
+        category: project.category,
+        subcategory,
+        projects: [project],
+      });
+    }
+  }
+  return groups;
+}
 
 /** Flattens the category/subcategory tree into one README-ordered list —
  * every project already carries its own `category`/`subcategory`, so nothing
@@ -72,53 +105,6 @@ function OpenButton({
   );
 }
 
-function ProjectCard({
-  project,
-  onOpen,
-}: {
-  project: DirectoryProject;
-  onOpen: (project: DirectoryProject) => void;
-}) {
-  const activity = formatMonthYear(project.latest_commit_activity);
-
-  return (
-    <li>
-      <article className="directory-card">
-        <h3 className="directory-card__title">
-          <OpenButton project={project} onOpen={onOpen} />
-        </h3>
-        <p className="directory-card__description">{project.description}</p>
-        <div className="directory-card__meta">
-          {project.subcategory ? (
-            <span className="directory-badge">{project.subcategory}</span>
-          ) : null}
-          {project.language ? (
-            <span className="directory-badge">{project.language}</span>
-          ) : null}
-          {typeof project.stars === "number" ? (
-            <span className="directory-badge directory-badge--stat">
-              <i className="fa-solid fa-star" aria-hidden="true" /> {formatCompactNumber(project.stars)}
-            </span>
-          ) : null}
-          {activity ? (
-            <span className="directory-badge directory-badge--stat" title="Latest commit activity">
-              <i className="fa-solid fa-code-commit" aria-hidden="true" /> {activity}
-            </span>
-          ) : null}
-          {project.source === "readme" ? (
-            <span
-              className="directory-badge directory-badge--pending"
-              title="Recently added to the directory; metrics not yet synced."
-            >
-              Recently added
-            </span>
-          ) : null}
-        </div>
-      </article>
-    </li>
-  );
-}
-
 function ProjectRow({
   project,
   onOpen,
@@ -137,28 +123,82 @@ function ProjectRow({
           </h3>
           <p className="directory-row__description">{project.description}</p>
         </div>
-        <span className="directory-row__cell directory-row__cell--sub">
-          {project.subcategory ?? ""}
-        </span>
+        {/* Each cell names itself for a screen reader; sighted readers get the
+            column header above the list instead. */}
         <span className="directory-row__cell directory-row__cell--lang">
-          {project.language ?? ""}
+          {project.language ? (
+            <>
+              <span className="visually-hidden">Language: </span>
+              {project.language}
+            </>
+          ) : null}
         </span>
         <span className="directory-row__cell directory-row__cell--stat">
           {typeof project.stars === "number" ? (
             <>
-              <i className="fa-solid fa-star" aria-hidden="true" />
-              <span className="visually-hidden">Stars:</span> {formatCompactNumber(project.stars)}
+              <span className="visually-hidden">Stars: </span>
+              {formatCompactNumber(project.stars)}
             </>
           ) : null}
         </span>
-        <span
-          className="directory-row__cell directory-row__cell--activity"
-          title="Latest commit activity"
-        >
-          {activity ?? (project.source === "readme" ? "Recently added" : "")}
+        <span className="directory-row__cell directory-row__cell--activity">
+          {activity ? (
+            <>
+              <span className="visually-hidden">Last commit: </span>
+              {activity}
+            </>
+          ) : project.source === "readme" ? (
+            <span
+              className="directory-row__pending"
+              title="Recently added to the directory; metrics not yet synced."
+            >
+              Recently added
+            </span>
+          ) : null}
         </span>
       </article>
     </li>
+  );
+}
+
+/**
+ * One subcategory: its heading, with the category's color from the sunburst,
+ * and its rows. The count is for the whole subcategory under the current
+ * filters, so a heading repeated after a page break still says how many there
+ * are in all.
+ */
+function ProjectGroup({
+  group,
+  total,
+  onOpen,
+}: {
+  group: Group;
+  total: number;
+  onOpen: (project: DirectoryProject) => void;
+}) {
+  // Names carry spaces and slashes; an id with a space is two ids to
+  // aria-labelledby.
+  const headingId = `group-${group.key.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  return (
+    <section className="directory-group" aria-labelledby={headingId}>
+      <header className="directory-group__head">
+        <span
+          className="directory-group__swatch"
+          style={{ background: categoryColor(group.category, {}) }}
+          aria-hidden="true"
+        />
+        <h2 id={headingId} className="directory-group__title">
+          {group.subcategory}
+        </h2>
+        <p className="directory-group__category">{group.category}</p>
+        <p className="directory-group__count">{pluralize(total, "project")}</p>
+      </header>
+      <ul className="directory-list">
+        {group.projects.map((project) => (
+          <ProjectRow key={project.url || project.name} project={project} onOpen={onOpen} />
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -167,23 +207,33 @@ function Bar({ width }: { width: string }) {
   return <span className="sk sk-text" style={{ width }} />;
 }
 
-// Six placeholder cards: two rows of three at the full container width, one
-// column of six on a phone. Widths vary so the grid reads as a page of
+// Two placeholder groups of rows. Widths vary so it reads as a page of
 // different projects rather than a pattern.
-const SKELETON_CARDS = [
-  { title: "58%", lines: ["100%", "94%", "62%"], badges: ["7.5em", "4.5em", "3.5em"] },
-  { title: "42%", lines: ["100%", "88%", "40%"], badges: ["6em", "4em", "3.5em", "4.5em"] },
-  { title: "66%", lines: ["100%", "96%", "74%"], badges: ["8.5em", "3.5em", "3.5em"] },
-  { title: "50%", lines: ["100%", "90%", "55%"], badges: ["6.5em", "5em", "3.5em"] },
-  { title: "72%", lines: ["100%", "84%", "30%"], badges: ["7em", "4em", "4em"] },
-  { title: "46%", lines: ["100%", "92%", "68%"], badges: ["9em", "4.5em", "3.5em", "4em"] },
+const SKELETON_GROUPS = [
+  {
+    title: "14em",
+    rows: [
+      { name: "9em", line: "78%" },
+      { name: "6em", line: "64%" },
+      { name: "11em", line: "82%" },
+      { name: "7em", line: "56%" },
+    ],
+  },
+  {
+    title: "10em",
+    rows: [
+      { name: "8em", line: "70%" },
+      { name: "12em", line: "60%" },
+      { name: "6.5em", line: "76%" },
+    ],
+  },
 ];
 
 /**
  * What the directory looks like before its payload has arrived: the same
- * controls, toolbar and card grid, with bars where the text will be. The
- * sizes come from the directory's own classes, so when the data lands the
- * cards replace the bars in place rather than the page jumping. Styles under
+ * controls, column header and grouped rows, with bars where the text will be.
+ * The sizes come from the directory's own classes, so when the data lands the
+ * rows replace the bars in place rather than the page jumping. Styles under
  * "loading skeleton" in globals.css; the pattern is Plug Map's index.html.
  */
 function DirectorySkeleton() {
@@ -217,34 +267,34 @@ function DirectorySkeleton() {
           </p>
         </div>
 
-        <div className="directory-toolbar">
+        <div className="directory-columns">
           <p className="directory-range">
             <Bar width="12em" />
           </p>
-          <span className="sk sk-toggle" />
         </div>
 
-        <ul className="directory-grid">
-          {SKELETON_CARDS.map((card, index) => (
-            <li key={index}>
-              <article className="directory-card">
-                <div className="directory-card__title sk-lines">
-                  <Bar width={card.title} />
-                </div>
-                <p className="directory-card__description sk-lines">
-                  {card.lines.map((width, line) => (
-                    <Bar key={line} width={width} />
-                  ))}
-                </p>
-                <div className="directory-card__meta">
-                  {card.badges.map((width, badge) => (
-                    <span key={badge} className="sk sk-badge" style={{ width }} />
-                  ))}
-                </div>
-              </article>
-            </li>
-          ))}
-        </ul>
+        {SKELETON_GROUPS.map((group, index) => (
+          <section key={index} className="directory-group">
+            <div className="directory-group__head">
+              <span className="directory-group__swatch sk" />
+              <div className="directory-group__title">
+                <Bar width={group.title} />
+              </div>
+            </div>
+            <ul className="directory-list">
+              {group.rows.map((row, line) => (
+                <li key={line}>
+                  <div className="directory-row">
+                    <div className="directory-row__main sk-lines">
+                      <Bar width={row.name} />
+                      <Bar width={row.line} />
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
       </div>
     </>
   );
@@ -258,7 +308,6 @@ export function ProjectDirectory() {
   const [category, setCategory] = useState(ALL);
   const [subcategory, setSubcategory] = useState(ALL);
   const [page, setPage] = useState(1);
-  const [view, setView] = useState<View>("grid");
   const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
   // True while the open overlay has its own history entry, so closing it can
   // step back instead of leaving a duplicate entry behind.
@@ -273,7 +322,6 @@ export function ProjectDirectory() {
     setSubcategory(param(params, "sub", ALL));
     const pageParam = Number(param(params, "page", "1"));
     setPage(Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1);
-    setView(param(params, "view", "grid") === "list" ? "list" : "grid");
     const project = params.get("project");
     setSelectedUrl(project);
     if (!project) pushedOverlay.current = false;
@@ -306,14 +354,6 @@ export function ProjectDirectory() {
         url.page = null;
       }
       write(url);
-    },
-    [write],
-  );
-
-  const chooseView = useCallback(
-    (next: View) => {
-      setView(next);
-      write({ view: next === "list" ? "list" : null });
     },
     [write],
   );
@@ -377,6 +417,15 @@ export function ProjectDirectory() {
     () => filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
     [filtered, currentPage],
   );
+  const groups = useMemo(() => groupBySubcategory(visible), [visible]);
+  const groupTotals = useMemo(() => {
+    const totals = new Map<string, number>();
+    for (const project of filtered) {
+      const key = `${project.category}/${project.subcategory ?? GENERAL}`;
+      totals.set(key, (totals.get(key) ?? 0) + 1);
+    }
+    return totals;
+  }, [filtered]);
 
   if (error) {
     return (
@@ -405,7 +454,7 @@ export function ProjectDirectory() {
           <span className="viz-field__label">Search</span>
           <input
             type="search"
-            placeholder="Search by name, description or topic…"
+            placeholder="Name, description or topic"
             value={query}
             onChange={(event) => applyFilters({ q: event.target.value })}
           />
@@ -446,45 +495,28 @@ export function ProjectDirectory() {
         <p className="panel-description">No projects match “{query}”. Try a different search or filter.</p>
       ) : (
         <>
-          <div className="directory-toolbar">
+          {/* One header for every group's columns, on the rows' own grid. */}
+          <div className="directory-columns">
             <p className="directory-range" aria-live="polite">
               Showing {formatNumber(rangeStart)}–{formatNumber(rangeEnd)} of {formatNumber(filtered.length)}
             </p>
-            <div className="viz-segmented directory-view-toggle" role="group" aria-label="Layout">
-              <button
-                type="button"
-                aria-pressed={view === "grid"}
-                aria-label="Grid view"
-                title="Grid view"
-                onClick={() => chooseView("grid")}
-              >
-                <i className="fa-solid fa-grip" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                aria-pressed={view === "list"}
-                aria-label="List view"
-                title="List view"
-                onClick={() => chooseView("list")}
-              >
-                <i className="fa-solid fa-list" aria-hidden="true" />
-              </button>
-            </div>
+            <span className="directory-columns__label" aria-hidden="true">Language</span>
+            <span className="directory-columns__label directory-columns__label--end" aria-hidden="true">
+              Stars
+            </span>
+            <span className="directory-columns__label directory-columns__label--end" aria-hidden="true">
+              Last commit
+            </span>
           </div>
 
-          {view === "grid" ? (
-            <ul className="directory-grid">
-              {visible.map((project) => (
-                <ProjectCard key={project.url || project.name} project={project} onOpen={openProject} />
-              ))}
-            </ul>
-          ) : (
-            <ul className="directory-list">
-              {visible.map((project) => (
-                <ProjectRow key={project.url || project.name} project={project} onOpen={openProject} />
-              ))}
-            </ul>
-          )}
+          {groups.map((group) => (
+            <ProjectGroup
+              key={`${group.key}/${group.projects[0].url}`}
+              group={group}
+              total={groupTotals.get(group.key) ?? group.projects.length}
+              onOpen={openProject}
+            />
+          ))}
 
           {totalPages > 1 ? (
             <nav className="directory-pagination" aria-label="Project directory pages">

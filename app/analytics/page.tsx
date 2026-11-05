@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunburst";
 import { Avatar } from "@/components/ui/avatar";
-import { MetricCard, MetricStat } from "@/components/ui/metric-card";
+import { LinkList } from "@/components/ui/link-list";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { snapshotOf } from "@/lib/data/snapshot";
@@ -23,34 +23,34 @@ export const metadata: Metadata = {
 };
 
 // This page is the landing spot the header's "Analytics" link points at —
-// an overview plus cards into the four dashboards below it, rather than a
+// an overview plus links into the four dashboards below it, rather than a
 // second copy of any one of them. See DATA_CONTRACT.md / the site-shell
-// report for why /projects itself is not one of these cards: it's the OST
+// report for why /projects itself is not one of these links: it's the OST
 // project directory now, not the project-rankings dashboard linked here.
-const routeCards = [
+const dashboards = [
   {
     href: routes.analyticsProjects,
-    title: "Project Analytics",
+    title: "Projects",
     description:
-      "Detailed insights into project rankings, lifecycle trends, and community attributes.",
+      "Rankings, lifecycle trends and community attributes for every project.",
   },
   {
     href: routes.organizations,
     title: "Organizations",
     description:
-      "Analyze the geographic distribution and hierarchy of contributing organizations.",
+      "Who maintains the ecosystem, where they are, and what kind of organization they are.",
   },
   {
     href: routes.topics,
     title: "Topics",
     description:
-      "Explore the most frequent terms and thematic clusters extracted from documentation.",
+      "The terms and themes that recur across the projects' documentation.",
   },
   {
     href: routes.methodology,
     title: "Methodology",
     description:
-      "Where the data comes from, how each metric is defined, and what this dashboard cannot tell you.",
+      "Where the data comes from, how each metric is defined, and what these dashboards cannot tell you.",
   },
 ];
 
@@ -68,157 +68,144 @@ export default async function AnalyticsPage() {
       : 0;
   const topProjects = projectRankings.records.slice(0, 10);
 
+  /*
+   * Two short tables instead of a row of big-number tiles and a strip of
+   * medians under it: exact figures, each with its unit and its qualifier on
+   * the same line, read the way a data appendix reads.
+   */
+  const ecosystemFigures = [
+    { label: "Projects", value: formatNumber(summary.totals.projects) },
+    {
+      label: "Active in the past year",
+      value: formatNumber(summary.totals.active_projects),
+      note: formatPercent(activeRate),
+    },
+    { label: "Organizations", value: formatNumber(summary.totals.organizations) },
+    { label: "Contributors", value: formatNumber(summary.totals.contributors) },
+    {
+      label: "Categories",
+      value: String(filters.categories.length),
+      note: `${filters.sub_categories.length} subcategories`,
+    },
+  ];
+  const medianFigures = [
+    {
+      label: "Age",
+      value: `${formatDecimal(summary.medians.project_age_years, 1)} years`,
+    },
+    { label: "Stars", value: formatNumber(summary.medians.stars) },
+    {
+      label: "Contributors",
+      value: formatDecimal(summary.medians.contributors, 0),
+    },
+    { label: "Commits", value: formatNumber(summary.medians.total_commits) },
+    {
+      label: "Development distribution score",
+      value: formatDecimal(summary.medians.dds, 3),
+    },
+  ];
+
   return (
     <main className="page-shell">
-      <section className="hero">
-        <h1>Open Source <span className="curved-underline">Sustainability</span> Analytics</h1>
-        <p className="hero-copy">
-          Tracking the health, community engagement, and technological trends
-          across the open-source climate-tech ecosystem.
-        </p>
-        {/*
-         * "active" used to be a third badge here, repeating the Active tile's
-         * own hint text below almost verbatim. Categories/sub-categories stay
-         * — they appear nowhere else on this page.
-         */}
-        <div className="hero-badges">
-          <span>{filters.categories.length} categories</span>
-          <span>{filters.sub_categories.length} sub-categories</span>
-        </div>
-        {/* Scope and provenance in one line, so a reader arriving from a link
-            knows what this covers and how current it is. */}
-        <p className="hero-scope">
-          {formatNumber(summary.totals.projects)} projects and{" "}
-          {formatNumber(summary.totals.organizations)} organizations, from a
-          snapshot of{" "}
-          <time dateTime={snapshot.iso}>{snapshot.label}</time>.{" "}
-          <Link className="inline-link" href="/methodology">
-            How this is measured
-          </Link>
-        </p>
+      <SectionHeading
+        as="h1"
+        title="Open Source Sustainability Analytics"
+        description="The health, activity and community of the open-source climate and sustainability ecosystem, measured."
+      />
+      {/* Scope and provenance in one line, so a reader arriving from a link
+          knows how current this is. */}
+      <p className="page-provenance">
+        Figures from the snapshot of{" "}
+        <time dateTime={snapshot.iso}>{snapshot.label}</time>.{" "}
+        <Link href={routes.methodology}>How this is measured</Link>
+      </p>
+
+      <section className="key-figures" aria-label="Key figures">
+        <FigureTable title="The ecosystem" rows={ecosystemFigures} />
+        <FigureTable title="The median project" rows={medianFigures} />
       </section>
 
-      <section className="metric-grid">
-        <MetricCard
-          label="Projects"
-          value={formatCompactNumber(summary.totals.projects)}
-          hint={`${formatNumber(summary.totals.projects)} tracked`}
-        />
-        <MetricCard
-          label="Active"
-          value={formatCompactNumber(summary.totals.active_projects)}
-          hint={`${formatPercent(activeRate)} committed in the past year`}
-        />
-        <MetricCard
-          label="Organizations"
-          value={formatCompactNumber(summary.totals.organizations)}
-          hint="Maintaining these projects"
-        />
-        <MetricCard
-          label="Contributors"
-          value={formatCompactNumber(summary.totals.contributors)}
-          hint="Across the whole ecosystem"
-        />
-      </section>
+      <div className="stack">
+        <Panel
+          className="panel--viz"
+          title="The ecosystem by category"
+          description="Every project, nested by category and subcategory. Color encodes the metric you choose; click a ring to zoom in."
+        >
+          <EcosystemSunburst />
+        </Panel>
+        <Panel
+          title="Top 10 projects"
+          description={
+            <>
+              Ranked by combined health and community score.{" "}
+              <Link href={routes.analyticsProjects}>See the full ranking</Link>
+            </>
+          }
+        >
+          <ol className="leader-list">
+            {topProjects.map((project, index) => (
+              <li key={project.url || project.name} className="leader-item">
+                <div className="leader-item__body">
+                  <p className="leader-item__rank">{index + 1}</p>
+                  {/* Populated on 2,571 of 2,691 records and drawn nowhere. */}
+                  <Avatar src={project.avatar_url} />
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-link leader-item__name"
+                  >
+                    {project.name}
+                  </a>
+                  <p className="leader-item__meta">
+                    {project.category} › {project.sub_category}
+                  </p>
+                  {/* stars/contributors were already in the payload and unused */}
+                  <p className="leader-item__stats">
+                    <span>{formatCompactNumber(project.stars)} stars</span>
+                    <span>
+                      {formatNumber(project.contributors)} contributors
+                    </span>
+                  </p>
+                </div>
+                <strong className="leader-item__score">
+                  {formatDecimal(project.total_score_combined, 2)}
+                </strong>
+              </li>
+            ))}
+          </ol>
+        </Panel>
+      </div>
 
-      {/* The medians the Streamlit dashboard shows in its second row. They were
-          in the payload but only surfaced as hint text on unrelated cards. */}
-      <section className="metric-strip" aria-label="Median project statistics">
-        <p className="metric-strip__title">Median project</p>
-        <div className="metric-strip__items">
-          <MetricStat
-            label="Age"
-            value={`${formatDecimal(summary.medians.project_age_years, 1)}y`}
-          />
-          <MetricStat
-            label="Stars"
-            value={formatNumber(summary.medians.stars)}
-          />
-          <MetricStat
-            label="Contributors"
-            value={formatDecimal(summary.medians.contributors, 0)}
-          />
-          <MetricStat
-            label="Commits"
-            value={formatNumber(summary.medians.total_commits)}
-          />
-          <MetricStat
-            label="Development Distribution"
-            value={formatDecimal(summary.medians.dds, 3)}
-          />
-        </div>
-      </section>
-
-      <section className="content-section">
-        <div className="stack">
-          <Panel
-            className="panel--viz"
-            title="Ecosystem Sunburst"
-            description="Every project in the open sustainability landscape, nested by category and sub-category. Color encodes the metric you choose; click a ring to zoom in."
-          >
-            <EcosystemSunburst />
-          </Panel>
-          <Panel
-            title="Top Projects"
-            description="Ranked by combined health and community score."
-          >
-            <ol className="leader-list">
-              {topProjects.map((project, index) => (
-                <li key={project.url || project.name} className="leader-item">
-                  <div className="leader-item__body">
-                    <p className="leader-item__rank">
-                      {String(index + 1).padStart(2, "0")}
-                    </p>
-                    {/* Populated on 2,571 of 2,691 records and drawn nowhere. */}
-                    <Avatar src={project.avatar_url} />
-                    <a
-                      href={project.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-link leader-item__name"
-                    >
-                      {project.name}
-                    </a>
-                    <p className="leader-item__meta">
-                      {project.category} · {project.sub_category}
-                    </p>
-                    {/* stars/contributors were already in the payload and unused */}
-                    <p className="leader-item__stats">
-                      <span>{formatCompactNumber(project.stars)} stars</span>
-                      <span>
-                        {formatNumber(project.contributors)} contributors
-                      </span>
-                    </p>
-                  </div>
-                  <strong className="leader-item__score">
-                    {formatDecimal(project.total_score_combined, 2)}
-                  </strong>
-                </li>
-              ))}
-            </ol>
-          </Panel>
-
-          <div>
-            <SectionHeading
-              eyebrow="Analytics"
-              title="Explore Ecosystem"
-              description="Deep-dive into specialized dashboards for deeper insights."
-            />
-            <div className="route-grid">
-              {routeCards.map((card) => (
-                <Link
-                  key={card.href}
-                  href={card.href}
-                  className="panel route-card"
-                >
-                  <h3 className="panel-title">{card.title}</h3>
-                  <p className="panel-description">{card.description}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
+      <section className="split-section" aria-labelledby="dashboards-title">
+        <h2 id="dashboards-title" className="split-section__title">
+          Dashboards
+        </h2>
+        <LinkList items={dashboards} />
       </section>
     </main>
+  );
+}
+
+type FigureRow = { label: string; value: string; note?: string };
+
+function FigureTable({ title, rows }: { title: string; rows: FigureRow[] }) {
+  return (
+    <div className="figure-table">
+      <h2 className="figure-table__title">{title}</h2>
+      <dl>
+        {rows.map((row) => (
+          <div key={row.label} className="figure-table__row">
+            <dt>{row.label}</dt>
+            <dd>
+              {row.value}
+              {row.note ? (
+                <span className="figure-table__note">{row.note}</span>
+              ) : null}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }

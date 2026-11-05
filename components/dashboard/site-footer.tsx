@@ -20,18 +20,6 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
               />
               OpenSustain.Tech
             </span>
-            {/* The year comes from the data, not the visitor's clock. */}
-            <p className="footer-copyright">
-              © {snapshot.year} OpenSustain.tech ·{" "}
-              <a
-                href="https://creativecommons.org/licenses/by/4.0/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                CC BY 4.0
-              </a>{" "}
-              · <Link href={routes.privacyPolicy}>Privacy Policy</Link>
-            </p>
             <p className="footer-copyright">
               Data snapshot of{" "}
               <time dateTime={snapshot.iso}>{snapshot.label}</time>. Project
@@ -41,19 +29,46 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
               </a>
               .
             </p>
-            <nav className="footer-social" aria-label="Social">
-              {socialLinks.map((link) => (
-                <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
-                  {link.label}
-                </a>
+            {/* The year comes from the data, not the visitor's clock. */}
+            <p className="footer-copyright">
+              © {snapshot.year} OpenSustain.tech, published under{" "}
+              <a
+                href="https://creativecommons.org/licenses/by/4.0/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                CC BY 4.0
+              </a>
+              . <Link href={routes.privacyPolicy}>Privacy policy</Link>
+            </p>
+          </div>
+          {footerNavigation.map((column) => (
+            <nav
+              key={column.heading}
+              className="footer-column"
+              aria-labelledby={`footer-${column.heading.toLowerCase()}`}
+            >
+              <p
+                id={`footer-${column.heading.toLowerCase()}`}
+                className="footer-column__heading"
+              >
+                {column.heading}
+              </p>
+              {column.links.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  {item.label}
+                </Link>
               ))}
             </nav>
-          </div>
-          <nav className="footer-nav" aria-label="Footer">
-            {footerNavigation.map((item) => (
-              <Link key={item.href} href={item.href}>
-                {item.label}
-              </Link>
+          ))}
+          <nav className="footer-column" aria-labelledby="footer-follow">
+            <p id="footer-follow" className="footer-column__heading">
+              Follow
+            </p>
+            {socialLinks.map((link) => (
+              <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+                {link.label}
+              </a>
             ))}
           </nav>
         </div>

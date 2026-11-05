@@ -62,28 +62,48 @@
    */
   --radius-control: 6px;
   --radius-surface: 8px;
+  /* Headings lose a step of weight on the dark ground, where type blooms. */
+  --weight-heading: 640;
+  /*
+   * The one filled button style (Contribute, Browse the directory, primary
+   * chart actions). Brand blue on paper; inverted ink on the dark ground.
+   */
+  --color-action-bg: #1878cf;
+  --color-action-ink: #ffffff;
+  --color-action-hover-bg: #145e9c;
   --container-max-width: 1100px;
 }
 
-/* --- Dark Theme Overrides --- */
+/*
+ * --- Dark Theme ---
+ * The same atlas printed on dark stock, not a separate look: a graphite
+ * ground well clear of black, off-white ink a notch under full contrast,
+ * lighter heading weights, and the category colors as the brightest thing on
+ * the page. Surfaces step up in tone instead of leaning on borders, and the
+ * filled button is inverted ink rather than a saturated blue.
+ */
 [data-theme="dark"] {
   color-scheme: dark;
-  --color-black: #eef4f2;
-  --color-bg: #0d1a1d;
-  --color-bg-alt: #132427;
-  --color-card-bg: #112023;
-  --color-border: #22363a;
-  --color-skeleton: #22363a;
-  --color-skeleton-shine: #2e464b;
-  --color-text: #dde7e5;
-  --color-text-secondary: #95aaad;
-  --color-silver: #22363a;
-  --color-header-bg: rgba(13, 26, 29, 0.92);
-  --color-banner-bg: #132427;
-  --color-warning: #fbbf24;
-  --color-warning-bg: rgba(251, 191, 36, 0.1);
-  --color-link: #6cb1ee;
-  --color-wordmark: #5aa4ea;
+  --color-black: #ebefec;
+  --color-bg: #1f2629;
+  --color-bg-alt: #252d30;
+  --color-card-bg: #283236;
+  --color-border: #38444a;
+  --color-skeleton: #313c40;
+  --color-skeleton-shine: #3d494e;
+  --color-text: #dce2df;
+  --color-text-secondary: #a3afae;
+  --color-silver: #38444a;
+  --color-header-bg: rgba(31, 38, 41, 0.94);
+  --color-banner-bg: #252d30;
+  --color-warning: #f0b860;
+  --color-warning-bg: rgba(240, 184, 96, 0.1);
+  --color-link: #93c3ea;
+  --color-wordmark: #6fb0ec;
+  --weight-heading: 560;
+  --color-action-bg: #e4e9e6;
+  --color-action-ink: #1f2629;
+  --color-action-hover-bg: #ffffff;
 }
 
 /* --- Global Theme Transition --- */
@@ -137,20 +157,20 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: 56px;
-  font-weight: 640;
+  font-weight: var(--weight-heading);
   font-stretch: var(--stretch-display);
   letter-spacing: -0.025em;
 }
 
 h2 {
   font-size: 40px;
-  font-weight: 640;
+  font-weight: var(--weight-heading);
   margin-bottom: 3rem;
 }
 
 h3 {
   font-size: 24px;
-  font-weight: 640;
+  font-weight: var(--weight-heading);
   margin-bottom: 1rem;
 }
 
@@ -198,12 +218,27 @@ p {
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #2e3f5c;
+  background-color: var(--color-bg-alt);
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-primary);
-  border-radius: 2px;
+  background-color: var(--color-border);
+  border: 2px solid var(--color-bg-alt);
+  border-radius: var(--radius-control);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-secondary);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-link) 28%, transparent);
+  color: var(--color-black);
+}
+
+html {
+  caret-color: var(--color-link);
+  accent-color: var(--color-primary);
 }
 
 /* ============================================================
@@ -480,10 +515,10 @@ p {
   min-height: 36px;
   margin-left: 28px;
   padding: 0 16px;
-  border: 1px solid var(--color-primary);
+  border: 1px solid var(--color-action-bg);
   border-radius: var(--radius-control);
-  background: var(--color-primary);
-  color: #ffffff;
+  background: var(--color-action-bg);
+  color: var(--color-action-ink);
   font-family: var(--font-heading);
   font-size: 14px;
   font-weight: 600;
@@ -492,9 +527,9 @@ p {
 }
 
 .site-nav-cta:hover {
-  background: var(--color-link);
-  border-color: var(--color-link);
-  color: #ffffff;
+  background: var(--color-action-hover-bg);
+  border-color: var(--color-action-hover-bg);
+  color: var(--color-action-ink);
 }
 
 .site-nav-cta:focus-visible {
@@ -521,29 +556,19 @@ p {
   cursor: pointer;
   font-size: 20px;
   color: var(--color-text-secondary);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: color 0.15s ease;
   padding: 0;
   margin-left: 20px;
 }
 
+/* Same treatment as the GitHub link beside it: an icon, not a lamp. */
 .theme-toggle:hover {
-  transform: rotate(15deg) scale(1.1);
-}
-
-[data-theme="dark"] .theme-toggle {
-  color: #f59e0b;
+  color: var(--color-link);
 }
 
 /* ============================================================
    Sections
    ============================================================ */
-/* Scoped to the section types that actually want the rule and rhythm — the
-   blanket `section` selector was also padding and underlining the metric grid
-   and the chart section. */
-.hero,
-
-
-
 .section-eyebrow {
   font-family: var(--font-heading);
   font-size: 13px;
@@ -593,7 +618,7 @@ p {
 .home-title {
   font-size: clamp(40px, 4.2vw, 58px);
   font-stretch: var(--stretch-display);
-  font-weight: 640;
+  font-weight: var(--weight-heading);
   line-height: 1;
   letter-spacing: -0.025em;
   text-wrap: balance;
@@ -639,15 +664,15 @@ p {
 }
 
 .home-action--primary {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #ffffff;
+  background: var(--color-action-bg);
+  border-color: var(--color-action-bg);
+  color: var(--color-action-ink);
 }
 
 .home-action--primary:hover {
-  background: var(--color-link);
-  border-color: var(--color-link);
-  color: #ffffff;
+  background: var(--color-action-hover-bg);
+  border-color: var(--color-action-hover-bg);
+  color: var(--color-action-ink);
 }
 
 .home-action:focus-visible,
@@ -853,7 +878,7 @@ a.panel:hover .panel-title {
 .panel-title {
   font-family: var(--font-heading);
   font-size: 22px;
-  font-weight: 640;
+  font-weight: var(--weight-heading);
   letter-spacing: -0.015em;
   color: var(--color-black);
 }
@@ -1374,49 +1399,26 @@ a.panel:hover .panel-title {
   --viz-centre-on: #13262b;
 }
 
+/* Low values sit back in deep blue; high values rise toward pale teal. */
 [data-theme="dark"] {
-  --viz-seq-0: #4353c1;
-  --viz-seq-1: #416adb;
-  --viz-seq-2: #3b82f6;
-  --viz-seq-3: #009ff5;
-  --viz-seq-4: #04b8f3;
-  --viz-seq-5: #00d7e0;
-  --viz-seq-6: #47f6ad;
+  --viz-seq-0: #2b4a8a;
+  --viz-seq-1: #2f63a8;
+  --viz-seq-2: #2f7fc0;
+  --viz-seq-3: #3399c9;
+  --viz-seq-4: #4fb1cc;
+  --viz-seq-5: #77c8cf;
+  --viz-seq-6: #a9ddd6;
 
-  --viz-arc-stroke-emphasis: #ffffff;
-  --viz-null: #334155;
-  --viz-label-on-tint: #f8fafc;
-  --viz-label-halo: rgba(13, 26, 29, 0.75);
-  --viz-grid-line: rgba(34, 54, 58, 0.9);
-  --viz-tooltip-bg: rgba(17, 32, 35, 0.96);
-  --viz-tooltip-border: rgba(34, 54, 58, 0.95);
-  --viz-tooltip-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
-  --viz-focus-color: #61d0ff;
-  --viz-centre-root: #132427;
-}
-
-/* A first-time visitor on a dark OS gets the dark chart before any
-   explicit choice is stored. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --viz-seq-0: #4353c1;
-    --viz-seq-1: #416adb;
-    --viz-seq-2: #3b82f6;
-    --viz-seq-3: #009ff5;
-    --viz-seq-4: #04b8f3;
-    --viz-seq-5: #00d7e0;
-    --viz-seq-6: #47f6ad;
-
-    --viz-arc-stroke-emphasis: #ffffff;
-    --viz-null: #334155;
-    --viz-label-on-tint: #f8fafc;
-    --viz-label-halo: rgba(13, 26, 29, 0.75);
-    --viz-tooltip-bg: rgba(17, 32, 35, 0.96);
-    --viz-tooltip-border: rgba(34, 54, 58, 0.95);
-    --viz-tooltip-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
-    --viz-focus-color: #61d0ff;
-    --viz-centre-root: #132427;
-  }
+  --viz-arc-stroke-emphasis: #ebefec;
+  --viz-null: #3d494e;
+  --viz-label-on-tint: #ebefec;
+  --viz-label-halo: rgba(31, 38, 41, 0.75);
+  --viz-grid-line: rgba(56, 68, 74, 0.9);
+  --viz-tooltip-bg: rgba(40, 50, 54, 0.97);
+  --viz-tooltip-border: rgba(56, 68, 74, 0.95);
+  --viz-tooltip-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+  --viz-focus-color: #93c3ea;
+  --viz-centre-root: #283236;
 }
 
 /* ============================================================
@@ -1615,15 +1617,15 @@ a.panel:hover .panel-title {
 }
 
 .viz-button--primary {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #ffffff;
+  background: var(--color-action-bg);
+  border-color: var(--color-action-bg);
+  color: var(--color-action-ink);
 }
 
 .viz-button--primary:hover {
-  background: var(--color-link);
-  border-color: var(--color-link);
-  color: #ffffff;
+  background: var(--color-action-hover-bg);
+  border-color: var(--color-action-hover-bg);
+  color: var(--color-action-ink);
 }
 
 /* An export control with nothing beside it sits at the right of its own row. */

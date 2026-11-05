@@ -7,8 +7,8 @@ import { useSyncExternalStore } from "react";
  *
  * SiteHeader mutates `document.documentElement` imperatively rather than
  * through React state, so a component that needs to recompute on theme change
- * has to observe the attribute directly. The media-query listener covers the
- * "no explicit choice yet" case.
+ * has to observe the attribute directly. The OS preference plays no part:
+ * the site is light unless the visitor chooses dark.
  */
 function subscribe(onChange: () => void): () => void {
   const observer = new MutationObserver(onChange);
@@ -16,19 +16,11 @@ function subscribe(onChange: () => void): () => void {
     attributes: true,
     attributeFilter: ["data-theme"],
   });
-  const media = window.matchMedia("(prefers-color-scheme: dark)");
-  media.addEventListener("change", onChange);
-  return () => {
-    observer.disconnect();
-    media.removeEventListener("change", onChange);
-  };
+  return () => observer.disconnect();
 }
 
 function getSnapshot(): "light" | "dark" {
-  const attribute = document.documentElement.getAttribute("data-theme");
-  if (attribute === "dark") return "dark";
-  if (attribute === "light") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
+  return document.documentElement.getAttribute("data-theme") === "dark"
     ? "dark"
     : "light";
 }

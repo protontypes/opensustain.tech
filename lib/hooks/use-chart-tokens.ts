@@ -45,16 +45,16 @@ const TOKEN_MAP: Record<keyof ChartTokens, string> = {
 };
 
 const FALLBACK: ChartTokens = {
-  ink: "#101620",
-  inkStrong: "#101620",
-  muted: "#4e6a9a",
-  grid: "rgba(230, 237, 243, 0.7)",
-  border: "#e6edf3",
-  primary: "#2563eb",
+  ink: "#13262b",
+  inkStrong: "#13262b",
+  muted: "#4d6166",
+  grid: "rgba(219, 227, 225, 0.7)",
+  border: "#dbe3e1",
+  primary: "#1878cf",
   surface: "#ffffff",
   tooltipBg: "rgba(255, 255, 255, 0.96)",
-  tooltipBorder: "rgba(230, 237, 243, 0.95)",
-  tooltipShadow: "0 14px 40px rgba(16, 22, 32, 0.14)",
+  tooltipBorder: "rgba(219, 227, 225, 0.95)",
+  tooltipShadow: "0 14px 40px rgba(19, 38, 43, 0.14)",
   nullFill: "#cbd5e1",
   highlight: "#47f6ad",
 };

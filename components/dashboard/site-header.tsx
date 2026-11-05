@@ -155,12 +155,11 @@ export function SiteHeader() {
     } catch {
       stored = null;
     }
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const resolved = stored === "dark" || (!stored && prefersDark) ? "dark" : "light";
+    // Light unless the visitor chose dark with the toggle. The light theme is
+    // the design; following the OS put most first-time visitors on the dark
+    // one without their asking.
+    const resolved = stored === "dark" ? "dark" : "light";
     setTheme(resolved);
-    // The inline script in layout.tsx only ever sets "dark". Writing the
-    // resolved value here means [data-theme] is always explicit, which is what
-    // the `:root:not([data-theme="light"])` media guards key off.
     document.documentElement.setAttribute("data-theme", resolved);
   }, []);
 

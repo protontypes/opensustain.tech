@@ -1,17 +1,11 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { withBasePath } from "@/lib/base-path";
-import {
-  climateTriageLink,
-  contributeLink,
-  ostGithubUrl,
-  primaryNavigation,
-  routes,
-} from "@/lib/navigation";
+import { ostGithubUrl, primaryNavigation, routes } from "@/lib/navigation";
 
 // A section stays highlighted on its sub-pages: Media on /blog/talks and on
 // every post, Analytics on each of its dashboards. trailingSlash: true means the
@@ -26,7 +20,43 @@ function isActive(pathname: string, href: string): boolean {
 }
 
 type NavItem = (typeof primaryNavigation)[number];
-type NavChild = { href: string; label: string; description: string };
+type NavChild = { href: string; label: string; description: string; external?: boolean };
+
+// A dropdown entry, on site or off. Off-site ones open in a new tab and say so
+// with an arrow.
+function NavChildLink({
+  item,
+  pathname,
+  className,
+  children,
+}: {
+  item: NavChild;
+  pathname: string;
+  className: string;
+  children: ReactNode;
+}) {
+  if (item.external) {
+    return (
+      <a href={item.href} className={className} target="_blank" rel="noreferrer">
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link
+      href={item.href}
+      className={className}
+      aria-current={normalize(pathname) === item.href ? "page" : undefined}
+    >
+      {children}
+    </Link>
+  );
+}
+
+// "Get involved" -> "get-involved": the mobile group heading's id.
+function slug(label: string): string {
+  return label.toLowerCase().replace(/\s+/g, "-");
+}
 
 // A dropdown's parent stays highlighted on any of its pages, so Analytics
 // lights up on /organizations and /topics too, not just under /analytics.
@@ -126,14 +156,15 @@ function NavDropdown({
       <ul id={menuId} className="site-nav-dropdown__menu" hidden={!open}>
         {items.map((item) => (
           <li key={item.href}>
-            <Link
-              href={item.href}
-              className="site-nav-dropdown__link"
-              aria-current={normalize(pathname) === item.href ? "page" : undefined}
-            >
-              <span className="site-nav-dropdown__label">{item.label}</span>
+            <NavChildLink item={item} pathname={pathname} className="site-nav-dropdown__link">
+              <span className="site-nav-dropdown__label">
+                {item.label}
+                {item.external && (
+                  <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+                )}
+              </span>
               <span className="site-nav-dropdown__description">{item.description}</span>
-            </Link>
+            </NavChildLink>
           </li>
         ))}
       </ul>
@@ -226,25 +257,7 @@ export function SiteHeader() {
                 </Link>
               ),
             )}
-            <a
-              className="site-nav-link site-nav-link--external"
-              href={climateTriageLink.href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {climateTriageLink.label}
-              <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
-            </a>
           </nav>
-
-          <a
-            className="site-nav-cta"
-            href={contributeLink.href}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {contributeLink.label}
-          </a>
 
           <a
             href={ostGithubUrl}
@@ -295,20 +308,20 @@ export function SiteHeader() {
               key={item.href}
               className="mobile-nav__group"
               role="group"
-              aria-labelledby={`mobile-nav-${item.label.toLowerCase()}`}
+              aria-labelledby={`mobile-nav-${slug(item.label)}`}
             >
-              <p id={`mobile-nav-${item.label.toLowerCase()}`} className="mobile-nav__heading">
+              <p id={`mobile-nav-${slug(item.label)}`} className="mobile-nav__heading">
                 {item.label}
               </p>
               {item.children.map((child) => (
-                <Link
+                <NavChildLink
                   key={child.href}
-                  href={child.href}
+                  item={child}
+                  pathname={pathname}
                   className="mobile-nav__link mobile-nav__link--sub"
-                  aria-current={normalize(pathname) === child.href ? "page" : undefined}
                 >
                   {child.label}
-                </Link>
+                </NavChildLink>
               ))}
             </div>
           ) : (
@@ -322,17 +335,6 @@ export function SiteHeader() {
             </Link>
           ),
         )}
-        {[climateTriageLink, contributeLink].map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
-            target="_blank"
-            rel="noreferrer"
-            className="mobile-nav__link"
-          >
-            {item.label}
-          </a>
-        ))}
       </nav>
     </header>
   );

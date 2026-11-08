@@ -404,17 +404,6 @@ html {
   background: none;
 }
 
-.site-nav-link--external {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.site-nav-link--external i {
-  font-size: 10px;
-  opacity: 0.7;
-}
-
 /* --- Analytics dropdown --- */
 .site-nav-dropdown {
   position: relative;
@@ -498,6 +487,13 @@ html {
   color: var(--color-text);
 }
 
+/* The off-site arrow, sized like the dropdown chevron. */
+.site-nav-dropdown__label i {
+  margin-left: 6px;
+  font-size: 10px;
+  opacity: 0.7;
+}
+
 .site-nav-dropdown__description {
   font-size: 13px;
   line-height: 1.4;
@@ -507,44 +503,6 @@ html {
 .site-nav-dropdown__link:hover .site-nav-dropdown__label,
 .site-nav-dropdown__link[aria-current="page"] .site-nav-dropdown__label {
   color: var(--color-link);
-}
-
-/* Contribute: the one action the header asks visitors to take, set apart as
-   a button instead of competing with the route links as more text. Same
-   fill/hover pair as .viz-button--primary. */
-.site-nav-cta {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-  margin-left: 28px;
-  padding: 0 16px;
-  border: 1px solid var(--color-action-bg);
-  border-radius: var(--radius-control);
-  background: var(--color-action-bg);
-  color: var(--color-action-ink);
-  font-family: var(--font-heading);
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-.site-nav-cta:hover {
-  background: var(--color-action-hover-bg);
-  border-color: var(--color-action-hover-bg);
-  color: var(--color-action-ink);
-}
-
-.site-nav-cta:focus-visible {
-  outline: 2px solid var(--color-link);
-  outline-offset: 2px;
-}
-
-/* Below 768px the mobile menu lists Contribute with everything else. */
-@media (max-width: 768px) {
-  .site-nav-cta {
-    display: none;
-  }
 }
 
 /* --- Theme Toggle --- */

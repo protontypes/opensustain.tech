@@ -61,16 +61,7 @@ export const analyticsNavigation = [
   { href: routes.methodology, label: "Methodology", description: "Sources and metric definitions" },
 ] as const;
 
-/** Header navigation, in display order. An item with `children` is a dropdown. */
-export const primaryNavigation = [
-  { href: routes.projects, label: "Directory" },
-  { href: routes.education, label: "Learn" },
-  { href: routes.analytics, label: "Analytics", children: analyticsNavigation },
-  { href: routes.blog, label: "Media" },
-  { href: routes.about, label: "About" },
-] as const;
-
-/** The header's one call to action, rendered as a button, not a nav link. */
+/** The contributing guide. The home page hero's "Add a project" button links here too. */
 export const contributeLink = {
   href: "https://github.com/protontypes/open-sustainable-technology/blob/main/CONTRIBUTING.md",
   label: "Contribute",
@@ -80,6 +71,48 @@ export const climateTriageLink = {
   href: "https://climatetriage.com/",
   label: "ClimateTriage",
 } as const;
+
+/** OpenSustain.tech community Discord, linked from the header as ClimateTriage does. */
+export const communityDiscordUrl = "https://discord.gg/JDUatGKxve";
+
+/**
+ * The header's "Get involved" dropdown: every way to help, all of them off
+ * site. The Discord link also sits in the community banner, but that one can
+ * be dismissed.
+ */
+export const getInvolvedNavigation = [
+  {
+    href: contributeLink.href,
+    label: "Add a project",
+    description: "Suggest a project for the directory on GitHub",
+    external: true,
+  },
+  {
+    href: climateTriageLink.href,
+    label: "Good first issues",
+    description: "Beginner-friendly issues on ClimateTriage",
+    external: true,
+  },
+  {
+    href: communityDiscordUrl,
+    label: "Join the Discord",
+    description: "Talk with the OpenSustain.tech community",
+    external: true,
+  },
+] as const;
+
+/**
+ * Header navigation, in display order. An item with `children` is a dropdown;
+ * its own `href` is only a key, since the toggle is a button, not a link.
+ */
+export const primaryNavigation = [
+  { href: routes.projects, label: "Directory" },
+  { href: routes.education, label: "Learn" },
+  { href: routes.analytics, label: "Analytics", children: analyticsNavigation },
+  { href: routes.blog, label: "Media" },
+  { href: routes.about, label: "About" },
+  { href: contributeLink.href, label: "Get involved", children: getInvolvedNavigation },
+] as const;
 
 /** Footer link columns. */
 export const footerNavigation = [
@@ -114,9 +147,6 @@ export const socialLinks = [
     label: "Bluesky",
   },
 ] as const;
-
-/** OpenSustain.tech community Discord, linked from the header as ClimateTriage does. */
-export const communityDiscordUrl = "https://discord.gg/JDUatGKxve";
 
 /** The GitHub repo contributors send directory PRs against. */
 export const ostGithubUrl =

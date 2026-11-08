@@ -36,6 +36,12 @@ export async function countOrganizationsWithoutLocation(): Promise<number> {
   return records.filter((record) => !record.location_country.trim()).length;
 }
 
+/** Organizations that record no type: the "Unknown" bar on /organizations. */
+export async function countOrganizationsWithoutType(): Promise<number> {
+  const { records } = await loadOrganizationRankings();
+  return records.filter((record) => !record.form_of_organization.trim()).length;
+}
+
 /**
  * Every figure on the methodology page, computed from the payloads.
  *

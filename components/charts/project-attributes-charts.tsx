@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useAnalyticsPayload } from "@/lib/data/use-analytics-payload";
-import { formatNumber, formatPercent } from "@/lib/format";
+import { formatLicense, formatNumber, formatPercent } from "@/lib/format";
 import type {
   CountRecord,
   ProjectAttributeField,
@@ -118,14 +118,18 @@ function useAttributeCounts(): { counts: AttributeCounts | null; error: string |
   return { counts, error: filters.active ? perProject.error : aggregate.error };
 }
 
-/** Top-N seeded from the payload's own `top_n_default` (30), once it lands. */
-function usePayloadTopN(topNDefault: number | undefined, fallback = 25) {
+/**
+ * Top-N seeded from the payload's own `top_n_default` (30) once it lands, but
+ * capped at 15: thirty licences, thirteen of them with seven projects or
+ * fewer, buried the few that matter. "Show" still offers the full list.
+ */
+function usePayloadTopN(topNDefault: number | undefined, fallback = 15) {
   const [topN, setTopN] = useState(fallback);
   const seeded = useRef(false);
   useEffect(() => {
     if (seeded.current || !topNDefault) return;
     seeded.current = true;
-    setTopN(topNDefault);
+    setTopN(Math.min(topNDefault, 15));
   }, [topNDefault]);
   return [topN, setTopN] as const;
 }
@@ -282,35 +286,13 @@ export function ContributingGuideChart() {
 
 /* ------------------------------------------------------------ licenses */
 
-/**
- * SPDX identifiers arrive lower-cased. Segments that are acronyms go up, the
- * rest are capitalised: "bsd-3-clause" → "BSD-3-Clause", "apache-2.0" →
- * "Apache-2.0". Covers all 24 identifiers currently in the data; anything new
- * simply keeps its raw casing, which is visible rather than wrong.
- */
-const LICENSE_ACRONYMS = new Set([
-  "agpl", "bsd", "by", "cc", "cc0", "epl", "eupl", "gpl", "isc", "lgpl",
-  "mit", "mpl", "nc", "nd", "sa",
-]);
-
-function licenseLabel(raw: string): string {
-  return raw
-    .split("-")
-    .map((part) =>
-      LICENSE_ACRONYMS.has(part)
-        ? part.toUpperCase()
-        : part.charAt(0).toUpperCase() + part.slice(1),
-    )
-    .join("-");
-}
-
 export function LicensesChart() {
   const { counts, error } = useAttributeCounts();
   const { exportPart } = useProjectFilters();
   const records = counts?.fields.license ?? [];
   const [topN, setTopN] = usePayloadTopN(counts?.topNDefault);
   const rows = useMemo(
-    () => toRows(records.slice(0, topN), licenseLabel),
+    () => toRows(records.slice(0, topN), formatLicense),
     [records, topN],
   );
 

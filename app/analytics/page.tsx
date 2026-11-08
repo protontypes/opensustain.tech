@@ -152,7 +152,7 @@ export default async function AnalyticsPage() {
                 <div className="leader-item__body">
                   <p className="leader-item__rank">{index + 1}</p>
                   {/* Populated on 2,571 of 2,691 records and drawn nowhere. */}
-                  <Avatar src={project.avatar_url} />
+                  <Avatar src={project.avatar_url} name={project.name} />
                   <a
                     href={project.url}
                     target="_blank"

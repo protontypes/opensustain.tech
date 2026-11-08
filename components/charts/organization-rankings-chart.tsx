@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { EChartsOption } from "echarts";
 
@@ -25,10 +25,8 @@ import { useChartExport } from "@/lib/charts/use-chart-export";
 import { EChart } from "./echart";
 import { ExportMenu } from "./export-menu";
 import { useOrganizationFilters } from "./organization-filters";
+import { TopNField } from "./top-n-field";
 
-// Streamlit reaches 300; capping at 100 put a third of its range out of
-// reach. The payload states its own default, which was ignored for a 25.
-const TOP_N_CHOICES = [10, 25, 50, 100, 300];
 const ALL = "All Categories";
 
 /** The category an organization scores highest in — used for its bar colour. */
@@ -64,9 +62,9 @@ export function OrganizationRankingsChart({
   );
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState(ALL);
+  // 25, not the payload's default_top_n: that is 60, matched no option in the
+  // select, and drew ~60 bars under a control reading "Top 10".
   const [topN, setTopN] = useState(25);
-  // Seeded from the payload once it lands, since these fetch client-side.
-  const seeded = useRef(false);
   const tokens = useChartTokens();
   const theme = useTheme();
   const filters = useOrganizationFilters();
@@ -86,12 +84,6 @@ export function OrganizationRankingsChart({
       .then((data) => {
         if (cancelled) return;
         setPayload(data);
-        // The pipeline tunes this; the literal above is only what shows while
-        // the payload is in flight.
-        if (!seeded.current && data.default_top_n) {
-          seeded.current = true;
-          setTopN(data.default_top_n);
-        }
       })
       .catch((cause: unknown) => {
         if (!cancelled) {
@@ -103,7 +95,7 @@ export function OrganizationRankingsChart({
     };
   }, []);
 
-  const top = useMemo(() => {
+  const matching = useMemo(() => {
     if (!payload) return [];
     return payload.records
       .filter(
@@ -115,9 +107,10 @@ export function OrganizationRankingsChart({
           filters.matches(record.location_country, record.form_of_organization),
       )
       .slice()
-      .sort((a, b) => scoreIn(b, category) - scoreIn(a, category))
-      .slice(0, topN);
-  }, [payload, category, topN, filters]);
+      .sort((a, b) => scoreIn(b, category) - scoreIn(a, category));
+  }, [payload, category, filters]);
+
+  const top = useMemo(() => matching.slice(0, topN), [matching, topN]);
 
   // A fixed grid gutter is wider than the whole chart box on a phone.
   const [width, setWidth] = useState(0);
@@ -260,19 +253,12 @@ export function OrganizationRankingsChart({
             </select>
           </label>
 
-          <label className="viz-field viz-field--select">
-            <span className="viz-field__label">Show</span>
-            <select
-              value={topN}
-              onChange={(event) => setTopN(Number(event.target.value))}
-            >
-              {TOP_N_CHOICES.map((choice) => (
-                <option key={choice} value={choice}>
-                  Top {choice}
-                </option>
-              ))}
-            </select>
-          </label>
+          <TopNField
+            value={topN}
+            onChange={setTopN}
+            max={Math.max(matching.length, 1)}
+            noun="organizations"
+          />
           <ExportMenu onExport={onExport} />
         </div>
       </div>

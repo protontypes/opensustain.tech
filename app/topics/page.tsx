@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 
 import { KeywordCountsChart } from "@/components/charts/keyword-counts-chart";
 import { TopicsHeatmapChart } from "@/components/charts/topics-heatmap-chart";
+import { WordCloud } from "@/components/charts/word-cloud";
 import { PageProvenance } from "@/components/ui/page-provenance";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { loadKeywordCounts, loadWordcloud } from "@/lib/data";
+import { loadKeywordCounts } from "@/lib/data";
 import { loadSiteTotals } from "@/lib/data/site";
 
 export const metadata: Metadata = {
@@ -18,11 +19,7 @@ export default async function TopicsPage() {
   // topics-heatmap is ~820 KB; the chart fetches it from /data instead of
   // having it serialised into the RSC stream. keyword-counts is 17 KB and
   // stays server-loaded.
-  const [keywordCounts, wordcloud, totals] = await Promise.all([
-    loadKeywordCounts(),
-    loadWordcloud(),
-    loadSiteTotals(),
-  ]);
+  const [keywordCounts, totals] = await Promise.all([loadKeywordCounts(), loadSiteTotals()]);
 
   return (
     <main className="page-shell">
@@ -35,6 +32,7 @@ export default async function TopicsPage() {
 
       <div className="stack">
         <Panel
+          id="keyword-counts"
           title="Keyword Counts"
           description="The most frequently occurring technical and conceptual keywords across the ecosystem."
         >
@@ -45,6 +43,7 @@ export default async function TopicsPage() {
         </Panel>
 
         <Panel
+          id="topics-heatmap"
           title="Topics Heatmap"
           description="How often each topic appears in the projects of each sub-category. Color is on a log scale, so a single dense cell does not flatten the rest."
         >
@@ -52,15 +51,12 @@ export default async function TopicsPage() {
         </Panel>
 
         <Panel
+          id="word-cloud"
           title="Word Cloud"
-          description="A visual representation of the overall vocabulary and focus areas within the ecosystem."
+          description="The 60 most common README keywords, sized by how many projects use each. Hover a word for its count."
+          notes="Illustrative: the Keyword Counts chart above gives the exact figures."
         >
-          <img
-            className="wordcloud-image"
-            src={wordcloud.image_url}
-            alt={wordcloud.caption}
-          />
-          <p className="panel-footnote">{wordcloud.caption}</p>
+          <WordCloud records={keywordCounts.records} />
         </Panel>
       </div>
     </main>

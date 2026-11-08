@@ -29,7 +29,7 @@ import { useProjectFilters } from "./project-filters";
 
 // Streamlit reaches 300; capping at 100 put a third of its range out of
 // reach. The payload states its own default, which was ignored for a 25.
-const TOP_N_CHOICES = [10, 25, 50, 100, 300];
+const TOP_N_CHOICES = [10, 15, 25, 50, 100, 300];
 
 function metricValue(record: ProjectRankingRecord, metric: RankingMetricId) {
   const value = record[metric];
@@ -49,7 +49,7 @@ export function ProjectRankingsChart() {
   const { data: payload, error } =
     useAnalyticsPayload<ProjectRankingsPayload>("projectRankings");
   const [metric, setMetric] = useState<RankingMetricId>("total_score_combined");
-  const [topN, setTopN] = useState(25);
+  const [topN, setTopN] = useState(15);
   // Categories and sub-categories come from the page's filter bar.
   const filters = useProjectFilters();
   // Seeded from the payload once it lands, since these fetch client-side.
@@ -98,12 +98,12 @@ export function ProjectRankingsChart() {
   const [activeOnly, setActiveOnly] = useState(true);
   const tokens = useChartTokens();
 
-  // The pipeline tunes this; the literal above is only what shows while the
-  // payload is in flight.
+  // Never more than 15 by default: the payload's own default drew ~50 bars,
+  // a 1,650px chart with its axis only at the bottom. "Show" offers the rest.
   useEffect(() => {
     if (!payload || seeded.current || !payload.default_top_n) return;
     seeded.current = true;
-    setTopN(payload.default_top_n);
+    setTopN(Math.min(payload.default_top_n, 15));
   }, [payload]);
 
   // Sparse metrics were drawn as zero: ranking by citations gave eighteen

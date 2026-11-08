@@ -17,6 +17,7 @@ import {
 import { ProjectFiltersProvider } from "@/components/charts/project-filters";
 import { ProjectRankingsChart } from "@/components/charts/project-rankings-chart";
 import { ProjectsOverTimeChart } from "@/components/charts/projects-over-time-chart";
+import { PageIndex } from "@/components/ui/page-index";
 import { PageProvenance } from "@/components/ui/page-provenance";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -47,6 +48,22 @@ export default async function ProjectsPage() {
         description="Detailed insights into project rankings, lifecycle trends, and community attributes across the climate tech ecosystem."
       />
       <PageProvenance totals={totals} show="metrics" />
+      <PageIndex
+        items={[
+          { id: "project-rankings", label: "Project Rankings" },
+          { id: "ecosystem-growth", label: "Ecosystem Growth" },
+          { id: "projects-over-time", label: "Projects Over Time" },
+          { id: "recent-commit-activity", label: "Recent Commit Activity" },
+          { id: "activity-pulse", label: "Activity Pulse" },
+          { id: "strength-in-numbers", label: "Strength in Numbers" },
+          { id: "code-of-conduct", label: "Code of Conduct" },
+          { id: "contributing-guide", label: "Contributing Guide" },
+          { id: "languages", label: "Languages" },
+          { id: "licenses", label: "Licenses" },
+          { id: "package-ecosystems", label: "Package Ecosystems" },
+          { id: "git-platforms", label: "Git Platforms" },
+        ]}
+      />
 
       <ProjectFiltersProvider
         categories={filters.categories}
@@ -55,6 +72,7 @@ export default async function ProjectsPage() {
       >
       <div className="stack">
         <Panel
+          id="project-rankings"
           title="Project Rankings"
           description="Rank every tracked project by any of nine metrics, active or all. Click a bar to open its repository."
           notes="Scores are computed by Ecosyste.ms from public activity data, not judged by the maintainers. A high rank is not an endorsement."
@@ -63,6 +81,7 @@ export default async function ProjectsPage() {
         </Panel>
 
         <Panel
+          id="ecosystem-growth"
           title="Ecosystem Growth"
           description="How many tools existed, year by year — derived from each project's first commit."
           notes="The start year is estimated from each project's age, so a repository migrated from elsewhere reads as younger than the work in it. Projects that started before 2005 are counted in 2005. “Active” keeps only projects still committing today."
@@ -71,6 +90,7 @@ export default async function ProjectsPage() {
         </Panel>
 
         <Panel
+          id="projects-over-time"
           title="Projects Over Time"
           description="Project age against sub-category, with each bubble sized by the metric you choose and colored by ecosystem category."
           notes="Age is measured from the first commit, so a repository migrated from elsewhere reads as younger than the work in it. Bubble area is scaled to the largest value currently shown, so it rescales when you change the metric or the filters."
@@ -83,6 +103,7 @@ export default async function ProjectsPage() {
 
         <div className="two-column-grid">
           <Panel
+            id="recent-commit-activity"
             title="Recent Commit Activity"
             description="Whether each tracked project has recorded a commit in the last 365 days."
           >
@@ -90,6 +111,7 @@ export default async function ProjectsPage() {
           </Panel>
 
           <Panel
+            id="activity-pulse"
             title="Activity Pulse"
             description="Which parts of the ecosystem are alive: the share of projects with a commit in the last 365 days, by category — or by sub-category once one category is selected."
           >
@@ -98,6 +120,7 @@ export default async function ProjectsPage() {
         </div>
 
         <Panel
+          id="strength-in-numbers"
           title="Strength in Numbers"
           description="How many people stand behind each project. Contributor counts are the bus-factor view; the Development Distribution Score shows how evenly the commits are spread."
         >
@@ -106,6 +129,7 @@ export default async function ProjectsPage() {
 
         <div className="two-column-grid">
           <Panel
+            id="code-of-conduct"
             title="Code of Conduct"
             description="Projects publishing a code of conduct."
           >
@@ -113,6 +137,7 @@ export default async function ProjectsPage() {
           </Panel>
 
           <Panel
+            id="contributing-guide"
             title="Contributing Guide"
             description="Projects publishing contribution guidelines."
           >
@@ -121,6 +146,7 @@ export default async function ProjectsPage() {
         </div>
 
         <Panel
+          id="languages"
           title="Languages"
           description="The primary language each repository reports."
         >
@@ -128,6 +154,7 @@ export default async function ProjectsPage() {
         </Panel>
 
         <Panel
+          id="licenses"
           title="Licenses"
           description="The license each repository declares, by SPDX identifier."
           notes="What the hosting platform detected, not a legal review. “Other” covers licences the detector could not match to an SPDX identifier."
@@ -136,6 +163,7 @@ export default async function ProjectsPage() {
         </Panel>
 
         <Panel
+          id="package-ecosystems"
           title="Package Ecosystems"
           description="The package registries these projects publish to."
           notes="Counts are registry entries, not projects: the source lists a registry once per package, so a project publishing several packages to PyPI is counted several times. An empty bucket produced by a trailing comma in the source data is excluded."
@@ -144,6 +172,7 @@ export default async function ProjectsPage() {
         </Panel>
 
         <Panel
+          id="git-platforms"
           title="Git Platforms"
           description="Where the repositories are hosted."
         >

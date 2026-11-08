@@ -25,9 +25,9 @@ export const metadata: Metadata = {
 
 // This page is the landing spot the header's "Analytics" link points at —
 // an overview plus links into the four dashboards below it, rather than a
-// second copy of any one of them. See DATA_CONTRACT.md / the site-shell
-// report for why /projects itself is not one of these links: it's the OST
-// project directory now, not the project-rankings dashboard linked here.
+// second copy of any one of them. /projects itself is not one of these links:
+// it's the OST project directory now (see DATA_CONTRACT.md), not the
+// project-rankings dashboard linked here.
 const dashboards = [
   {
     href: routes.analyticsProjects,

@@ -2,8 +2,7 @@
  * Styles for a single /blog/<slug> post. Scoped via CSS Modules; the
  * :global() blocks target markup this route doesn't control directly —
  * PostAuthors' plain classNames and the raw HTML (<figure>, <iframe>)
- * embedded in the migrated markdown bodies (see content/blog/*.md and the
- * attr_list conversion note in lib/blog/posts.ts's rendering step).
+ * the migrated markdown bodies in content/blog/*.md embed directly.
  */
 
 .article {

@@ -13,7 +13,7 @@ export const routes = {
   // category and subcategory, joined with data/projects.csv. See
   // DATA_CONTRACT.md. This is NOT the project-rankings dashboard; that one
   // moved to /analytics/projects when this path was freed up for the
-  // directory (see the "Analytics nav item" note in the site-shell report).
+  // directory.
   projects: "/projects",
 
   // education.md's courses, books and tutorials. Not projects, so not in the

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { ProjectDirectory } from "@/components/directory/project-directory";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { loadDirectory } from "@/lib/data/directory";
+import { loadSiteTotals } from "@/lib/data/site";
 import { formatNumber } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -12,14 +12,14 @@ export const metadata: Metadata = {
 };
 
 export default async function ProjectsPage() {
-  const directory = await loadDirectory();
+  const totals = await loadSiteTotals();
 
   return (
     <main className="page-shell">
       <SectionHeading
         as="h1"
         title="Project Directory"
-        description={`${formatNumber(directory.totals.projects)} open-source projects across ${directory.totals.categories} categories and ${directory.totals.subcategories} subcategories; climate change, sustainable energy, biodiversity and natural resources.`}
+        description={`${formatNumber(totals.projects)} open-source projects across ${totals.categories} categories and ${totals.subcategories} subcategories; climate change, sustainable energy, biodiversity and natural resources.`}
       />
       <ProjectDirectory />
     </main>

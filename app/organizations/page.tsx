@@ -14,12 +14,16 @@ import { SubcategorySunburst } from "@/components/charts/sunburst/subcategory-su
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { loadFilters } from "@/lib/data";
+import { loadSiteTotals } from "@/lib/data/site";
+import { formatNumber } from "@/lib/format";
 
-export const metadata: Metadata = {
-  title: "Organizations",
-  description:
-    "The 1,274 organizations building open-source climate tech: where they are, what kind they are, which sub-categories they work in, and what they maintain.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const totals = await loadSiteTotals();
+  return {
+    title: "Organizations",
+    description: `The ${formatNumber(totals.organizations)} organizations building open-source climate tech: where they are, what kind they are, which sub-categories they work in, and what they maintain.`,
+  };
+}
 
 export default async function OrganizationsPage() {
   // Every payload on this page is fetched client-side by the chart that needs

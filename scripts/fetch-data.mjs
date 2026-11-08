@@ -64,6 +64,7 @@ import { parse as parseCsv } from "csv-parse/sync";
  * build from a sibling checkout's data/payloads/ (`make build-json`) instead.
  */
 const ANALYTICS_DATA_REMOTE_BASE =
+  process.env.OST_ANALYTICS_DATA_REMOTE_BASE ??
   "https://raw.githubusercontent.com/protontypes/opensustain.analytics/data";
 
 /**
@@ -77,6 +78,16 @@ const ANALYTICS_DATA_CSV_REMOTE_BASE =
 /** The OST README does have a real remote today. */
 const OST_README_REMOTE_URL =
   "https://raw.githubusercontent.com/protontypes/open-sustainable-technology/main/README.md";
+
+/**
+ * OST's second list: open educational resources (courses, books, tutorials).
+ * They are not projects, so they get their own page and count (/education,
+ * from public/data/education.json) and stay out of the directory and the
+ * ring. ecosyste.ms files them under Sustainable Development › Education;
+ * opensustain.analytics drops that subcategory from every payload.
+ */
+const OST_EDUCATION_REMOTE_URL =
+  "https://raw.githubusercontent.com/protontypes/open-sustainable-technology/main/education.md";
 
 /**
  * Sibling checkouts on the machine this was written on. Real, working local
@@ -240,6 +251,52 @@ function parseReadmeEntries(readmeText) {
   return entries;
 }
 
+/**
+ * education.md as its own list: `## Topic` / `### Subtopic` / `- [name](url)
+ * - description`, in file order, each resource once (the file repeats two).
+ */
+function buildEducation(educationText) {
+  const linkLine = /^\s*[-*]\s*\[([^\]]+)\]\(([^)]+)\)\s*-?\s*(.*)$/;
+  const topics = [];
+  const seen = new Set();
+  let topic = null;
+  let subtopic = null;
+
+  for (const line of educationText.split(/\r?\n/)) {
+    if (line.startsWith("## ")) {
+      topic = { name: line.slice(3).trim(), subtopics: [] };
+      topics.push(topic);
+      subtopic = null;
+      continue;
+    }
+    if (line.startsWith("### ") && topic) {
+      subtopic = { name: line.slice(4).trim(), resources: [] };
+      topic.subtopics.push(subtopic);
+      continue;
+    }
+    const match = linkLine.exec(line);
+    if (!match || !topic) continue;
+    const [, name, url, description] = match;
+    const key = normalizeUrl(url);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    if (!subtopic) {
+      subtopic = { name: null, resources: [] };
+      topic.subtopics.push(subtopic);
+    }
+    subtopic.resources.push({ name: name.trim(), url: url.trim(), description: description.trim() });
+  }
+
+  const nonEmpty = topics
+    .map((t) => ({ ...t, subtopics: t.subtopics.filter((sub) => sub.resources.length > 0) }))
+    .filter((t) => t.subtopics.length > 0);
+  return {
+    generated_at: new Date().toISOString(),
+    totals: { resources: seen.size, topics: nonEmpty.length },
+    topics: nonEmpty,
+  };
+}
+
 function parseCsvRows(csvText) {
   return parseCsv(csvText, {
     columns: true,
@@ -278,7 +335,11 @@ function numberOrNull(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-/** Joins README entries with CSV rows by normalized URL, then by name. */
+/**
+ * Joins README entries with CSV rows by normalized URL, then by name. Returns
+ * the directory payload and, for the ring, each entry with the CSV row it
+ * matched (or null).
+ */
 function buildDirectory(readmeText, projectsCsvText) {
   const entries = parseReadmeEntries(readmeText);
   const csvRows = projectsCsvText ? parseCsvRows(projectsCsvText) : [];
@@ -292,6 +353,15 @@ function buildDirectory(readmeText, projectsCsvText) {
     if (n && !byName.has(n)) byName.set(n, row);
   }
 
+  // A row an entry claims by URL is that entry's. The name fallback may not
+  // hand it to a second entry: "EMMA" at neon.energy is not the EMMA repo
+  // another entry links to, and must not show that repo's stars.
+  const claimed = new Set();
+  for (const entry of entries) {
+    const row = byUrl.get(normalizeUrl(entry.url));
+    if (row) claimed.add(row);
+  }
+
   let matchedByUrl = 0;
   let matchedByName = 0;
   let readmeOnly = 0;
@@ -299,20 +369,27 @@ function buildDirectory(readmeText, projectsCsvText) {
   // category name -> subcategory name -> projects[], preserving encounter order.
   const categoryOrder = [];
   const categories = new Map();
+  const joined = [];
 
   for (const entry of entries) {
-    const row = byUrl.get(normalizeUrl(entry.url)) ?? byName.get(normalizeName(entry.name));
+    let row = byUrl.get(normalizeUrl(entry.url)) ?? null;
     let source;
-    if (row && byUrl.has(normalizeUrl(entry.url))) {
+    if (row) {
       source = "csv";
       matchedByUrl += 1;
-    } else if (row) {
-      source = "csv";
-      matchedByName += 1;
     } else {
-      source = "readme";
-      readmeOnly += 1;
+      const candidate = byName.get(normalizeName(entry.name));
+      row = candidate && !claimed.has(candidate) ? candidate : null;
+      if (row) {
+        claimed.add(row);
+        source = "csv";
+        matchedByName += 1;
+      } else {
+        source = "readme";
+        readmeOnly += 1;
+      }
     }
+    joined.push({ entry, row });
 
     const project = {
       name: entry.name,
@@ -357,12 +434,13 @@ function buildDirectory(readmeText, projectsCsvText) {
     };
   });
 
-  return {
+  const directory = {
     generated_at: new Date().toISOString(),
     source: csvRows.length > 0 ? "csv+readme" : "readme-only",
     totals: {
       categories: categoriesOut.length,
       subcategories: categoriesOut.reduce((n, c) => n + c.subcategories.length, 0),
+      // Every project OST lists: the site's headline count.
       projects: entries.length,
       matched_from_csv: matchedByUrl + matchedByName,
       matched_by_url: matchedByUrl,
@@ -370,6 +448,79 @@ function buildDirectory(readmeText, projectsCsvText) {
       readme_only: readmeOnly,
     },
     categories: categoriesOut,
+  };
+  return { directory, joined };
+}
+
+/**
+ * The ecosystem ring, rebuilt to hold exactly the directory's projects, so the
+ * chart and the headline count the same set. Listed projects ecosyste.ms has
+ * a row for keep the pipeline's leaf (metrics, activity); the rest join as
+ * leaves with no metrics and `tracked: false`. Pipeline leaves for projects
+ * no list carries any more are left out. Placement follows the lists'
+ * headings, so a project sits in the same subcategory here as in /projects.
+ */
+function buildListedSunburst(sunburst, joined) {
+  const leafByUrl = new Map();
+  for (const category of sunburst.root.children) {
+    for (const sub of category.children) {
+      for (const leaf of sub.children) {
+        const u = normalizeUrl(leaf.url);
+        if (u && !leafByUrl.has(u)) leafByUrl.set(u, leaf);
+      }
+    }
+  }
+
+  // Keep the pipeline's category order and colours; anything new goes last.
+  const categories = new Map(
+    sunburst.root.children.map((category) => [
+      category.name,
+      { ...category, children: new Map(category.children.map((sub) => [sub.name, []])) },
+    ]),
+  );
+
+  let tracked = 0;
+  for (const { entry, row } of joined) {
+    const subName = entry.subcategory ?? entry.category;
+    const pipelineLeaf = row ? leafByUrl.get(normalizeUrl(row.git_url)) : null;
+    const leaf = pipelineLeaf
+      ? { ...pipelineLeaf, category: entry.category, sub_category: subName }
+      : {
+          name: entry.name,
+          kind: "project",
+          value: 1,
+          url: entry.url,
+          homepage: "",
+          description: row?.description || entry.readmeDescription || "",
+          category: entry.category,
+          sub_category: subName,
+          is_active_last_365d: false,
+          latest_commit_activity: null,
+          metrics: {},
+          tracked: false,
+        };
+    if (pipelineLeaf) tracked += 1;
+    if (!categories.has(entry.category)) {
+      categories.set(entry.category, { name: entry.category, kind: "category", children: new Map() });
+    }
+    const subs = categories.get(entry.category).children;
+    if (!subs.has(subName)) subs.set(subName, []);
+    subs.get(subName).push(leaf);
+  }
+
+  const children = [...categories.values()]
+    .map((category) => ({
+      ...category,
+      children: [...category.children.entries()]
+        .filter(([, leaves]) => leaves.length > 0)
+        .map(([name, leaves]) => ({ name, kind: "sub_category", children: leaves })),
+    }))
+    .filter((category) => category.children.length > 0);
+
+  return {
+    payload: { ...sunburst, root: { ...sunburst.root, children } },
+    leaves: joined.length,
+    tracked,
   };
 }
 
@@ -399,13 +550,53 @@ async function fetchDirectory(projectsCsvText) {
     return;
   }
 
-  const directory = buildDirectory(readmeText, projectsCsvText);
+  const { directory, joined } = buildDirectory(readmeText, projectsCsvText);
   console.log(
     `[fetch-data] directory.json: built ${directory.totals.projects} projects ` +
       `(${directory.totals.matched_from_csv} from CSV, ${directory.totals.readme_only} README-only) ` +
       `across ${directory.totals.categories} categories`,
   );
   await writeFile(path.join(DATA_DIR, "directory.json"), JSON.stringify(directory), "utf-8");
+
+  // The ring on / and /analytics draws the same listed set the headline counts.
+  const sunburstPath = path.join(DATA_DIR, "ecosystem-sunburst.json");
+  const sunburstText = await readLocal(sunburstPath);
+  if (sunburstText === null) return;
+  const ring = buildListedSunburst(JSON.parse(sunburstText), joined);
+  console.log(
+    `[fetch-data] ecosystem-sunburst.json: ${ring.leaves} listed projects ` +
+      `(${ring.tracked} with ecosyste.ms metrics, ${ring.leaves - ring.tracked} without)`,
+  );
+  await writeFile(sunburstPath, JSON.stringify(ring.payload), "utf-8");
+}
+
+// ---------------------------------------------------------------------------
+// education.md → public/data/education.json
+// ---------------------------------------------------------------------------
+
+async function fetchEducation() {
+  const target = path.join(DATA_DIR, "education.json");
+  const educationText = await resolve("education.md", {
+    remoteUrl: OST_EDUCATION_REMOTE_URL,
+    localPath: path.join(OST_README_REPO_LOCAL_PATH, "education.md"),
+    fallbackPath: null, // education.json's own fallback covers this tier
+  });
+  if (educationText === null) {
+    const fallback = await readLocal(path.join(FALLBACK_DIR, "education.json"));
+    if (fallback !== null) {
+      console.log("[fetch-data] education.json: committed fallback snapshot");
+      await writeFile(target, fallback, "utf-8");
+    } else {
+      console.warn("[fetch-data] education.json: no source available at all");
+    }
+    return;
+  }
+  const education = buildEducation(educationText);
+  console.log(
+    `[fetch-data] education.json: ${education.totals.resources} learning resources ` +
+      `across ${education.totals.topics} topics`,
+  );
+  await writeFile(target, JSON.stringify(education), "utf-8");
 }
 
 // ---------------------------------------------------------------------------
@@ -543,6 +734,71 @@ async function fetchProjectAttributeRecords(projectsCsvText) {
 
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Everything above → public/data/site-totals.json
+// ---------------------------------------------------------------------------
+//
+// The one place a page reads a count from. The home page's sentence, the
+// directory header, /analytics' figures and the ring all describe the same
+// set: the projects OST's README lists. Activity and metrics are counted over
+// the ring, which holds exactly that set, so the ring's own "Active" view and
+// /analytics' "Active" figure cannot disagree. Organizations and contributors
+// are the pipeline's, which already leaves learning resources out.
+
+async function writeSiteTotals() {
+  const read = async (file) => {
+    const text = await readLocal(path.join(DATA_DIR, file));
+    return text === null ? null : JSON.parse(text);
+  };
+  const [directory, sunburst, education, summary] = await Promise.all([
+    read("directory.json"),
+    read("ecosystem-sunburst.json"),
+    read("education.json"),
+    read("summary.json"),
+  ]);
+  if (!directory || !sunburst || !education || !summary) {
+    console.warn("[fetch-data] site-totals.json: an input is missing, keeping the committed fallback");
+    const fallback = await readLocal(path.join(FALLBACK_DIR, "site-totals.json"));
+    if (fallback !== null) await writeFile(path.join(DATA_DIR, "site-totals.json"), fallback, "utf-8");
+    return;
+  }
+
+  const leaves = sunburst.root.children.flatMap((category) =>
+    category.children.flatMap((sub) => sub.children),
+  );
+  const totals = {
+    generated_at: new Date().toISOString(),
+    as_of: summary.as_of,
+    projects: directory.totals.projects,
+    projects_with_metrics: leaves.filter((leaf) => leaf.tracked !== false).length,
+    active_projects: leaves.filter((leaf) => leaf.is_active_last_365d).length,
+    categories: directory.totals.categories,
+    subcategories: directory.totals.subcategories,
+    organizations: summary.totals.organizations,
+    contributors: summary.totals.contributors,
+    learning_resources: education.totals.resources,
+    learning_topics: education.totals.topics,
+  };
+  if (leaves.length !== totals.projects) {
+    console.warn(
+      `[fetch-data] site-totals.json: the ring holds ${leaves.length} projects but the directory ` +
+        `lists ${totals.projects}; one of them came from a fallback snapshot`,
+    );
+  }
+  if (summary.totals.projects !== totals.projects_with_metrics) {
+    console.warn(
+      `[fetch-data] site-totals.json: the analytics pipeline has ${summary.totals.projects} projects, ` +
+        `${totals.projects_with_metrics} of them listed in the README. The rest are ecosyste.ms rows ` +
+        "for links the README no longer carries (a renamed repository, usually): fix the link upstream.",
+    );
+  }
+  console.log(
+    `[fetch-data] site-totals.json: ${totals.projects} projects (${totals.projects_with_metrics} with metrics, ` +
+      `${totals.active_projects} active), ${totals.learning_resources} learning resources`,
+  );
+  await writeFile(path.join(DATA_DIR, "site-totals.json"), JSON.stringify(totals, null, 2), "utf-8");
+}
+
 async function main() {
   await mkdir(DATA_DIR, { recursive: true });
   await fetchAnalyticsPayloads();
@@ -553,7 +809,9 @@ async function main() {
     fallbackPath: null,
   });
   await fetchDirectory(projectsCsvText);
+  await fetchEducation();
   await fetchProjectAttributeRecords(projectsCsvText);
+  await writeSiteTotals();
 }
 
 main().catch((error) => {

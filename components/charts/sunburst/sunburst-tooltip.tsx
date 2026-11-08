@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 
 import { formatDecimal, formatNumber } from "@/lib/format";
 import type { RankingMetricId } from "@/lib/types";
-import { METRIC_ORDER, type SunburstNode } from "@/lib/sunburst/types";
+import { METRIC_ORDER, UNTRACKED_NOTE, type SunburstNode } from "@/lib/sunburst/types";
 
 /** Per-metric formatting: counts, scores and ratios each read differently. */
 function formatMetric(metric: RankingMetricId, value: number): string {
@@ -59,19 +59,24 @@ export function SunburstTooltip({ node, x, y, metric, metricLabels }: Props) {
             {project.category} <span aria-hidden="true">›</span>{" "}
             {project.sub_category}
           </p>
-          <p
-            className={
-              project.is_active_last_365d
-                ? "viz-tooltip__status viz-tooltip__status--active"
-                : "viz-tooltip__status"
-            }
-          >
-            {project.is_active_last_365d ? "Active" : "Dormant"} · last commit{" "}
-            {formatDate(project.latest_commit_activity)}
-          </p>
+          {project.tracked === false ? (
+            <p className="viz-tooltip__status">{UNTRACKED_NOTE}</p>
+          ) : (
+            <p
+              className={
+                project.is_active_last_365d
+                  ? "viz-tooltip__status viz-tooltip__status--active"
+                  : "viz-tooltip__status"
+              }
+            >
+              {project.is_active_last_365d ? "Active" : "Dormant"} · last commit{" "}
+              {formatDate(project.latest_commit_activity)}
+            </p>
+          )}
           {project.description ? (
             <p className="viz-tooltip__description">{project.description}</p>
           ) : null}
+          {project.tracked === false ? null : (
           <dl className="viz-tooltip__metrics">
             {METRIC_ORDER.map((id) => (
               <div
@@ -87,6 +92,7 @@ export function SunburstTooltip({ node, x, y, metric, metricLabels }: Props) {
               </div>
             ))}
           </dl>
+          )}
           <p className="viz-tooltip__hint">
             Click to select · {"⌘"}/Ctrl-click to open the repository
           </p>

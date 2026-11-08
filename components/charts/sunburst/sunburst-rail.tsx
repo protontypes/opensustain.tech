@@ -3,7 +3,7 @@
 import { formatDecimal, formatNumber } from "@/lib/format";
 import type { RankingMetricId } from "@/lib/types";
 import { binFillsInHue, categoryColor, type Bins } from "@/lib/sunburst/color";
-import { METRIC_ORDER, type SunburstNode } from "@/lib/sunburst/types";
+import { METRIC_ORDER, UNTRACKED_NOTE, type SunburstNode } from "@/lib/sunburst/types";
 
 function formatBound(metric: RankingMetricId, value: number): string {
   if (metric === "dds") return formatDecimal(value, 2);
@@ -188,6 +188,9 @@ export function SunburstDetails({
           ) : null}
         </div>
       </div>
+      {project.tracked === false ? (
+        <p className="viz-details__description">{UNTRACKED_NOTE}</p>
+      ) : (
       <dl className="viz-details__metrics">
         {METRIC_ORDER.map((id) => (
           <div key={id}>
@@ -202,6 +205,85 @@ export function SunburstDetails({
           </div>
         ))}
       </dl>
+      )}
+    </div>
+  );
+}
+
+function formatMonth(iso: string | null): string | null {
+  if (!iso) return null;
+  const parsed = new Date(iso);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toLocaleDateString("en-US", { year: "numeric", month: "short" });
+}
+
+/**
+ * The home page's selected project: three facts a visitor can read without a
+ * glossary, and the way out to the repository. The full metric set stays on
+ * /analytics, where SunburstDetails shows it.
+ */
+export function SunburstSelectionCard({
+  node,
+  onClear,
+}: {
+  node: SunburstNode;
+  onClear: () => void;
+}) {
+  const project = node.project!;
+  const lastCommit = formatMonth(project.latest_commit_activity);
+  const facts = [
+    { label: "Stars", value: project.metrics.stars },
+    { label: "Contributors", value: project.metrics.contributors },
+    { label: "Commits", value: project.metrics.total_commits },
+  ];
+  return (
+    <div className="selection-card">
+      <div className="selection-card__head">
+        <p className="selection-card__path">
+          {project.category} <span aria-hidden="true">›</span> {project.sub_category}
+        </p>
+        <button type="button" className="viz-link" onClick={onClear}>
+          Close
+        </button>
+      </div>
+      <h2 className="selection-card__name">{project.name}</h2>
+      <p className="selection-card__status">
+        {project.tracked === false
+          ? UNTRACKED_NOTE
+          : `${project.is_active_last_365d ? "Active" : "Dormant"}${
+              lastCommit ? `, last commit ${lastCommit}` : ""
+            }`}
+      </p>
+      {project.description ? (
+        <p className="selection-card__description">{project.description}</p>
+      ) : null}
+      {project.tracked === false ? null : (
+        <dl className="selection-card__facts">
+          {facts.map((fact) => (
+            <div key={fact.label}>
+              <dt>{fact.label}</dt>
+              <dd>{formatNumber(fact.value ?? 0)}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      <div className="selection-card__actions">
+        {project.url ? (
+          <a
+            className="viz-button viz-button--primary"
+            href={project.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open repository
+          </a>
+        ) : null}
+        {project.homepage ? (
+          <a className="viz-button" href={project.homepage} target="_blank" rel="noreferrer">
+            Homepage
+          </a>
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { metricCoverage } from "@/lib/charts/coverage";
 import { loadProjectRankings, loadSummary } from "@/lib/data";
+import { loadSiteTotals } from "@/lib/data/site";
 import { snapshotOf, type Snapshot } from "@/lib/data/snapshot";
 import { METRIC_ORDER, metricValue, type SunburstNode } from "@/lib/sunburst/types";
 import type { ProjectRankingRecord, RankingMetricId } from "@/lib/types";
@@ -15,7 +16,10 @@ export type MetricCoverage = {
 export type MethodologyFacts = {
   snapshot: Snapshot;
   projects: number;
+  projectsWithMetrics: number;
   activeProjects: number;
+  categories: number;
+  subcategories: number;
   organizations: number;
   contributors: number;
   coverage: MetricCoverage[];
@@ -32,9 +36,10 @@ export type MethodologyFacts = {
  * afford a stale number.
  */
 export async function loadMethodologyFacts(): Promise<MethodologyFacts> {
-  const [summary, rankings] = await Promise.all([
+  const [summary, rankings, totals] = await Promise.all([
     loadSummary(),
     loadProjectRankings(),
+    loadSiteTotals(),
   ]);
   const records = rankings.records;
 
@@ -48,10 +53,13 @@ export async function loadMethodologyFacts(): Promise<MethodologyFacts> {
 
   return {
     snapshot: snapshotOf(summary.as_of),
-    projects: summary.totals.projects,
-    activeProjects: summary.totals.active_projects,
-    organizations: summary.totals.organizations,
-    contributors: summary.totals.contributors,
+    projects: totals.projects,
+    projectsWithMetrics: totals.projects_with_metrics,
+    activeProjects: totals.active_projects,
+    categories: totals.categories,
+    subcategories: totals.subcategories,
+    organizations: totals.organizations,
+    contributors: totals.contributors,
     metricLabels: rankings.metric_labels,
     coverage: METRIC_ORDER.map((id) => {
       const result = metricCoverage(records, (record) =>

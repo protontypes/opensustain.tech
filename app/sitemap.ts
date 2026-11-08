@@ -14,6 +14,7 @@ import { SITE_URL } from "@/lib/seo/site";
 const paths: string[] = [
   routes.home,
   routes.projects,
+  routes.education,
   routes.analytics,
   routes.analyticsProjects,
   routes.organizations,

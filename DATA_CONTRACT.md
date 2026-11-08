@@ -4,6 +4,38 @@ This documents where the project directory's data comes from, why, and the
 exact numbers behind that decision. See `scripts/fetch-data.mjs` for the
 implementation and its header comment for the fallback chain.
 
+## One set of totals (`public/data/site-totals.json`)
+
+Every count a page shows comes from this one file, written by
+`fetch-data.mjs` (`writeSiteTotals`) and read through `loadSiteTotals()`.
+They all describe the same set:
+
+| Field | Counts | Source |
+|---|---|---|
+| `projects` | every project README.md lists: the headline | directory.json |
+| `projects_with_metrics` | of those, the ones Ecosyste.ms tracks | ring leaves without `tracked: false` |
+| `active_projects` | of those, a commit in the past 365 days | ring leaves |
+| `categories`, `subcategories` | README headings | directory.json |
+| `organizations`, `contributors` | analytics pipeline | summary.json |
+| `learning_resources` | education.md, counted apart | education.json |
+
+The ring (`ecosystem-sunburst.json`) is rebuilt by `buildListedSunburst` to
+hold exactly the directory's projects: listed projects Ecosyste.ms has no row
+for join as leaves with empty `metrics` and `tracked: false`, and pipeline
+leaves no README entry points at are dropped. So the ring's "All" count, the
+home page sentence, `/projects` and `/analytics` agree by construction.
+
+**Learning resources are not projects.** education.md's courses, books and
+tutorials live on `/education` (`education.json`, in the file's own topic
+grouping) and nowhere else. Ecosyste.ms files them under Sustainable
+Development › Education; opensustain.analytics' payload builder drops that
+subcategory (`LEARNING_RESOURCE_SUB_CATEGORIES`) and the organizations that
+maintain nothing else, so no analytics figure counts them either.
+
+When the pipeline's project count and `projects_with_metrics` differ, the
+build warns: an Ecosyste.ms row for a link the README no longer carries,
+usually a renamed repository. Fix the README link; do not code around it.
+
 ## The question
 
 `open-sustainable-technology/README.md` is the ~2,767-entry awesome list and

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { METRIC_HELP } from "@/lib/charts/metric-help";
-import { loadFilters } from "@/lib/data";
 import { loadMethodologyFacts } from "@/lib/data/methodology";
 import { formatNumber, formatPercent } from "@/lib/format";
 
@@ -20,10 +19,7 @@ const ORGANIZATIONS_CSV =
   "https://api.getgrist.com/o/docs/api/docs/gSscJkc5Rb1Rw45gh1o1Yc/download/csv?viewSection=7&tableId=Organizations";
 
 export default async function MethodologyPage() {
-  const [facts, filters] = await Promise.all([
-    loadMethodologyFacts(),
-    loadFilters(),
-  ]);
+  const facts = await loadMethodologyFacts();
 
   return (
     <main className="page-shell">
@@ -56,10 +52,13 @@ export default async function MethodologyPage() {
               <strong>
                 <time dateTime={facts.snapshot.iso}>{facts.snapshot.label}</time>
               </strong>
-              , and covers {formatNumber(facts.projects)} projects,{" "}
+              , and covers {formatNumber(facts.projects)} projects (
+              {formatNumber(facts.projectsWithMetrics)} of them tracked by
+              Ecosyste.ms, so with metrics),{" "}
               {formatNumber(facts.organizations)} organizations,{" "}
-              {filters.categories.length} categories and{" "}
-              {filters.sub_categories.length} sub-categories.
+              {facts.categories} categories and {facts.subcategories}{" "}
+              sub-categories. The courses, books and tutorials OpenSustain.tech
+              also lists are counted on their own, not as projects.
             </p>
             <p>
               The data is published under{" "}

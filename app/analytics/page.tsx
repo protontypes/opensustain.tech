@@ -7,7 +7,8 @@ import { LinkList } from "@/components/ui/link-list";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { snapshotOf } from "@/lib/data/snapshot";
-import { loadFilters, loadProjectRankings, loadSummary } from "@/lib/data";
+import { loadProjectRankings, loadSummary } from "@/lib/data";
+import { loadSiteTotals } from "@/lib/data/site";
 import { routes } from "@/lib/navigation";
 import {
   formatCompactNumber,
@@ -55,16 +56,18 @@ const dashboards = [
 ];
 
 export default async function AnalyticsPage() {
-  const [summary, filters, projectRankings] = await Promise.all([
+  const [summary, totals, projectRankings] = await Promise.all([
     loadSummary(),
-    loadFilters(),
+    loadSiteTotals(),
     loadProjectRankings(),
   ]);
   const snapshot = snapshotOf(summary.as_of);
 
+  // Activity is only known for projects Ecosyste.ms tracks, so the share is
+  // of those, not of every listed project.
   const activeRate =
-    summary.totals.projects > 0
-      ? summary.totals.active_projects / summary.totals.projects
+    totals.projects_with_metrics > 0
+      ? totals.active_projects / totals.projects_with_metrics
       : 0;
   const topProjects = projectRankings.records.slice(0, 10);
 
@@ -74,18 +77,23 @@ export default async function AnalyticsPage() {
    * the same line, read the way a data appendix reads.
    */
   const ecosystemFigures = [
-    { label: "Projects", value: formatNumber(summary.totals.projects) },
+    { label: "Projects", value: formatNumber(totals.projects) },
+    {
+      label: "With metrics",
+      value: formatNumber(totals.projects_with_metrics),
+      note: "tracked by Ecosyste.ms",
+    },
     {
       label: "Active in the past year",
-      value: formatNumber(summary.totals.active_projects),
-      note: formatPercent(activeRate),
+      value: formatNumber(totals.active_projects),
+      note: `${formatPercent(activeRate)} of those tracked`,
     },
-    { label: "Organizations", value: formatNumber(summary.totals.organizations) },
-    { label: "Contributors", value: formatNumber(summary.totals.contributors) },
+    { label: "Organizations", value: formatNumber(totals.organizations) },
+    { label: "Contributors", value: formatNumber(totals.contributors) },
     {
       label: "Categories",
-      value: String(filters.categories.length),
-      note: `${filters.sub_categories.length} subcategories`,
+      value: String(totals.categories),
+      note: `${totals.subcategories} subcategories`,
     },
   ];
   const medianFigures = [

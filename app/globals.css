@@ -152,6 +152,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   line-height: 1.08;
   letter-spacing: -0.015em;
+  text-wrap: balance;
   color: var(--color-black);
 }
 
@@ -187,6 +188,8 @@ p {
   font-weight: 400;
   line-height: 1.6;
   color: var(--color-text);
+  /* No one-word last lines. */
+  text-wrap: pretty;
 }
 
 /* --- Container --- */
@@ -686,6 +689,85 @@ html {
 }
 
 /*
+ * The clicked project. Beside the ring it takes the description's place, so
+ * the column still fits the first screen; on a narrow screen it rises from the
+ * bottom edge instead, over the ring rather than a scroll away from it.
+ */
+.hero-selection:not(:empty) {
+  margin-bottom: 28px;
+}
+
+/* The card's own actions stand in for the page's while it is open, so the
+   column never holds two primary buttons at once. */
+@media (min-width: 1025px) {
+  .home-hero__text:has(.hero-selection:not(:empty))
+    :is(.home-lede, .home-facts, .home-actions) {
+    display: none;
+  }
+}
+
+.selection-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.selection-card__path {
+  font-size: 13px;
+  font-stretch: var(--stretch-label);
+  color: var(--color-text-secondary);
+}
+
+.selection-card__name {
+  margin: 6px 0 4px;
+  font-size: 26px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.selection-card__status {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.selection-card__description {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.selection-card__facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.selection-card__facts dt {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.selection-card__facts dd {
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-black);
+}
+
+.selection-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+/*
  * A heading beside its content, on the home hero's two columns so the content
  * starts where the chart did. Shared with the analytics page.
  */
@@ -814,14 +896,59 @@ html {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /*
+   * The text column dissolves into the grid so the ring can come straight
+   * after the title: the thing to play with is on the first screen, and the
+   * description and actions follow it.
+   */
   .home-hero {
-    gap: 40px;
-    padding-top: 40px;
+    gap: 0;
+    padding-top: 28px;
   }
 
   .home-hero__text {
-    position: static;
-    max-width: 560px;
+    display: contents;
+  }
+
+  .home-title {
+    order: 1;
+    margin-bottom: 20px;
+  }
+
+  .home-hero__chart {
+    order: 2;
+    margin-bottom: 32px;
+  }
+
+  .home-lede {
+    order: 3;
+  }
+
+  .home-facts {
+    order: 4;
+  }
+
+  .home-actions {
+    order: 5;
+  }
+
+  .hero-selection:not(:empty) {
+    position: fixed;
+    inset-inline: 12px;
+    bottom: 12px;
+    z-index: 1100;
+    max-height: 70vh;
+    overflow-y: auto;
+    margin: 0;
+    padding: 16px 18px;
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-surface);
+    box-shadow: 0 12px 32px rgba(19, 38, 43, 0.18);
+  }
+
+  .selection-card__name {
+    font-size: 21px;
   }
 
   .split-section__note {
@@ -836,6 +963,13 @@ html {
 
   .home-lede {
     font-size: 19px;
+  }
+
+  /* One line, so the ring starts high on a phone. */
+  .home-title {
+    font-size: 6.1vw;
+    font-stretch: 100%;
+    white-space: nowrap;
   }
 
   .link-list {
@@ -1581,7 +1715,6 @@ a.panel:hover .panel-title {
 .viz-segmented button em {
   font-style: normal;
   font-weight: 500;
-  opacity: 0.75;
 }
 
 .viz-segmented button[aria-pressed="true"] {
@@ -1827,14 +1960,14 @@ a.panel:hover .panel-title {
   pointer-events: auto;
 }
 
-/* The home page's root plate is a caption, not a control. */
+/* The root plate is a caption, not a control. */
 .viz-hole__button--static {
   cursor: default;
 }
 
 .viz-hole__eyebrow {
   font-family: var(--font-heading);
-  font-size: clamp(8px, calc(var(--viz-hole-d, 250px) * 0.046), 11px);
+  font-size: clamp(10px, calc(var(--viz-hole-d, 250px) * 0.046), 12px);
   font-weight: 700;
   font-stretch: var(--stretch-label);
   color: var(--color-link);
@@ -1858,14 +1991,14 @@ a.panel:hover .panel-title {
 
 .viz-hole__meta {
   font-family: var(--font-heading);
-  font-size: clamp(9px, calc(var(--viz-hole-d, 250px) * 0.05), 12px);
+  font-size: clamp(11px, calc(var(--viz-hole-d, 250px) * 0.05), 13px);
   font-weight: 500;
   color: var(--color-text-secondary);
 }
 
 .viz-hole__hint {
   font-family: var(--font-heading);
-  font-size: clamp(9px, calc(var(--viz-hole-d, 250px) * 0.045), 11px);
+  font-size: clamp(11px, calc(var(--viz-hole-d, 250px) * 0.045), 12px);
   font-weight: 500;
   line-height: 1.35;
   color: var(--color-text-secondary);
@@ -1883,7 +2016,7 @@ a.panel:hover .panel-title {
 
 .viz-hole__back {
   font-family: var(--font-heading);
-  font-size: clamp(9px, calc(var(--viz-hole-d, 250px) * 0.045), 11px);
+  font-size: clamp(11px, calc(var(--viz-hole-d, 250px) * 0.045), 12px);
   font-weight: 700;
   font-stretch: var(--stretch-label);
   color: var(--color-link);
@@ -1909,13 +2042,7 @@ a.panel:hover .panel-title {
   display: none;
 }
 
-/*
- * The 11px floor the other tiers share still clips a 67px circle — the
- * wordmark is one unbreakable token, so it cannot wrap its way out.
- */
-.viz-hole--tiny .viz-hole__title {
-  font-size: clamp(8px, calc(var(--viz-hole-d, 250px) * 0.115), 13px);
-}
+/* The smallest circle holds only a count, so it keeps the 11px floor. */
 
 /* ============================================================
    Rail: colour bar, legend, details
@@ -1945,6 +2072,27 @@ a.panel:hover .panel-title {
 
 .viz-root--hero .viz-field--search input {
   min-width: 280px;
+}
+
+/* A wrapped path pushed the ring down under the finger that just tapped it. */
+.viz-root--hero .viz-breadcrumb {
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+/* Beside the search box on a wide screen, the path shrinks and scrolls rather
+   than pushing the box onto a second row and the ring down with it. */
+@media (min-width: 769px) {
+  .viz-root--hero .viz-toolbar {
+    flex-wrap: nowrap;
+  }
+
+  .viz-root--hero .viz-breadcrumb {
+    flex: 1 1 auto;
+  }
 }
 
 .viz-legend__chips {

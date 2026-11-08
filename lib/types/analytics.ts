@@ -107,6 +107,12 @@ export interface EcosystemProjectNode {
   is_active_last_365d: boolean;
   latest_commit_activity: IsoDateString | null;
   metrics: ProjectMetrics;
+  /**
+   * False for a listed project Ecosyste.ms has no row for (scripts/fetch-data
+   * adds those to the ring): `metrics` is empty and activity is unknown, not
+   * zero. Absent on every leaf the pipeline built.
+   */
+  tracked?: false;
 }
 
 export interface EcosystemSubCategoryNode {

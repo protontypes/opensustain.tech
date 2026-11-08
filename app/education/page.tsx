@@ -1,26 +1,66 @@
 import type { Metadata } from "next";
 
-import { RedirectStub } from "@/components/seo/redirect-stub";
-import { SITE_URL } from "@/lib/seo/site";
+import { LinkList } from "@/components/ui/link-list";
+import { Panel } from "@/components/ui/panel";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { loadEducation } from "@/lib/data/site";
+import { formatNumber } from "@/lib/format";
 
-// The old mkdocs nav's "Education" tab (education.md) was a curated list of
-// learning resources. That list now lives as the directory's own "Education"
-// subcategory, under "Sustainable Development" — see DATA_CONTRACT.md and
-// public/data/filters.json's `sub_categories_by_category`.
-const DESTINATION = "/projects?category=Sustainable+Development&subcategory=Education";
+// education.md is edited by pull request, like the README.
+const EDUCATION_SOURCE =
+  "https://github.com/protontypes/open-sustainable-technology/blob/main/education.md";
 
-export const metadata: Metadata = {
-  title: "Moved",
-  robots: { index: false, follow: true },
-  alternates: { canonical: `${SITE_URL}${DESTINATION}` },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const education = await loadEducation();
+  return {
+    title: "Learning resources",
+    description: `${formatNumber(education.totals.resources)} open courses, books and tutorials for getting started in climate, energy and environmental technology.`,
+  };
+}
 
-export default function EducationRedirectPage() {
+/*
+ * The old mkdocs "Education" tab, back as a page of its own. These are
+ * courses, books and tutorials, not projects, so they are counted here and
+ * nowhere else: not in the directory, the ring or any analytics total.
+ */
+export default async function EducationPage() {
+  const education = await loadEducation();
+
   return (
-    <RedirectStub
-      to={DESTINATION}
-      destinationLabel="the Education subcategory in the Projects directory"
-      reason="Education resources are now part of the project directory."
-    />
+    <main className="page-shell">
+      <SectionHeading
+        as="h1"
+        title="Learning resources"
+        description={`${formatNumber(education.totals.resources)} open courses, books and tutorials across ${education.totals.topics} topics, for getting started in climate, energy and environmental technology.`}
+      />
+
+      <div className="stack">
+        {education.topics.map((topic) => (
+          <Panel key={topic.name} title={topic.name}>
+            {topic.subtopics.map((subtopic) => (
+              <section key={subtopic.name ?? topic.name}>
+                {subtopic.name ? <h3>{subtopic.name}</h3> : null}
+                <LinkList
+                  items={subtopic.resources.map((resource) => ({
+                    href: resource.url,
+                    title: resource.name,
+                    description: resource.description,
+                    external: true,
+                  }))}
+                />
+              </section>
+            ))}
+          </Panel>
+        ))}
+
+        <p>
+          Know a resource that belongs here?{" "}
+          <a href={EDUCATION_SOURCE} target="_blank" rel="noreferrer">
+            Add it to education.md
+          </a>
+          .
+        </p>
+      </div>
+    </main>
   );
 }

@@ -132,7 +132,8 @@ export function toCsvBlob(
       project.sub_category,
       project.url,
       project.homepage,
-      project.is_active_last_365d,
+      // Unknown, not false, for a project Ecosyste.ms does not track.
+      project.tracked === false ? "" : project.is_active_last_365d,
       project.latest_commit_activity ?? "",
       ...METRIC_ORDER.map((metric) => metrics[metric] ?? ""),
     ];

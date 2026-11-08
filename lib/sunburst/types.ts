@@ -91,9 +91,14 @@ export type ViewState = {
   selectedId: string | null;
 };
 
+/** What a leaf with `tracked: false` says in place of its activity and metrics. */
+export const UNTRACKED_NOTE = "Not tracked by Ecosyste.ms: no activity or metrics";
+
+// Every listed project, so the ring matches the count beside it and a visitor
+// can reach any project. "Active" stays one click away in the toolbar.
 export const INITIAL_VIEW: ViewState = {
   metric: "total_score_combined",
-  activity: "active",
+  activity: "all",
   zoomPath: [],
   isolated: [],
   query: "",

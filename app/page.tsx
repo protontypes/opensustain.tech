@@ -3,7 +3,8 @@ import Link from "next/link";
 import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunburst";
 import { LegacyAnchorRedirect } from "@/components/seo/legacy-anchor-redirect";
 import { LinkList, type LinkListItem } from "@/components/ui/link-list";
-import { loadFilters, loadSummary } from "@/lib/data";
+import { loadFilters } from "@/lib/data";
+import { loadSiteTotals } from "@/lib/data/site";
 import { formatNumber } from "@/lib/format";
 import { climateTriageLink, contributeLink, routes } from "@/lib/navigation";
 
@@ -14,6 +15,12 @@ const furtherReading: LinkListItem[] = [
     title: "Project directory",
     description:
       "Every project as a searchable list, filtered by category and subcategory.",
+  },
+  {
+    href: routes.education,
+    title: "Learning resources",
+    description:
+      "Open courses, books and tutorials for getting started in sustainable technology.",
   },
   {
     href: routes.analytics,
@@ -37,7 +44,7 @@ const furtherReading: LinkListItem[] = [
 ];
 
 export default async function HomePage() {
-  const [summary, filters] = await Promise.all([loadSummary(), loadFilters()]);
+  const [totals, filters] = await Promise.all([loadSiteTotals(), loadFilters()]);
 
   return (
     <main className="home">
@@ -49,6 +56,10 @@ export default async function HomePage() {
           <h1 id="home-title" className="home-title">
             Open Sustainable Technology
           </h1>
+          {/* Filled by the chart when a project is clicked. It takes the place
+              of the description beside the ring on a wide screen, and rises
+              from the bottom edge on a narrow one. */}
+          <div id="hero-selection" className="hero-selection" aria-live="polite" />
           <p className="home-lede">
             A map of the open-source projects working on climate change,
             sustainable energy, biodiversity and natural resources.
@@ -58,11 +69,15 @@ export default async function HomePage() {
            * describe the chart beside them, they are not the point of the page.
            */}
           <p className="home-facts">
-            {formatNumber(summary.totals.projects)} projects, maintained by{" "}
-            {formatNumber(summary.totals.organizations)} organizations and{" "}
-            {formatNumber(summary.totals.contributors)} contributors, sorted into{" "}
-            {filters.categories.length} categories and{" "}
-            {filters.sub_categories.length} subcategories.
+            {formatNumber(totals.projects)} projects, maintained by{" "}
+            {formatNumber(totals.organizations)} organizations and{" "}
+            {formatNumber(totals.contributors)} contributors, sorted into{" "}
+            {totals.categories} categories and {totals.subcategories}{" "}
+            subcategories. Plus{" "}
+            <Link href={routes.education}>
+              {formatNumber(totals.learning_resources)} learning resources
+            </Link>{" "}
+            to get started with.
           </p>
           <div className="home-actions">
             <Link className="home-action home-action--primary" href={routes.projects}>
@@ -79,7 +94,7 @@ export default async function HomePage() {
           </div>
         </div>
         <div className="home-hero__chart">
-          <EcosystemSunburst variant="hero" />
+          <EcosystemSunburst variant="hero" selectionSlot="hero-selection" />
         </div>
       </section>
 

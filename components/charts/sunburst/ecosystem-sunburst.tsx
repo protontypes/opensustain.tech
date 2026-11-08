@@ -8,6 +8,7 @@ import {
   useState,
   type CSSProperties,
 } from "react";
+import { createPortal } from "react-dom";
 
 import { useElementSize } from "@/lib/hooks/use-element-size";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
@@ -58,6 +59,7 @@ import {
   SunburstColorBar,
   SunburstDetails,
   SunburstLegend,
+  SunburstSelectionCard,
 } from "./sunburst-rail";
 
 const MAX_CHART = 1040;
@@ -65,6 +67,9 @@ const MAX_HERO_CHART = 760;
 /** Header, community bar, the hero's top padding and the chart's search row. */
 const HERO_CHROME = 220;
 const ROOT_HINT = "Click a category to see its projects";
+/* One ring at a time once a category is open, so the first click shows
+   subcategories by name rather than a fan of unlabelled project slivers. */
+const HERO_ROOT_HINT = "Click a category to open it";
 
 type Props = {
   /**
@@ -74,9 +79,14 @@ type Props = {
    * the data closely.
    */
   variant?: "full" | "hero";
+  /**
+   * Id of an element elsewhere on the page that shows the hero's selected
+   * project: beside the chart, rather than below it and off the first screen.
+   */
+  selectionSlot?: string;
 };
 
-export function EcosystemSunburst({ variant = "full" }: Props) {
+export function EcosystemSunburst({ variant = "full", selectionSlot }: Props) {
   const hero = variant === "hero";
   const maxChart = hero ? MAX_HERO_CHART : MAX_CHART;
   const [payload, setPayload] = useState<EcosystemSunburstPayload | null>(null);
@@ -117,6 +127,10 @@ export function EcosystemSunburst({ variant = "full" }: Props) {
   }>({ node: null, x: 0, y: 0 });
 
   const svgHandle = useRef<SunburstSvgHandle | null>(null);
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setSlot(selectionSlot ? document.getElementById(selectionSlot) : null);
+  }, [selectionSlot]);
   const { ref: frameRef, width } = useElementSize<HTMLDivElement>();
   const reducedMotion = useReducedMotion();
   const theme = useTheme();
@@ -205,13 +219,14 @@ export function EcosystemSunburst({ variant = "full" }: Props) {
     // total_score_combined, so without this the ring read high-to-low for the
     // default metric only, and picking Stars recoloured it without resequencing.
     // Branches keep their payload order; only leaves carry a metric.
-    return layoutAll(allNodes, focusNode, MAX_RINGS, (a, b) => {
+    const rings = hero && focusNode.depth > 0 ? 1 : MAX_RINGS;
+    return layoutAll(allNodes, focusNode, rings, (a, b) => {
       if (a.kind !== "project" || b.kind !== "project") return 0;
       return (
         (metricValue(b, view.metric) ?? 0) - (metricValue(a, view.metric) ?? 0)
       );
     });
-  }, [allNodes, focusNode, view.activity, view.isolated, view.metric]);
+  }, [allNodes, focusNode, hero, view.activity, view.isolated, view.metric]);
 
   const bins = useMemo(() => {
     if (!filtered) return computeBins([]);
@@ -371,15 +386,16 @@ export function EcosystemSunburst({ variant = "full" }: Props) {
     [update],
   );
 
+  // Through `update`, so the address follows. Setting state alone left `?z=`
+  // behind: the next search or a reload zoomed straight back in.
   const zoomOut = useCallback(() => {
     setHover({ node: null, x: 0, y: 0 });
-    setView((current) => ({
-      ...current,
-      zoomPath: current.zoomPath.slice(0, -1),
-      selectedId: null,
-    }));
+    update(
+      { zoomPath: view.zoomPath.slice(0, -1), selectedId: null },
+      "push",
+    );
     setFocusedIndex(-1);
-  }, []);
+  }, [update, view.zoomPath]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -518,7 +534,10 @@ export function EcosystemSunburst({ variant = "full" }: Props) {
     height: fit.diameter,
     "--viz-hole-d": `${fit.diameter}px`,
   } as CSSProperties;
-  const rootMeta = `${pluralize(focusNode.visibleLeaves, "project")} · ${pluralize(
+  const rootMeta = `${pluralize(
+    focusNode.visibleLeaves,
+    view.activity === "active" ? "active project" : "project",
+  )} · ${pluralize(
     // The raw child array ignores the legend's isolation, so this kept saying
     // "13 categories" with one category showing.
     focusNode.children.filter((child) => child.visibleLeaves > 0).length,
@@ -526,14 +545,19 @@ export function EcosystemSunburst({ variant = "full" }: Props) {
     "categories",
   )}`;
   const caption = [
-    // The hero's plate already carries the count, active-qualified; repeating
-    // it here unqualified read as a second, different total.
-    fit.compact && !hero
-      ? focusNode.kind === "root"
-        ? rootMeta
-        : pluralize(focusNode.visibleLeaves, "project")
-      : null,
-    fit.showHint || focusNode.kind !== "root" ? null : ROOT_HINT,
+    // A compact plate drops its count line, so the count moves out here: at
+    // the root always (the plate keeps the title), inside a category on the
+    // hero only in the smallest circle.
+    fit.compact && focusNode.kind === "root"
+      ? rootMeta
+      : fit.compact && (!hero || fit.tiny)
+        ? pluralize(focusNode.visibleLeaves, "project")
+        : null,
+    fit.showHint || focusNode.kind !== "root"
+      ? null
+      : hero
+        ? HERO_ROOT_HINT
+        : ROOT_HINT,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -614,46 +638,26 @@ export function EcosystemSunburst({ variant = "full" }: Props) {
                   </span>
                   <span className="viz-hole__back">Back</span>
                 </button>
-              ) : hero ? (
-                <div className="viz-hole__button viz-hole__button--static">
-                  <span className="viz-hole__title">
-                    {/* The activity filter has no control here, so the count
-                        names it rather than disagreeing with the page's total. */}
-                    {pluralize(
-                      focusNode.visibleLeaves,
-                      view.activity === "active" ? "active project" : "project",
-                    )}
-                  </span>
-                  <span className="viz-hole__meta">
-                    {pluralize(
-                      focusNode.children.filter((child) => child.visibleLeaves > 0)
-                        .length,
-                      "category",
-                      "categories",
-                    )}
-                  </span>
-                  <span className="viz-hole__hint">{ROOT_HINT}</span>
-                </div>
               ) : (
-                <a
-                  className="viz-hole__button"
-                  href="https://opensustain.tech/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                // A caption, not a control. On /analytics this was a link to
+                // the production homepage in a new tab, named by its hint.
+                <div className="viz-hole__button viz-hole__button--static">
                   <span className="viz-hole__eyebrow">OpenSustain.tech</span>
                   <span className="viz-hole__title">
-                    {/* 43 characters will not wrap inside a 94px circle, and
-                        at 67px only the wordmark is left. */}
+                    {/* The chart's name, as the Streamlit dashboard titles
+                        it. It wraps to three lines in the hero's ~150px
+                        circle; under 112px only the wordmark fits. */}
                     {fit.tiny
                       ? "OpenSustain.tech"
-                      : fit.compact
-                        ? "Open Source Sustainability"
-                        : "The Open Source Ecosystem in Sustainability"}
+                      : "The Open Source Ecosystem in Sustainability"}
                   </span>
+                  {/* The count names the activity filter, so it never reads
+                      as a second, different total beside the page's own. */}
                   <span className="viz-hole__meta">{rootMeta}</span>
-                  <span className="viz-hole__hint">{ROOT_HINT}</span>
-                </a>
+                  <span className="viz-hole__hint">
+                    {hero ? HERO_ROOT_HINT : ROOT_HINT}
+                  </span>
+                </div>
               )}
             </div>
           </div>
@@ -672,7 +676,16 @@ export function EcosystemSunburst({ variant = "full" }: Props) {
 
       </div>
 
-      {selectedNode ? (
+      {selectedNode && hero && slot
+        ? createPortal(
+            <SunburstSelectionCard
+              node={selectedNode}
+              onClear={() => update({ selectedId: null })}
+            />,
+            slot,
+          )
+        : null}
+      {selectedNode && !(hero && slot) ? (
         <SunburstDetails
           node={selectedNode}
           metricLabels={payload.metric_labels}

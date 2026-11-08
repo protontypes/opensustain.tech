@@ -9,12 +9,16 @@
 export const routes = {
   home: "/",
 
-  // The OST project directory — ~2,767 projects grouped by category and
-  // subcategory, built from README.md + data/projects.csv. See
+  // The OST project directory — every project README.md lists, grouped by
+  // category and subcategory, joined with data/projects.csv. See
   // DATA_CONTRACT.md. This is NOT the project-rankings dashboard; that one
   // moved to /analytics/projects when this path was freed up for the
   // directory (see the "Analytics nav item" note in the site-shell report).
   projects: "/projects",
+
+  // education.md's courses, books and tutorials. Not projects, so not in the
+  // directory: their own list and their own count.
+  education: "/education",
 
   // Analytics section. `analytics` is a small landing page (this repo's
   // former "/" overview) linking out to the four dashboards below it;
@@ -60,6 +64,7 @@ export const analyticsNavigation = [
 /** Header navigation, in display order. An item with `children` is a dropdown. */
 export const primaryNavigation = [
   { href: routes.projects, label: "Directory" },
+  { href: routes.education, label: "Learn" },
   { href: routes.analytics, label: "Analytics", children: analyticsNavigation },
   { href: routes.blog, label: "Media" },
   { href: routes.about, label: "About" },
@@ -82,6 +87,7 @@ export const footerNavigation = [
     heading: "Data",
     links: [
       { href: routes.projects, label: "Directory" },
+      { href: routes.education, label: "Learning resources" },
       { href: routes.analytics, label: "Analytics" },
       { href: routes.analyticsProjects, label: "Project analytics" },
       { href: routes.organizations, label: "Organizations" },

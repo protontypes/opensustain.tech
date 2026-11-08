@@ -642,7 +642,6 @@ export function EcosystemSunburst({ variant = "full", selectionSlot }: Props) {
                 // A caption, not a control. On /analytics this was a link to
                 // the production homepage in a new tab, named by its hint.
                 <div className="viz-hole__button viz-hole__button--static">
-                  <span className="viz-hole__eyebrow">OpenSustain.tech</span>
                   <span className="viz-hole__title">
                     {/* The chart's name, as the Streamlit dashboard titles
                         it. It wraps to three lines in the hero's ~150px

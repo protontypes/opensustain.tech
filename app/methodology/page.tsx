@@ -26,16 +26,16 @@ export default async function MethodologyPage() {
       <SectionHeading
         as="h1"
         title="What this dashboard is, and what it cannot tell you"
-        description="Every chart here reads one nightly snapshot of a public dataset. These are its sources, its definitions, and the places it is known to be wrong or incomplete."
+        description="Every chart here reads one snapshot of a public dataset, rebuilt whenever the project list or the analytics data changes and at least weekly. These are its sources, its definitions, and the places it is known to be wrong or incomplete."
       />
 
       <div className="stack">
-        <Panel title="Where the data comes from">
+        <Panel id="data" title="Where the data comes from">
           <div className="prose">
             <p>
               Projects and organizations come from{" "}
               <a href="https://opensustain.tech/" target="_blank" rel="noreferrer">
-                OpenSustain.tech
+                Open Sustainable Technology
               </a>
               , a curated index of open-source work in environmental
               sustainability. Repository and package metrics; contributors,
@@ -43,7 +43,7 @@ export default async function MethodologyPage() {
               <a href="https://ecosyste.ms/" target="_blank" rel="noreferrer">
                 Ecosyste.ms
               </a>
-              . Categories and sub-categories are assigned by the OpenSustain
+              . Categories and sub-categories are assigned by the Open Sustainable Technology
               taxonomy, not inferred.
             </p>
             <p>
@@ -57,7 +57,7 @@ export default async function MethodologyPage() {
               Ecosyste.ms, so with metrics),{" "}
               {formatNumber(facts.organizations)} organizations,{" "}
               {facts.categories} categories and {facts.subcategories}{" "}
-              sub-categories. The courses, books and tutorials OpenSustain.tech
+              sub-categories. The courses, books and tutorials Open Sustainable Technology
               also lists are counted on their own, not as projects.
             </p>
             <p>
@@ -193,7 +193,7 @@ export default async function MethodologyPage() {
             <p>
               Nothing in the dataset places a project geographically. Every map
               and country chart here is showing the location its{" "}
-              <em>organization</em> records, and {formatNumber(102)}{" "}
+              <em>organization</em> records, and {formatNumber(facts.organizationsWithoutLocation)}{" "}
               organizations record none at all. A country&rsquo;s bar is
               therefore about where maintainers say they are, not where the
               software is used.
@@ -249,7 +249,7 @@ export default async function MethodologyPage() {
                 target="_blank"
                 rel="noreferrer"
               >
-                the OpenSustain.tech index
+                the Open Sustainable Technology index
               </a>
               ; anything about how a chart reads belongs in{" "}
               <a

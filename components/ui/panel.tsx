@@ -4,6 +4,8 @@ type PanelProps = PropsWithChildren<{
   title?: ReactNode;
   description?: ReactNode;
   className?: string;
+  /** An anchor, for panels linked to from elsewhere (About's #contact). */
+  id?: string;
   /**
    * Panels sit under the route's h1, so their titles are h2 by default. A
    * panel nested inside another section can drop to h3.
@@ -24,13 +26,14 @@ export function Panel({
   title,
   description,
   className,
+  id,
   titleAs: Title = "h2",
   notes,
   source,
   children,
 }: PanelProps) {
   return (
-    <section className={["panel", className].filter(Boolean).join(" ")}>
+    <section id={id} className={["panel", className].filter(Boolean).join(" ")}>
       {(title || description) && (
         <header className="panel-header">
           {title ? <Title className="panel-title">{title}</Title> : null}

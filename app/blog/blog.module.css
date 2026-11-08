@@ -162,3 +162,17 @@
   margin-left: 6px;
   color: var(--color-text-secondary);
 }
+
+/* Under the byline: old posts quote old counts. */
+.datedNote {
+  margin: 12px 0 0;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.datedNote a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

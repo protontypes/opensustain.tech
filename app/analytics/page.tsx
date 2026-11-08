@@ -4,9 +4,9 @@ import Link from "next/link";
 import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunburst";
 import { Avatar } from "@/components/ui/avatar";
 import { LinkList } from "@/components/ui/link-list";
+import { PageProvenance } from "@/components/ui/page-provenance";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { snapshotOf } from "@/lib/data/snapshot";
 import { loadProjectRankings, loadSummary } from "@/lib/data";
 import { loadSiteTotals } from "@/lib/data/site";
 import { routes } from "@/lib/navigation";
@@ -26,8 +26,8 @@ export const metadata: Metadata = {
 // This page is the landing spot the header's "Analytics" link points at —
 // an overview plus links into the four dashboards below it, rather than a
 // second copy of any one of them. /projects itself is not one of these links:
-// it's the OST project directory now (see DATA_CONTRACT.md), not the
-// project-rankings dashboard linked here.
+// it's the OST project directory now, not the project-rankings dashboard
+// linked here.
 const dashboards = [
   {
     href: routes.analyticsProjects,
@@ -61,7 +61,6 @@ export default async function AnalyticsPage() {
     loadSiteTotals(),
     loadProjectRankings(),
   ]);
-  const snapshot = snapshotOf(summary.as_of);
 
   // Activity is only known for projects Ecosyste.ms tracks, so the share is
   // of those, not of every listed project.
@@ -122,11 +121,7 @@ export default async function AnalyticsPage() {
       />
       {/* Scope and provenance in one line, so a reader arriving from a link
           knows how current this is. */}
-      <p className="page-provenance">
-        Figures from the snapshot of{" "}
-        <time dateTime={snapshot.iso}>{snapshot.label}</time>.{" "}
-        <Link href={routes.methodology}>How this is measured</Link>
-      </p>
+      <PageProvenance totals={totals} />
 
       <section className="key-figures" aria-label="Key figures">
         <FigureTable title="The ecosystem" rows={ecosystemFigures} />
@@ -149,6 +144,7 @@ export default async function AnalyticsPage() {
               <Link href={routes.analyticsProjects}>See the full ranking</Link>
             </>
           }
+          notes="Scores are computed by Ecosyste.ms from public activity data, not judged by the maintainers. A high rank is not an endorsement."
         >
           <ol className="leader-list">
             {topProjects.map((project, index) => (

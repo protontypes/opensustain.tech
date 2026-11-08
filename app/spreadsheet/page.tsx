@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 
 import { RedirectStub } from "@/components/seo/redirect-stub";
+import { routes } from "@/lib/navigation";
 
 // The old mkdocs nav's "Spreadsheet" tab (docs/spreadsheet.md) embedded the
-// contributor-facing Grist database as an iframe. There's no equivalent
-// widget on this site; the closest useful destination for anyone who
-// followed that link is how to actually add or edit a project.
-const DESTINATION =
-  "https://github.com/protontypes/open-sustainable-technology/blob/main/CONTRIBUTING.md";
+// Grist database as an iframe. The embed is gone but the data is not: the
+// methodology page links its CSV exports, which is what that link was for.
+const DESTINATION = `${routes.methodology}#data`;
 
 export const metadata: Metadata = {
   title: "Moved",
@@ -19,9 +18,8 @@ export default function SpreadsheetRedirectPage() {
   return (
     <RedirectStub
       to={DESTINATION}
-      destinationLabel="the contributing guide on GitHub"
-      reason="The project spreadsheet has been retired."
-      external
+      destinationLabel="the data downloads on the methodology page"
+      reason="The spreadsheet is no longer embedded here; its data is still downloadable."
     />
   );
 }

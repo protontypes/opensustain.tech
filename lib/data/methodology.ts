@@ -1,5 +1,5 @@
 import { metricCoverage } from "@/lib/charts/coverage";
-import { loadProjectRankings, loadSummary } from "@/lib/data";
+import { loadOrganizationRankings, loadProjectRankings, loadSummary } from "@/lib/data";
 import { loadSiteTotals } from "@/lib/data/site";
 import { snapshotOf, type Snapshot } from "@/lib/data/snapshot";
 import { METRIC_ORDER, metricValue, type SunburstNode } from "@/lib/sunburst/types";
@@ -26,7 +26,15 @@ export type MethodologyFacts = {
   /** The payload's own names — the raw ids read as "Dds". */
   metricLabels: Record<RankingMetricId, string>;
   duplicateNames: number;
+  /** Organizations whose record gives no country at all. */
+  organizationsWithoutLocation: number;
 };
+
+/** Organizations whose record gives no country: the gap every map and country chart carries. */
+export async function countOrganizationsWithoutLocation(): Promise<number> {
+  const { records } = await loadOrganizationRankings();
+  return records.filter((record) => !record.location_country.trim()).length;
+}
 
 /**
  * Every figure on the methodology page, computed from the payloads.
@@ -36,10 +44,11 @@ export type MethodologyFacts = {
  * afford a stale number.
  */
 export async function loadMethodologyFacts(): Promise<MethodologyFacts> {
-  const [summary, rankings, totals] = await Promise.all([
+  const [summary, rankings, totals, organizationsWithoutLocation] = await Promise.all([
     loadSummary(),
     loadProjectRankings(),
     loadSiteTotals(),
+    countOrganizationsWithoutLocation(),
   ]);
   const records = rankings.records;
 
@@ -68,5 +77,6 @@ export async function loadMethodologyFacts(): Promise<MethodologyFacts> {
       return { id, label: rankings.metric_labels[id] ?? id, ...result };
     }).sort((a, b) => a.share - b.share),
     duplicateNames: [...seen.values()].filter((count) => count > 1).length,
+    organizationsWithoutLocation,
   };
 }

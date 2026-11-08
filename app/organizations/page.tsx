@@ -11,9 +11,11 @@ import {
 import { OrganizationsMap } from "@/components/charts/organizations-map";
 import { OrganizationSunburst } from "@/components/charts/sunburst/organization-sunburst";
 import { SubcategorySunburst } from "@/components/charts/sunburst/subcategory-sunburst";
+import { PageProvenance } from "@/components/ui/page-provenance";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { loadFilters } from "@/lib/data";
+import { countOrganizationsWithoutLocation } from "@/lib/data/methodology";
 import { loadSiteTotals } from "@/lib/data/site";
 import { formatNumber } from "@/lib/format";
 
@@ -29,21 +31,27 @@ export default async function OrganizationsPage() {
   // Every payload on this page is fetched client-side by the chart that needs
   // it — crossing one into a client component serialises the whole thing into
   // the RSC stream. `filters` is 9 KB of controls and stays here.
-  const filters = await loadFilters();
+  const [filters, withoutLocation, totals] = await Promise.all([
+    loadFilters(),
+    countOrganizationsWithoutLocation(),
+    loadSiteTotals(),
+  ]);
 
   return (
     <main className="page-shell">
       <SectionHeading
         as="h1"
         title="Ecosystem Organizations"
-        description="Analyze the geographic distribution, hierarchy, and sustainability impact of organizations contributing to open-source climate tech."
+        description="Where the organizations behind open-source climate tech are based, what kind of organizations they are, and which projects and sub-categories they maintain."
       />
+      <PageProvenance totals={totals} show="metrics" />
 
       <OrganizationFiltersProvider>
       <div className="stack">
         <Panel
           title="Organization Rankings"
           description="Organizations ranked by the combined score of the projects they maintain. Filter to a category to rank by that category’s score alone; each bar takes the color of the category the organization scores highest in."
+          notes="Scores are computed by Ecosyste.ms from public activity data, not judged by the maintainers. A high rank is not an endorsement."
         >
           <OrganizationRankingsChart
             categories={filters.categories}
@@ -62,7 +70,7 @@ export default async function OrganizationsPage() {
         <Panel
           className="panel--viz"
           title="Organizations by Sub-Category"
-          description="The 81 technical sub-categories, sized by how many organizations work in each and colored by their parent ecosystem category. Click a sub-category to see the organizations behind it, and filter by country or organization type."
+          description="Every technical sub-category, plus Education, sized by how many organizations work in each and colored by their parent ecosystem category. Click a sub-category to see the organizations behind it, and filter by country or organization type."
         >
           <SubcategorySunburst
             categoryColors={filters.category_colors}
@@ -74,7 +82,7 @@ export default async function OrganizationsPage() {
           className="panel--viz"
           title="Where the Organizations Are"
           description="Every organization behind these projects, by the country it records. Shade the map by projects or by organizations; countries are joined on their ISO 3166-1 alpha-3 code."
-          notes="Projects have no country of their own; this is where the organization behind them is based, and 102 of those give no location at all. Singapore is drawn from its own bounding box, which the map's source omits at this scale."
+          notes={`Projects have no country of their own; this is where the organization behind them is based, and ${formatNumber(withoutLocation)} of those give no location at all. Singapore is drawn from its own bounding box, which the map's source omits at this scale.`}
         >
           <OrganizationsMap />
         </Panel>

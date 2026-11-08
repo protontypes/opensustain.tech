@@ -31,7 +31,7 @@ export function CommunityBanner() {
         {/* One span, so the sentence keeps real word spaces and wraps inside
             itself; as bare text nodes each run becomes its own flex item. */}
         <span>
-          OpenSustain.tech is a community project.{" "}
+          Open Sustainable Technology is a community project.{" "}
           <a href={communityDiscordUrl} target="_blank" rel="noreferrer">
             Join us on Discord
           </a>

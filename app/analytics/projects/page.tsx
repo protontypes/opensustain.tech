@@ -17,22 +17,27 @@ import {
 import { ProjectFiltersProvider } from "@/components/charts/project-filters";
 import { ProjectRankingsChart } from "@/components/charts/project-rankings-chart";
 import { ProjectsOverTimeChart } from "@/components/charts/projects-over-time-chart";
+import { PageProvenance } from "@/components/ui/page-provenance";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { loadFilters } from "@/lib/data";
+import { loadSiteTotals } from "@/lib/data/site";
+import { formatNumber } from "@/lib/format";
 
-export const metadata: Metadata = {
-  title: "Project Analytics",
-  description:
-    "Rank 2,691 open-source climate and sustainability projects by nine metrics, track how the ecosystem has grown, and see the licences, languages and registries behind them.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const totals = await loadSiteTotals();
+  return {
+    title: "Project Analytics",
+    description: `Rank the ${formatNumber(totals.projects_with_metrics)} tracked open-source climate and sustainability projects by nine metrics, track how the ecosystem has grown, and see the licences, languages and registries behind them.`,
+  };
+}
 
 export default async function ProjectsPage() {
   // Every payload this page draws is fetched client-side by the chart that
   // needs it — loading them here serialised each one into the RSC stream on
   // every navigation, and the rankings and lifecycle files alone are ~1.7 MB
   // and ~1.4 MB. `filters` is 9 KB of controls and stays here.
-  const filters = await loadFilters();
+  const [filters, totals] = await Promise.all([loadFilters(), loadSiteTotals()]);
 
   return (
     <main className="page-shell">
@@ -41,6 +46,7 @@ export default async function ProjectsPage() {
         title="Project Analytics"
         description="Detailed insights into project rankings, lifecycle trends, and community attributes across the climate tech ecosystem."
       />
+      <PageProvenance totals={totals} show="metrics" />
 
       <ProjectFiltersProvider
         categories={filters.categories}
@@ -51,6 +57,7 @@ export default async function ProjectsPage() {
         <Panel
           title="Project Rankings"
           description="Rank every tracked project by any of nine metrics, active or all. Click a bar to open its repository."
+          notes="Scores are computed by Ecosyste.ms from public activity data, not judged by the maintainers. A high rank is not an endorsement."
         >
           <ProjectRankingsChart />
         </Panel>

@@ -2,8 +2,8 @@
  * Styles scoped to /about only (CSS Module, not app/globals.css).
  *
  * Kept out of the shared stylesheet on purpose: several other pages are
- * being built in this same repo at the same time (blog, presentations,
- * privacy policy), all needing their own new classes, and app/globals.css
+ * being built in this same repo at the same time (blog, presentations),
+ * all needing their own new classes, and app/globals.css
  * is the one file all of them would otherwise be editing concurrently.
  * Custom properties (--color-*, --font-*, --color-border, ...) still come
  * from globals.css — CSS Modules only scope class *names*, not variables.
@@ -123,27 +123,6 @@
 
 .linkPill:hover {
   border-color: var(--color-link);
-}
-
-/*
- * Deliberately loud (dashed border, warning color) so it reads as
- * unfinished to whoever edits lib/data/team.ts next — not styled to blend
- * in like the rest of the card.
- */
-.todo {
-  display: inline-block;
-  width: fit-content;
-  margin-top: 8px;
-  font-family: var(--font-heading);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 6px;
-  border: 1px dashed var(--color-warning);
-  color: var(--color-warning);
-  background: var(--color-warning-bg);
 }
 
 .sectionNote {

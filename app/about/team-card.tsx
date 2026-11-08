@@ -38,21 +38,9 @@ export function TeamCard({ member }: { member: TeamMember }) {
       )}
 
       <p className={styles.name}>{displayName}</p>
-      {member.fullName === null ? (
-        <span className={styles.todo}>TODO: full name</span>
-      ) : null}
+      {member.role ? <p className={styles.role}>{member.role}</p> : null}
 
-      {member.role ? (
-        <p className={styles.role}>{member.role}</p>
-      ) : (
-        <span className={styles.todo}>TODO: role</span>
-      )}
-
-      {member.bio ? (
-        <p className={styles.bio}>{member.bio}</p>
-      ) : (
-        <span className={styles.todo}>TODO: bio</span>
-      )}
+      {member.bio ? <p className={styles.bio}>{member.bio}</p> : null}
 
       {member.links.length > 0 ? (
         <div className={styles.links}>
@@ -68,9 +56,7 @@ export function TeamCard({ member }: { member: TeamMember }) {
             </a>
           ))}
         </div>
-      ) : (
-        <span className={styles.todo}>TODO: links (GitHub / LinkedIn / site)</span>
-      )}
+      ) : null}
     </li>
   );
 }

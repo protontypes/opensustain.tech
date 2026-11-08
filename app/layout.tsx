@@ -20,20 +20,20 @@ export const metadata: Metadata = {
   // different pages were indistinguishable in a tab strip, in browser
   // history and in a shared link. Kept per-route here too.
   title: {
-    default: "OpenSustain.Tech",
-    template: "%s · OpenSustain.Tech",
+    default: "Open Sustainable Technology",
+    template: "%s · Open Sustainable Technology",
   },
   description: SITE_DESCRIPTION,
   openGraph: {
-    title: "OpenSustain.Tech",
+    title: "Open Sustainable Technology",
     description: SITE_DESCRIPTION,
     url: SITE_URL,
-    siteName: "OpenSustain.Tech",
+    siteName: "Open Sustainable Technology",
     images: ["/images/earth.png"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "OpenSustain.Tech",
+    title: "Open Sustainable Technology",
     description: SITE_DESCRIPTION,
     images: ["/images/earth.png"],
   },
@@ -102,9 +102,14 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        {/* First in the tab order, so keyboard and screen-reader users can
+            jump past the banner and the header's nine stops. */}
+        <a className="skip-link" href="#content">
+          Skip to content
+        </a>
         <CommunityBanner />
         <SiteHeader />
-        <div className="site-content">
+        <div className="site-content" id="content" tabIndex={-1}>
           {children}
         </div>
         <SiteFooter snapshot={snapshot} />

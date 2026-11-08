@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { withBasePath } from "@/lib/base-path";
 import type { Snapshot } from "@/lib/data/snapshot";
-import { footerNavigation, routes, socialLinks } from "@/lib/navigation";
+import { footerNavigation, socialLinks } from "@/lib/navigation";
 
 export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
   return (
@@ -31,7 +31,7 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
             </p>
             {/* The year comes from the data, not the visitor's clock. */}
             <p className="footer-copyright">
-              © {snapshot.year} OpenSustain.tech, published under{" "}
+              © {snapshot.year} Open Sustainable Technology, published under{" "}
               <a
                 href="https://creativecommons.org/licenses/by/4.0/"
                 target="_blank"
@@ -39,7 +39,7 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
               >
                 CC BY 4.0
               </a>
-              . <Link href={routes.privacyPolicy}>Privacy policy</Link>
+              .
             </p>
           </div>
           {footerNavigation.map((column) => (

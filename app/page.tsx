@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunburst";
 import { LegacyAnchorRedirect } from "@/components/seo/legacy-anchor-redirect";
 import { LinkList, type LinkListItem } from "@/components/ui/link-list";
+import { PageProvenance } from "@/components/ui/page-provenance";
 import { loadFilters } from "@/lib/data";
 import { loadSiteTotals } from "@/lib/data/site";
 import { formatNumber } from "@/lib/format";
@@ -69,9 +70,12 @@ export default async function HomePage() {
            * describe the chart beside them, they are not the point of the page.
            */}
           <p className="home-facts">
-            {formatNumber(totals.projects)} projects, maintained by{" "}
-            {formatNumber(totals.organizations)} organizations and{" "}
-            {formatNumber(totals.contributors)} contributors, sorted into{" "}
+            <Link href={routes.projects}>{formatNumber(totals.projects)} projects</Link>,
+            maintained by{" "}
+            <Link href={routes.organizations}>
+              {formatNumber(totals.organizations)} organizations
+            </Link>{" "}
+            and {formatNumber(totals.contributors)} contributors, sorted into{" "}
             {totals.categories} categories and {totals.subcategories}{" "}
             subcategories. Plus{" "}
             <Link href={routes.education}>
@@ -79,6 +83,7 @@ export default async function HomePage() {
             </Link>{" "}
             to get started with.
           </p>
+          <PageProvenance totals={totals} className="page-provenance--home" />
           <div className="home-actions">
             <Link className="home-action home-action--primary" href={routes.projects}>
               Browse the directory
@@ -95,6 +100,11 @@ export default async function HomePage() {
         </div>
         <div className="home-hero__chart">
           <EcosystemSunburst variant="hero" selectionSlot="hero-selection" />
+          {/* The ring needs a pointer and sight; the directory holds the same
+              categories as a plain, filterable list. */}
+          <p className="home-hero__alternative">
+            <Link href={routes.projects}>Browse the same categories as a list</Link>
+          </p>
         </div>
       </section>
 

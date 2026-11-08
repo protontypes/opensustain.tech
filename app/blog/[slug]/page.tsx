@@ -67,6 +67,13 @@ export default async function BlogPostPage({ params }: PageProps) {
               {formatBlogDate(post.date)}
             </time>
           </div>
+          {/* Posts quote the counts of their day ("2,200+ projects"), which
+              the live totals overtake; say so before a reader compares. */}
+          <p className={styles.datedNote}>
+            Figures in this article were correct when it was published. For
+            today&rsquo;s numbers, see the <Link href={routes.projects}>directory</Link>{" "}
+            and <Link href={routes.analytics}>analytics</Link>.
+          </p>
         </header>
 
         {post.image ? (

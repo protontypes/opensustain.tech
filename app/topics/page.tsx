@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 
 import { KeywordCountsChart } from "@/components/charts/keyword-counts-chart";
 import { TopicsHeatmapChart } from "@/components/charts/topics-heatmap-chart";
+import { PageProvenance } from "@/components/ui/page-provenance";
 import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { loadKeywordCounts, loadWordcloud } from "@/lib/data";
+import { loadSiteTotals } from "@/lib/data/site";
 
 export const metadata: Metadata = {
   title: "Topics",
@@ -16,9 +18,10 @@ export default async function TopicsPage() {
   // topics-heatmap is ~820 KB; the chart fetches it from /data instead of
   // having it serialised into the RSC stream. keyword-counts is 17 KB and
   // stays server-loaded.
-  const [keywordCounts, wordcloud] = await Promise.all([
+  const [keywordCounts, wordcloud, totals] = await Promise.all([
     loadKeywordCounts(),
     loadWordcloud(),
+    loadSiteTotals(),
   ]);
 
   return (
@@ -28,6 +31,7 @@ export default async function TopicsPage() {
         title="Topic & Keyword Analysis"
         description="Explore the most frequent terms and thematic clusters extracted from project documentation and README files."
       />
+      <PageProvenance totals={totals} show="metrics" />
 
       <div className="stack">
         <Panel

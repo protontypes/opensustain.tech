@@ -29,8 +29,8 @@ export default function RouteError({
         <h1>This page could not be drawn</h1>
         <p className="section-description">
           The charts on this page read a data snapshot that is regenerated
-          nightly. If it changed shape, this is what you get. Nothing you did
-          caused it.
+          whenever the project list or the analytics data changes. If it
+          changed shape, this is what you get. Nothing you did caused it.
         </p>
       </div>
 

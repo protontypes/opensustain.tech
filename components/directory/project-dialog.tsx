@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 
 import { formatCompactNumber, formatDecimal, formatNumber } from "@/lib/format";
-import { contributeLink } from "@/lib/navigation";
+import { communityDiscordUrl, ostGithubUrl, routes } from "@/lib/navigation";
 import { categoryToken } from "@/lib/sunburst/color";
 import type { DirectoryProject } from "@/lib/types/directory";
 
@@ -43,6 +44,22 @@ function projectStats(project: DirectoryProject): Stat[] {
   if (created) stats.push({ label: "Created", value: created });
   if (lastCommit) stats.push({ label: "Last commit", value: lastCommit });
   return stats.filter((stat): stat is Stat => stat !== null);
+}
+
+// A new issue on the list's repo with the entry already named, so a
+// correction does not start with "which project?".
+function correctionUrl(project: DirectoryProject): string {
+  const category = [project.category, project.subcategory].filter(Boolean).join(" › ");
+  const body = [
+    `Project: ${project.name}`,
+    `Repository: ${project.url}`,
+    `Category: ${category}`,
+    "",
+    "What is wrong or missing:",
+    "",
+  ].join("\n");
+  const params = new URLSearchParams({ title: `Correction: ${project.name}`, body });
+  return `${ostGithubUrl}/issues/new?${params.toString()}`;
 }
 
 type ProjectLink = { href: string; label: string; icon: string };
@@ -182,6 +199,13 @@ export function ProjectDialog({
                   </div>
                 ))}
               </dl>
+              <p className="project-dialog__source">
+                Collected automatically by Ecosyste.ms, not reviewed by the
+                maintainers.{" "}
+                <Link className="inline-link" href={routes.methodology}>
+                  How these are measured
+                </Link>
+              </p>
             </section>
           ) : null}
 
@@ -237,10 +261,16 @@ export function ProjectDialog({
           </section>
 
           <p className="project-dialog__footer">
+            The name, description and category come from the curated list.
             Something wrong or missing?{" "}
-            <a className="inline-link" href={contributeLink.href} target="_blank" rel="noreferrer">
-              Suggest an edit on GitHub
+            <a className="inline-link" href={correctionUrl(project)} target="_blank" rel="noreferrer">
+              Report it on GitHub
+            </a>{" "}
+            or{" "}
+            <a className="inline-link" href={communityDiscordUrl} target="_blank" rel="noreferrer">
+              tell us on Discord
             </a>
+            .
           </p>
         </div>
       ) : null}

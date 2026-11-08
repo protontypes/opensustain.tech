@@ -505,6 +505,45 @@ html {
   color: var(--color-link);
 }
 
+/* Hidden until focused: the first Tab on any page lands here. */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2000;
+  padding: 10px 16px;
+  background: var(--color-card-bg);
+  color: var(--color-link);
+  border: 2px solid var(--color-link);
+  border-radius: var(--radius-control);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* The skip target takes focus without drawing a ring around the whole page. */
+.site-content:focus {
+  outline: none;
+}
+
+.home-hero__alternative {
+  margin: 12px 0 0;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 14px;
+}
+
+.home-hero__alternative a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* --- Theme Toggle --- */
 .theme-toggle {
   display: inline-flex;
@@ -659,7 +698,7 @@ html {
    column never holds two primary buttons at once. */
 @media (min-width: 1025px) {
   .home-hero__text:has(.hero-selection:not(:empty))
-    :is(.home-lede, .home-facts, .home-actions) {
+    :is(.home-lede, .home-facts, .page-provenance--home, .home-actions) {
     display: none;
   }
 }
@@ -734,6 +773,18 @@ html {
   margin: -24px 0 40px;
   font-size: 14px;
   color: var(--color-text-secondary);
+}
+
+/* On the home hero it follows the totals sentence instead of a heading. */
+.page-provenance--home {
+  margin: -20px 0 32px;
+}
+
+.home-facts a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .page-provenance a,
@@ -3099,6 +3150,14 @@ a.panel:hover .panel-title {
 
 .project-dialog__link-arrow {
   flex: none;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* Whose numbers these are: collected, not curated. */
+.project-dialog__source {
+  margin: 10px 0 0;
+  font-family: var(--font-heading);
   font-size: 12px;
   color: var(--color-text-secondary);
 }

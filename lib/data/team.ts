@@ -57,7 +57,7 @@ export const team: TeamMember[] = [
     givenName: "Andrew Nesbit",
     fullName: "Andrew Nesbitt",
     role: "Creator of ecosyste.ms & Libraries.io",
-    bio: "Open source metadata specialist behind ecosyste.ms, the open dataset and API that powers OpenSustain.tech's project and organization data. Previously built Libraries.io and worked at GitHub and Tidelift.",
+    bio: "Open source metadata specialist behind ecosyste.ms, the open dataset and API that powers Open Sustainable Technology's project and organization data. Previously built Libraries.io and worked at GitHub and Tidelift.",
     avatarUrl: "https://avatars.githubusercontent.com/u/1060?v=4",
     links: [
       { label: "GitHub", url: "https://github.com/andrewnez" },
@@ -93,7 +93,7 @@ export const team: TeamMember[] = [
     givenName: "Richard",
     fullName: "Richard Littauer",
     role: "Host, Sustain & OSS for Climate podcasts",
-    bio: "Open source maintainer and community builder. Main host of the Sustain podcast, with hundreds of conversations on what keeps open source going, and host of OSS for Climate, the podcast made in collaboration with OpenSustain.tech.",
+    bio: "Open source maintainer and community builder. Main host of the Sustain podcast, with hundreds of conversations on what keeps open source going, and host of OSS for Climate, the podcast made in collaboration with Open Sustainable Technology.",
     avatarUrl: "https://avatars.githubusercontent.com/u/910753?v=4",
     links: [
       { label: "GitHub", url: "https://github.com/RichardLitt" },

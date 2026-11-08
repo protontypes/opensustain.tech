@@ -23,7 +23,6 @@ const paths: string[] = [
   routes.blog,
   routes.talks,
   routes.about,
-  routes.privacyPolicy,
 ];
 
 function withTrailingSlash(path: string): string {

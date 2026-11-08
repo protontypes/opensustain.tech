@@ -14,7 +14,7 @@ import styles from "./blog.module.css";
 export const metadata: Metadata = {
   title: "Articles",
   description:
-    "Articles from the OpenSustain.tech community on open source, climate technology and environmental sustainability.",
+    "Articles from the Open Sustainable Technology community on open source, climate technology and environmental sustainability.",
 };
 
 export default async function BlogIndexPage() {

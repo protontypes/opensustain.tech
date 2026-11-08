@@ -41,12 +41,11 @@ export const routes = {
   blogPost: (slug: string) => `/blog/${slug}` as const,
   talks: "/blog/talks",
   about: "/about",
-  privacyPolicy: "/privacy-policy",
 } as const;
 
 /** Shared under the "Media" heading on both of its tabs, /blog and /blog/talks. */
 export const MEDIA_DESCRIPTION =
-  "Articles and conference talks from the OpenSustain.tech community on open source, climate technology and environmental sustainability.";
+  "Articles and conference talks from the Open Sustainable Technology community on open source, climate technology and environmental sustainability.";
 
 /**
  * The analytics dashboards, in the order the header's Analytics dropdown and
@@ -96,7 +95,7 @@ export const getInvolvedNavigation = [
   {
     href: communityDiscordUrl,
     label: "Join the Discord",
-    description: "Talk with the OpenSustain.tech community",
+    description: "Talk with the Open Sustainable Technology community",
     external: true,
   },
 ] as const;
@@ -134,6 +133,7 @@ export const footerNavigation = [
       { href: routes.blog, label: "Articles" },
       { href: routes.talks, label: "Talks" },
       { href: routes.about, label: "About" },
+      { href: `${routes.about}#contact`, label: "Contact" },
     ],
   },
 ] as const;

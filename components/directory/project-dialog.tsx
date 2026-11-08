@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 
-import { formatCompactNumber, formatDecimal, formatNumber } from "@/lib/format";
+import { Avatar } from "@/components/ui/avatar";
+import { formatCompactNumber, formatDecimal, formatLicense, formatNumber } from "@/lib/format";
 import { communityDiscordUrl, ostGithubUrl, routes } from "@/lib/navigation";
 import { categoryToken } from "@/lib/sunburst/color";
 import type { DirectoryProject } from "@/lib/types/directory";
@@ -17,33 +18,42 @@ import {
 
 type Stat = { label: string; value: string };
 
-function projectStats(project: DirectoryProject): Stat[] {
-  const stats: (Stat | null)[] = [
-    typeof project.stars === "number"
-      ? { label: "Stars", value: formatCompactNumber(project.stars) }
-      : null,
-    typeof project.contributors === "number"
-      ? { label: "Contributors", value: formatNumber(project.contributors) }
-      : null,
-    typeof project.total_commits === "number"
-      ? { label: "Commits", value: formatCompactNumber(project.total_commits) }
-      : null,
-    // Zero for most projects that publish no package, so only shown when real.
-    project.downloads_last_month
-      ? { label: "Downloads / month", value: formatCompactNumber(project.downloads_last_month) }
-      : null,
-    project.score
-      ? { label: "Ecosyste.ms score", value: formatDecimal(project.score, 1) }
-      : null,
-    project.language ? { label: "Language", value: project.language } : null,
-    project.license ? { label: "License", value: project.license } : null,
-    project.platform ? { label: "Platform", value: project.platform } : null,
-  ];
-  const created = formatMonthYear(project.project_created_at);
+const present = (stats: (Stat | null)[]) => stats.filter((stat): stat is Stat => stat !== null);
+
+/**
+ * Four headline figures as a strip, the rest as a short list: ten identical
+ * tiles gave a language name the same weight as a contributor count. Platform
+ * is left out; the repository link below already names the host.
+ */
+function projectStats(project: DirectoryProject): { headline: Stat[]; details: Stat[] } {
   const lastCommit = formatMonthYear(project.latest_commit_activity);
-  if (created) stats.push({ label: "Created", value: created });
-  if (lastCommit) stats.push({ label: "Last commit", value: lastCommit });
-  return stats.filter((stat): stat is Stat => stat !== null);
+  const created = formatMonthYear(project.project_created_at);
+  return {
+    headline: present([
+      typeof project.stars === "number"
+        ? { label: "Stars", value: formatCompactNumber(project.stars) }
+        : null,
+      typeof project.contributors === "number"
+        ? { label: "Contributors", value: formatNumber(project.contributors) }
+        : null,
+      typeof project.total_commits === "number"
+        ? { label: "Commits", value: formatCompactNumber(project.total_commits) }
+        : null,
+      lastCommit ? { label: "Last commit", value: lastCommit } : null,
+    ]),
+    details: present([
+      project.language ? { label: "Language", value: project.language } : null,
+      project.license ? { label: "License", value: formatLicense(project.license) } : null,
+      // Zero for most projects that publish no package, so only shown when real.
+      project.downloads_last_month
+        ? { label: "Downloads / month", value: formatCompactNumber(project.downloads_last_month) }
+        : null,
+      project.score
+        ? { label: "Ecosyste.ms score", value: formatDecimal(project.score, 1) }
+        : null,
+      created ? { label: "Created", value: created } : null,
+    ]),
+  };
 }
 
 // A new issue on the list's repo with the entry already named, so a
@@ -112,7 +122,7 @@ export function ProjectDialog({
     if (!project && dialog.open) dialog.close();
   }, [project]);
 
-  const stats = project ? projectStats(project) : [];
+  const stats = project ? projectStats(project) : { headline: [], details: [] };
   const links = project ? projectLinks(project) : [];
   const keywords = project?.keywords ?? [];
 
@@ -142,18 +152,7 @@ export function ProjectDialog({
           </button>
 
           <header className="project-dialog__header">
-            {project.avatar_url ? (
-              // Static export + a third-party image host: plain <img>, as
-              // components/ui/avatar.tsx does. Decorative beside the name.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="project-dialog__avatar"
-                src={project.avatar_url}
-                alt=""
-                width={56}
-                height={56}
-              />
-            ) : null}
+            <Avatar src={project.avatar_url} name={project.name} size={56} square />
             <div className="project-dialog__heading">
               <h2 id="project-dialog-title" className="project-dialog__title">
                 {project.name}
@@ -186,19 +185,31 @@ export function ProjectDialog({
             </p>
           ) : null}
 
-          {stats.length > 0 ? (
+          {stats.headline.length + stats.details.length > 0 ? (
             <section aria-labelledby="project-dialog-stats">
               <h3 id="project-dialog-stats" className="project-dialog__section-title">
                 At a glance
               </h3>
-              <dl className="project-dialog__stats">
-                {stats.map((stat) => (
-                  <div key={stat.label} className="project-dialog__stat">
-                    <dt>{stat.label}</dt>
-                    <dd>{stat.value}</dd>
-                  </div>
-                ))}
-              </dl>
+              {stats.headline.length > 0 ? (
+                <dl className="project-dialog__metrics">
+                  {stats.headline.map((stat) => (
+                    <div key={stat.label} className="project-dialog__metric">
+                      <dt>{stat.label}</dt>
+                      <dd>{stat.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
+              {stats.details.length > 0 ? (
+                <dl className="project-dialog__facts">
+                  {stats.details.map((stat) => (
+                    <div key={stat.label} className="project-dialog__fact">
+                      <dt>{stat.label}</dt>
+                      <dd>{stat.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
               <p className="project-dialog__source">
                 Collected automatically by Ecosyste.ms, not reviewed by the
                 maintainers.{" "}
@@ -221,7 +232,7 @@ export function ProjectDialog({
                       type="button"
                       className="project-dialog__topic"
                       onClick={() => onKeyword(keyword)}
-                      aria-label={`Search the directory for ${keyword}`}
+                      aria-label={`Show projects tagged ${keyword}`}
                     >
                       <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
                       {keyword}

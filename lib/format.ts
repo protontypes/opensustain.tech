@@ -35,3 +35,26 @@ export function pluralize(
 ): string {
   return `${formatNumber(count)} ${count === 1 ? singular : plural}`;
 }
+
+/**
+ * SPDX identifiers arrive lower-cased. Segments that are acronyms (and single
+ * letters, as in CERN-OHL-S) go up, the rest are capitalised: "bsd-3-clause"
+ * → "BSD-3-Clause", "apache-2.0" → "Apache-2.0", "cern-ohl-s-2.0" →
+ * "CERN-OHL-S-2.0". Anything not covered keeps a readable capitalised form.
+ */
+const LICENSE_ACRONYMS = new Set([
+  "0bsd", "agpl", "bsd", "bsl", "by", "cc", "cc0", "cecill", "cern", "epl",
+  "eupl", "gpl", "isc", "lgpl", "mit", "mpl", "nc", "nd", "ofl", "ogl", "ohl",
+  "sa", "upl",
+]);
+
+export function formatLicense(raw: string): string {
+  return raw
+    .split("-")
+    .map((part) =>
+      LICENSE_ACRONYMS.has(part) || part.length === 1
+        ? part.toUpperCase()
+        : part.charAt(0).toUpperCase() + part.slice(1),
+    )
+    .join("-");
+}

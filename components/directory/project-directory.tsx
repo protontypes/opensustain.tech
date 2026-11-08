@@ -8,6 +8,8 @@ import { formatCompactNumber, formatNumber, pluralize } from "@/lib/format";
 import { categoryColor } from "@/lib/sunburst/color";
 import type { DirectoryPayload, DirectoryProject } from "@/lib/types/directory";
 
+import { Avatar } from "@/components/ui/avatar";
+
 import { ProjectDialog } from "./project-dialog";
 import { formatMonthYear } from "./project-format";
 
@@ -25,9 +27,17 @@ import { formatMonthYear } from "./project-format";
  */
 function matchesQuery(project: DirectoryProject, query: string): boolean {
   if (!query) return true;
-  // Topics are searched too, so a topic chip in the overlay finds its siblings.
   const haystack = `${project.name} ${project.description} ${(project.keywords ?? []).join(" ")}`.toLowerCase();
   return haystack.includes(query);
+}
+
+/**
+ * A topic chip filters by the tag itself. Routed through the free-text search
+ * it matched substrings, so the topic "r" found 2,756 of 2,762 projects.
+ */
+function hasTopic(project: DirectoryProject, topic: string): boolean {
+  if (!topic) return true;
+  return (project.keywords ?? []).some((keyword) => keyword.toLowerCase() === topic);
 }
 
 /** "All categories" / "All subcategories" sentinel used both in state and the URL. */
@@ -118,10 +128,13 @@ function ProjectRow({
     <li>
       <article className="directory-row">
         <div className="directory-row__main">
-          <h3 className="directory-row__title">
-            <OpenButton project={project} onOpen={onOpen} />
-          </h3>
-          <p className="directory-row__description">{project.description}</p>
+          <Avatar src={project.avatar_url} name={project.name} size={24} square />
+          <div className="directory-row__text">
+            <h3 className="directory-row__title">
+              <OpenButton project={project} onOpen={onOpen} />
+            </h3>
+            <p className="directory-row__description">{project.description}</p>
+          </div>
         </div>
         {/* Each cell names itself for a screen reader; sighted readers get the
             column header above the list instead. */}
@@ -131,7 +144,11 @@ function ProjectRow({
               <span className="visually-hidden">Language: </span>
               {project.language}
             </>
-          ) : null}
+          ) : (
+            <span className="directory-row__missing" aria-label="Language not reported">
+              –
+            </span>
+          )}
         </span>
         <span className="directory-row__cell directory-row__cell--stat">
           {typeof project.stars === "number" ? (
@@ -139,7 +156,11 @@ function ProjectRow({
               <span className="visually-hidden">Stars: </span>
               {formatCompactNumber(project.stars)}
             </>
-          ) : null}
+          ) : (
+            <span className="directory-row__missing" aria-label="Stars not available">
+              –
+            </span>
+          )}
         </span>
         <span className="directory-row__cell directory-row__cell--activity">
           {activity ? (
@@ -305,6 +326,7 @@ export function ProjectDirectory() {
   const { params, write } = useUrlState();
 
   const [query, setQuery] = useState("");
+  const [topic, setTopic] = useState("");
   const [category, setCategory] = useState(ALL);
   const [subcategory, setSubcategory] = useState(ALL);
   const [page, setPage] = useState(1);
@@ -318,6 +340,7 @@ export function ProjectDirectory() {
   useEffect(() => {
     if (!params) return;
     setQuery(param(params, "q", ""));
+    setTopic(param(params, "topic", ""));
     setCategory(param(params, "cat", ALL));
     setSubcategory(param(params, "sub", ALL));
     const pageParam = Number(param(params, "page", "1"));
@@ -330,11 +353,15 @@ export function ProjectDirectory() {
   /** Updates one or more filters, writes them to the address bar, and resets
    * to page 1 unless the patch is itself a page change. */
   const applyFilters = useCallback(
-    (patch: { q?: string; cat?: string; sub?: string; page?: number }) => {
+    (patch: { q?: string; topic?: string; cat?: string; sub?: string; page?: number }) => {
       const url: Record<string, string | null> = {};
       if (patch.q !== undefined) {
         setQuery(patch.q);
         url.q = patch.q || null;
+      }
+      if (patch.topic !== undefined) {
+        setTopic(patch.topic);
+        url.topic = patch.topic || null;
       }
       if (patch.cat !== undefined) {
         setCategory(patch.cat);
@@ -381,7 +408,7 @@ export function ProjectDirectory() {
     (keyword: string) => {
       pushedOverlay.current = false;
       write({ project: null });
-      applyFilters({ q: keyword, cat: ALL });
+      applyFilters({ topic: keyword, q: "", cat: ALL });
     },
     [write, applyFilters],
   );
@@ -404,12 +431,14 @@ export function ProjectDirectory() {
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
+    const normalizedTopic = topic.trim().toLowerCase();
     return allProjects.filter((project) => {
       if (category !== ALL && project.category !== category) return false;
       if (subcategory !== ALL && (project.subcategory ?? "General") !== subcategory) return false;
+      if (!hasTopic(project, normalizedTopic)) return false;
       return matchesQuery(project, normalizedQuery);
     });
-  }, [allProjects, query, category, subcategory]);
+  }, [allProjects, query, topic, category, subcategory]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(page, 1), totalPages);
@@ -443,6 +472,19 @@ export function ProjectDirectory() {
   if (!data) {
     return <DirectorySkeleton />;
   }
+
+  // Every filter in force, each removable on its own: a topic set from the
+  // overlay has no control of its own on the page to undo it.
+  const activeFilters: { key: string; label: string; clear: () => void }[] = [
+    query ? { key: "q", label: `Search: ${query}`, clear: () => applyFilters({ q: "" }) } : null,
+    topic ? { key: "topic", label: `Topic: ${topic}`, clear: () => applyFilters({ topic: "" }) } : null,
+    category !== ALL
+      ? { key: "cat", label: `Category: ${category}`, clear: () => applyFilters({ cat: ALL }) }
+      : null,
+    subcategory !== ALL
+      ? { key: "sub", label: `Subcategory: ${subcategory}`, clear: () => applyFilters({ sub: ALL }) }
+      : null,
+  ].filter((filter): filter is { key: string; label: string; clear: () => void } => filter !== null);
 
   const rangeStart = filtered.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(filtered.length, currentPage * PAGE_SIZE);
@@ -487,12 +529,44 @@ export function ProjectDirectory() {
         </label>
         <p className="directory-count">
           {formatNumber(filtered.length)} of {formatNumber(data.totals.projects)} projects
-          {query || category !== ALL || subcategory !== ALL ? " match your filters" : ""}
+          {activeFilters.length > 0 ? " match your filters" : ""}
         </p>
       </div>
 
+      {activeFilters.length > 0 ? (
+        <ul className="directory-filters" aria-label="Active filters">
+          {activeFilters.map((filter) => (
+            <li key={filter.key}>
+              <button
+                type="button"
+                className="directory-filter"
+                onClick={filter.clear}
+                aria-label={`Remove filter ${filter.label}`}
+              >
+                {filter.label}
+                <span aria-hidden="true">×</span>
+              </button>
+            </li>
+          ))}
+          {activeFilters.length > 1 ? (
+            <li>
+              <button
+                type="button"
+                className="directory-filters__clear"
+                onClick={() => applyFilters({ q: "", topic: "", cat: ALL })}
+              >
+                Clear all
+              </button>
+            </li>
+          ) : null}
+        </ul>
+      ) : null}
+
       {filtered.length === 0 ? (
-        <p className="panel-description">No projects match “{query}”. Try a different search or filter.</p>
+        <p className="panel-description">
+          No projects match {activeFilters.map((filter) => filter.label).join(", ")}. Remove a
+          filter above to widen the search.
+        </p>
       ) : (
         <>
           {/* One header for every group's columns, on the rows' own grid. */}

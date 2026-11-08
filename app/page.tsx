@@ -4,6 +4,7 @@ import { EcosystemSunburst } from "@/components/charts/sunburst/ecosystem-sunbur
 import { LegacyAnchorRedirect } from "@/components/seo/legacy-anchor-redirect";
 import { LinkList, type LinkListItem } from "@/components/ui/link-list";
 import { PageProvenance } from "@/components/ui/page-provenance";
+import { withBasePath } from "@/lib/base-path";
 import { loadFilters } from "@/lib/data";
 import { loadSiteTotals } from "@/lib/data/site";
 import { formatNumber } from "@/lib/format";
@@ -84,6 +85,20 @@ export default async function HomePage() {
             to get started with.
           </p>
           <PageProvenance totals={totals} className="page-provenance--home" />
+          {/* Beside the main action, not across the page in the chart's corner.
+              A plain GET form: /projects reads ?q= into its own search. */}
+          <form className="home-search" action={withBasePath(routes.projects)} role="search">
+            <label className="visually-hidden" htmlFor="home-search">
+              Search the directory
+            </label>
+            <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+            <input
+              id="home-search"
+              type="search"
+              name="q"
+              placeholder={`Search ${formatNumber(totals.projects)} projects, e.g. "solar forecasting"`}
+            />
+          </form>
           <div className="home-actions">
             <Link className="home-action home-action--primary" href={routes.projects}>
               Browse the directory

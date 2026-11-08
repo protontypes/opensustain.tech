@@ -6,15 +6,24 @@ export type LinkListItem = {
   description: string;
   /** Opens in a new tab, for a destination off this site. */
   external?: boolean;
+  /** A short kind label beside the title ("Repository", "Video"). */
+  tag?: string;
 };
 
 /**
  * Where to go next, as plain links with a line each — the quiet alternative to
  * a grid of cards, for lists that should read as secondary to the page.
  */
-export function LinkList({ items }: { items: LinkListItem[] }) {
+export function LinkList({
+  items,
+  compact = false,
+}: {
+  items: LinkListItem[];
+  /** Smaller titles, for long reference lists rather than a page's next steps. */
+  compact?: boolean;
+}) {
   return (
-    <ul className="link-list">
+    <ul className={compact ? "link-list link-list--compact" : "link-list"}>
       {items.map((item) => (
         <li key={item.href}>
           {item.external ? (
@@ -31,6 +40,7 @@ export function LinkList({ items }: { items: LinkListItem[] }) {
               {item.title}
             </Link>
           )}
+          {item.tag ? <span className="link-list__tag">{item.tag}</span> : null}
           <p>{item.description}</p>
         </li>
       ))}

@@ -31,7 +31,7 @@ export default async function AboutPage() {
       />
 
       <div className="stack">
-        <Panel title="What this is">
+        <Panel className="panel--prose" title="What this is">
           <div className="prose">
             <p>
               Open Sustainable Technology finds, lists, and shares open
@@ -46,7 +46,7 @@ export default async function AboutPage() {
           </div>
         </Panel>
 
-        <Panel title="Who runs it">
+        <Panel className="panel--prose" title="Who runs it">
           <div className="prose">
             <p>
               Open Sustainable Technology is an open community, founded by
@@ -84,7 +84,7 @@ export default async function AboutPage() {
           </div>
         </Panel>
 
-        <Panel id="contact" title="Contact">
+        <Panel id="contact" className="panel--prose" title="Contact">
           <div className="prose">
             <p>
               The quickest way to reach the maintainers, for corrections,
@@ -102,6 +102,7 @@ export default async function AboutPage() {
         </Panel>
 
         <Panel
+          className="panel--prose"
           title="Team"
           description="The people building and maintaining Open Sustainable Technology."
         >
@@ -113,6 +114,7 @@ export default async function AboutPage() {
         </Panel>
 
         <Panel
+          className="panel--prose"
           title="Contributors"
           description={`Everyone who has sent a pull request to ${ostRepoSlug}.`}
         >

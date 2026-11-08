@@ -16,7 +16,7 @@
 }
 
 .yearTitle {
-  font-size: 28px;
+  font-size: var(--text-2xl);
   margin-bottom: 20px;
 }
 
@@ -36,14 +36,55 @@
   height: 100%;
   overflow: hidden;
   border: 1px solid var(--color-border);
-  border-radius: 16px;
+  border-radius: var(--radius-surface);
   background: var(--color-card-bg);
   transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(37, 99, 235, 0.3);
+  border-color: var(--color-text-secondary);
+}
+
+/*
+ * A typographic cover for posts with no image, so a row of cards keeps one
+ * rhythm instead of mixing pictures with bare text tiles.
+ */
+.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 16 / 9;
+  margin: 10px;
+  padding: 16px 18px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.coverMark {
+  width: 24px;
+  height: 24px;
+}
+
+.coverTitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-stretch: var(--stretch-display);
+  line-height: 1.2;
+  color: var(--color-black);
+}
+
+.coverYear {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-stretch: var(--stretch-label);
+  color: var(--color-text-secondary);
 }
 
 .cardTitleLink {
@@ -80,7 +121,7 @@
   object-fit: cover;
   background: var(--color-bg-alt);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-control);
 }
 
 .cardBody {

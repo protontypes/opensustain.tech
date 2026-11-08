@@ -23,7 +23,7 @@ export default async function BlogIndexPage() {
 
   return (
     <main className="page-shell">
-      <SectionHeading as="h1" title="Media" description={MEDIA_DESCRIPTION} />
+      <SectionHeading as="h1" title="Articles & talks" description={MEDIA_DESCRIPTION} />
       <MediaTabs active="articles" />
 
       {years.map(([year, yearPosts]) => (
@@ -52,16 +52,21 @@ export default async function BlogIndexPage() {
                     // screenshots with a plain white background, which
                     // otherwise sit directly against the card's ground with
                     // no visible border in dark mode — reading as a broken
-                    // image rather than a thumbnail. See wordcloud-image in
-                    // globals.css for the same treatment on the same
-                    // problem elsewhere on the site.
+                    // image rather than a thumbnail.
                     <div className={styles.cardImageWrap}>
                       {/* Static export + third-party/local blog images: plain
                           <img>, same reasoning as components/ui/avatar.tsx. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img className={styles.cardImage} src={withBasePath(post.image)} alt="" loading="lazy" />
                     </div>
-                  ) : null}
+                  ) : (
+                    <div className={styles.cover} aria-hidden="true">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className={styles.coverMark} src={withBasePath("/images/logo.png")} alt="" />
+                      <span className={styles.coverTitle}>{post.title}</span>
+                      <span className={styles.coverYear}>{year}</span>
+                    </div>
+                  )}
                   <div className={styles.cardBody}>
                     <h3 className={styles.cardTitle}>
                       <Link href={routes.blogPost(post.slug)} className={styles.cardTitleLink}>

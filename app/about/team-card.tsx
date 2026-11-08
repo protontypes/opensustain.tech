@@ -12,9 +12,8 @@ function initials(name: string): string {
 }
 
 /**
- * One team member's card. Every field that lib/data/team.ts left `null` or
- * `[]` renders a visible "TODO: ..." marker here — nothing is guessed to
- * make the card look complete.
+ * One team member. Fields lib/data/team.ts leaves `null` or `[]` are left out
+ * rather than guessed or flagged on the public page.
  */
 export function TeamCard({ member }: { member: TeamMember }) {
   const displayName = member.fullName ?? member.givenName;

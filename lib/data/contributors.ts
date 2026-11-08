@@ -57,6 +57,8 @@ function toContributor(raw: unknown): Contributor | null {
   ) {
     return null;
   }
+  // Automation accounts (github-actions[bot], dependabot[bot]) are not people.
+  if (r.login.endsWith("[bot]") || r.type === "Bot") return null;
   return {
     login: r.login,
     id: r.id,

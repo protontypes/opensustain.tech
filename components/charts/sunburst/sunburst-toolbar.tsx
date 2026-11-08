@@ -150,7 +150,7 @@ export function SunburstToolbar({
             value={draft}
             placeholder={
               compact
-                ? "Find a project by name or topic"
+                ? "Highlight projects in the chart"
                 : "Name, description, sub-category"
             }
             onChange={(event) => setDraft(event.target.value)}

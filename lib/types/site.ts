@@ -1,6 +1,6 @@
 /**
  * public/data/site-totals.json: every count a page shows, computed once by
- * scripts/fetch-data.mjs. See DATA_CONTRACT.md.
+ * scripts/fetch-data.mjs. See "Counts" in README.md.
  */
 export type SiteTotals = {
   generated_at: string;

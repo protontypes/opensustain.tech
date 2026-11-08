@@ -9,8 +9,7 @@ import { SITE_URL } from "@/lib/seo/site";
 // Deliberately excludes the legacy redirect stubs (app/spreadsheet,
 // app/contributing, etc.) — those are `robots: {index: false}` and have no
 // business in a sitemap. `routes.blogPost` isn't included: it's a function,
-// not a path, and this repo doesn't yet know what posts exist to enumerate
-// (see docs/migration for the open item on generating this once /blog does).
+// not a path, and the posts aren't enumerated here yet.
 const paths: string[] = [
   routes.home,
   routes.projects,

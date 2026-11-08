@@ -1,4 +1,4 @@
-/** One entry in the OST project directory. See DATA_CONTRACT.md. */
+/** One entry in the OST project directory, built by scripts/fetch-data.mjs. */
 export type DirectoryProject = {
   name: string;
   url: string;

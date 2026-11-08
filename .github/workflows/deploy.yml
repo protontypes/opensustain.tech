@@ -9,7 +9,7 @@ name: Deploy to GitHub Pages
 #                               opensustain.analytics when it republishes its
 #                               payloads to its `data` branch. Both need the
 #                               OST_TECH_DISPATCH_TOKEN secret in the sending
-#                               repo; see docs/migration/README.md.
+#                               repo (see README.md; the token expires).
 #   - schedule:                a weekly safety net in case a dispatch is
 #                               missed, dropped, or not wired up yet.
 #   - workflow_dispatch:       a manual run.

@@ -29,13 +29,11 @@
  *      on the main branch), so step 3 usually succeeds over the network even
  *      in CI with no sibling checkout present.
  *
- * Sources (1)+(2)+(3) are then joined into public/data/directory.json — see
- * DATA_CONTRACT.md for the exact shape and the match statistics behind this
- * decision. CSV is the primary source (it matched 97.3% of README entries
- * with every one of category/sub_category/url/description present); the
- * ~2.7% of README entries with no CSV row (recently-added, or hosted
- * somewhere the analytics crawler doesn't cover) are still included, sourced
- * from the README alone with metrics fields left null and `source: "readme"`.
+ * Sources (1)+(2)+(3) are then joined into public/data/directory.json. The
+ * README decides which projects exist and where they sit; a matching CSV row
+ * adds its metrics. README entries with no CSV row (newly added, or hosted
+ * somewhere ecosyste.ms doesn't crawl) are still included, with metrics left
+ * null and `source: "readme"`.
  *
  * Committing the full output as tracked, churn-prone data is exactly what
  * this pipeline exists to avoid — the 13 payloads alone are ~10 MB and

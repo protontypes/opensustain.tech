@@ -10,8 +10,8 @@ export const routes = {
   home: "/",
 
   // The OST project directory — every project README.md lists, grouped by
-  // category and subcategory, joined with data/projects.csv. See
-  // DATA_CONTRACT.md. This is NOT the project-rankings dashboard; that one
+  // category and subcategory, joined with data/projects.csv. This is NOT
+  // the project-rankings dashboard; that one
   // moved to /analytics/projects when this path was freed up for the
   // directory.
   projects: "/projects",

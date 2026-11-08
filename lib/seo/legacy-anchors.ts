@@ -9,8 +9,7 @@
  * a link to the "Photovoltaics and Solar Energy" subcategory section. Both
  * slug algorithms agree on every one of this taxonomy's 93 category/
  * subcategory names, which are plain ASCII words and spaces with nothing
- * else to disagree on (verified against `public/data/directory.json` — see
- * DATA_CONTRACT.md), so this reproduces those ids without fetching or
+ * else to disagree on (verified against `public/data/directory.json`), so this reproduces those ids without fetching or
  * re-parsing README.md at runtime; the categories/subcategories to slug come
  * from the same taxonomy the /projects directory already loads
  * (`filters.sub_categories_by_category`, identical to directory.json's

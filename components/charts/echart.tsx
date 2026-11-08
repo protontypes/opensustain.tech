@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
 import type { EChartsOption, SetOptionOpts } from "echarts";
 import * as echarts from "echarts/core";
@@ -66,6 +66,44 @@ type EChartProps = {
   onWidth?: (width: number) => void;
 };
 
+/** Below this the value axis keeps three ticks, in compact numbers. */
+const NARROW = 480;
+
+const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+
+type Axis = { type?: string; splitNumber?: number; axisLabel?: Record<string, unknown> };
+
+/**
+ * Value axes, fitted to the box. ECharts packs ticks by its own default count,
+ * so at 390px a 0–1,800 axis printed as "0 300600900 1,200": hideOverlap drops
+ * the colliding ones everywhere, and a narrow chart gets fewer, shorter ticks
+ * (every bar already carries its exact value as a label). An axis with its own
+ * formatter (a percentage, a year) keeps it.
+ */
+function fitValueAxes(option: EChartsOption, narrow: boolean): EChartsOption {
+  const fit = (axis: unknown) => {
+    if (!axis || typeof axis !== "object") return axis;
+    const value = axis as Axis;
+    if (value.type !== "value") return axis;
+    const axisLabel: Record<string, unknown> = { hideOverlap: true, ...value.axisLabel };
+    if (!narrow) return { ...value, axisLabel };
+    return {
+      ...value,
+      splitNumber: value.splitNumber ?? 3,
+      axisLabel: {
+        ...axisLabel,
+        formatter: axisLabel.formatter ?? ((tick: number) => compact.format(tick)),
+      },
+    };
+  };
+  const each = (axes: unknown) => (Array.isArray(axes) ? axes.map(fit) : fit(axes));
+  return {
+    ...option,
+    ...(option.xAxis ? { xAxis: each(option.xAxis) } : {}),
+    ...(option.yAxis ? { yAxis: each(option.yAxis) } : {}),
+  } as EChartsOption;
+}
+
 export function EChart({
   option,
   className,
@@ -84,6 +122,7 @@ export function EChart({
   onClickRef.current = onClick;
   const onWidthRef = useRef(onWidth);
   onWidthRef.current = onWidth;
+  const [narrow, setNarrow] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -106,7 +145,10 @@ export function EChart({
     const resizeObserver = new ResizeObserver((entries) => {
       chart.resize();
       const width = entries[0]?.contentRect.width;
-      if (width) onWidthRef.current?.(width);
+      if (width) {
+        setNarrow(width < NARROW);
+        onWidthRef.current?.(width);
+      }
     });
     resizeObserver.observe(containerRef.current);
 
@@ -115,7 +157,10 @@ export function EChart({
     // page renders a frame — so a chart that mounts in a background tab would
     // otherwise sit on its fallback width indefinitely.
     const initial = containerRef.current.getBoundingClientRect().width;
-    if (initial) onWidthRef.current?.(initial);
+    if (initial) {
+      setNarrow(initial < NARROW);
+      onWidthRef.current?.(initial);
+    }
 
     return () => {
       resizeObserver.disconnect();
@@ -129,8 +174,8 @@ export function EChart({
   // it: doing both built every chart twice, the second time with a stale
   // closure over `option` from the empty-dependency init effect.
   useEffect(() => {
-    chartRef.current?.setOption(option, setOptionOpts ?? DEFAULT_SET_OPTION);
-  }, [option, setOptionOpts]);
+    chartRef.current?.setOption(fitValueAxes(option, narrow), setOptionOpts ?? DEFAULT_SET_OPTION);
+  }, [option, setOptionOpts, narrow]);
 
   return (
     <div

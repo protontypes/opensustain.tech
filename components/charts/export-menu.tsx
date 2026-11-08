@@ -49,7 +49,7 @@ export function ExportMenu({
     <div className="viz-menu" ref={rootRef}>
       <button
         type="button"
-        className="viz-button"
+        className="viz-button viz-button--quiet"
         aria-expanded={open}
         aria-haspopup="true"
         disabled={disabled}

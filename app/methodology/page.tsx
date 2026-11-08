@@ -25,12 +25,12 @@ export default async function MethodologyPage() {
     <main className="page-shell">
       <SectionHeading
         as="h1"
-        title="What this dashboard is, and what it cannot tell you"
-        description="Every chart here reads one snapshot of a public dataset, rebuilt whenever the project list or the analytics data changes and at least weekly. These are its sources, its definitions, and the places it is known to be wrong or incomplete."
+        title="Methodology"
+        description="What these dashboards are, and what they cannot tell you. Every chart here reads one snapshot of a public dataset, rebuilt whenever the project list or the analytics data changes and at least weekly. These are its sources, its definitions, and the places it is known to be wrong or incomplete."
       />
 
       <div className="stack">
-        <Panel id="data" title="Where the data comes from">
+        <Panel id="data" className="panel--prose" title="Where the data comes from">
           <div className="prose">
             <p>
               Projects and organizations come from{" "}
@@ -185,6 +185,7 @@ export default async function MethodologyPage() {
         </Panel>
 
         <Panel
+          className="panel--prose"
           title="Known limitations"
           description="Things that are wrong or missing in the source data, and what this site does about each."
         >
@@ -239,7 +240,7 @@ export default async function MethodologyPage() {
           </div>
         </Panel>
 
-        <Panel title="Corrections">
+        <Panel className="panel--prose" title="Corrections">
           <div className="prose">
             <p>
               If something here is wrong, the data and the dashboard are

@@ -22,7 +22,7 @@
 }
 
 .title {
-  font-size: 40px;
+  font-size: var(--text-3xl);
   margin-bottom: 16px;
 }
 
@@ -79,7 +79,7 @@
    white-background screenshot doesn't bleed straight into the page. */
 .coverImageWrap {
   padding: 10px;
-  border-radius: 20px;
+  border-radius: var(--radius-surface);
   background: var(--color-bg-alt);
   margin: 32px 0;
 }
@@ -89,7 +89,7 @@
   width: 100%;
   max-height: 420px;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   border: 1px solid var(--color-border);
 }
 

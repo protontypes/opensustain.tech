@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function TalksPage() {
   return (
     <main className="page-shell">
-      <SectionHeading as="h1" title="Media" description={MEDIA_DESCRIPTION} />
+      <SectionHeading as="h1" title="Articles & talks" description={MEDIA_DESCRIPTION} />
       <MediaTabs active="talks" />
 
       <ul className="presentations-grid">

@@ -150,7 +150,7 @@ function NavDropdown({
           setOpen((current) => (fromMouse ? true : !current));
         }}
       >
-        {label}
+        <span className="site-nav-dropdown__toggle-label">{label}</span>
         <i className="fa-solid fa-chevron-down" aria-hidden="true" />
       </button>
       <ul id={menuId} className="site-nav-dropdown__menu" hidden={!open}>

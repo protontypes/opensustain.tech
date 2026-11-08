@@ -43,7 +43,7 @@ export const routes = {
   about: "/about",
 } as const;
 
-/** Shared under the "Media" heading on both of its tabs, /blog and /blog/talks. */
+/** Shared under the "Articles & talks" heading on both of its tabs, /blog and /blog/talks. */
 export const MEDIA_DESCRIPTION =
   "Articles and conference talks from the Open Sustainable Technology community on open source, climate technology and environmental sustainability.";
 
@@ -106,9 +106,9 @@ export const getInvolvedNavigation = [
  */
 export const primaryNavigation = [
   { href: routes.projects, label: "Directory" },
-  { href: routes.education, label: "Learn" },
+  { href: routes.education, label: "Learning resources" },
   { href: routes.analytics, label: "Analytics", children: analyticsNavigation },
-  { href: routes.blog, label: "Media" },
+  { href: routes.blog, label: "Articles & talks" },
   { href: routes.about, label: "About" },
   { href: contributeLink.href, label: "Get involved", children: getInvolvedNavigation },
 ] as const;
@@ -132,6 +132,11 @@ export const footerNavigation = [
     links: [
       { href: routes.blog, label: "Articles" },
       { href: routes.talks, label: "Talks" },
+    ],
+  },
+  {
+    heading: "Project",
+    links: [
       { href: routes.about, label: "About" },
       { href: `${routes.about}#contact`, label: "Contact" },
     ],

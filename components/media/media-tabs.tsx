@@ -20,7 +20,7 @@ export type MediaTab = (typeof tabs)[number]["id"];
  */
 export function MediaTabs({ active }: { active: MediaTab }) {
   return (
-    <nav className={styles.tabs} aria-label="Media">
+    <nav className={styles.tabs} aria-label="Articles and talks">
       {tabs.map((tab) => (
         <Link
           key={tab.id}

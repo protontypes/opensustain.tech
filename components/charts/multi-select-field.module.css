@@ -23,7 +23,7 @@
   color: var(--color-text);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: 0;
+  border-radius: var(--radius-control);
   cursor: pointer;
 }
 
@@ -78,7 +78,7 @@
   background: var(--color-bg);
   border: 0;
   border-bottom: 1px solid var(--color-border);
-  border-radius: 0;
+  border-radius: var(--radius-control);
 }
 
 .search:focus-visible {
@@ -99,8 +99,8 @@
   font-family: var(--font-heading);
   font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  text-transform: none;
+  letter-spacing: 0;
   color: var(--color-link);
   background: none;
   border: 0;
@@ -125,8 +125,8 @@
   font-family: var(--font-heading);
   font-size: 11px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
+  text-transform: none;
+  letter-spacing: 0;
   color: var(--color-text-secondary);
 }
 

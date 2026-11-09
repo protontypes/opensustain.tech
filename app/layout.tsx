@@ -5,10 +5,10 @@ import { CommunityBanner } from "@/components/dashboard/community-banner";
 import { SiteHeader } from "@/components/dashboard/site-header";
 import { SiteFooter } from "@/components/dashboard/site-footer";
 import { loadSnapshot } from "@/lib/data/snapshot";
+import { SITE_URL } from "@/lib/seo/site";
 
 import "./globals.css";
 
-const SITE_URL = "https://opensustain.tech";
 // Adapted from open-sustainable-technology/docs/meta_tags.md, the mkdocs
 // site's own description and social-preview image.
 const SITE_DESCRIPTION =

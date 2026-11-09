@@ -22,3 +22,6 @@ tsconfig.tsbuildinfo
 # public/data/, so that directory is unaffected). See the header comment in
 # scripts/fetch-data.mjs for the full fallback chain.
 /public/data/*.json
+
+#AI
+.impeccable/

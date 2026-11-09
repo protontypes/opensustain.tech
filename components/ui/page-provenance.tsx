@@ -26,16 +26,23 @@ export function PageProvenance({
 }) {
   const list = snapshotOf(totals.generated_at);
   const metrics = snapshotOf(totals.as_of);
+  // Read the same day, the two dates are one fact: say it once.
+  const sameDay = show === "both" && list.label === metrics.label;
 
   return (
     <p className={["page-provenance", className].filter(Boolean).join(" ")}>
-      {show !== "metrics" ? (
+      {sameDay ? (
+        <>
+          Project list and metrics read <time dateTime={metrics.iso}>{metrics.label}</time>
+        </>
+      ) : null}
+      {!sameDay && show !== "metrics" ? (
         <>
           Project list read <time dateTime={list.iso}>{list.label}</time>
         </>
       ) : null}
-      {show === "both" ? " · " : null}
-      {show !== "list" ? (
+      {!sameDay && show === "both" ? " · " : null}
+      {!sameDay && show !== "list" ? (
         <>
           {show === "both" ? "metrics" : "Metrics"} as of{" "}
           <time dateTime={metrics.iso}>{metrics.label}</time>

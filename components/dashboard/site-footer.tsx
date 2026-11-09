@@ -1,8 +1,7 @@
 import Link from "next/link";
 
-import { withBasePath } from "@/lib/base-path";
 import type { Snapshot } from "@/lib/data/snapshot";
-import { footerNavigation, socialLinks } from "@/lib/navigation";
+import { communityDiscordUrl, footerNavigation, socialLinks } from "@/lib/navigation";
 
 export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
   return (
@@ -11,36 +10,22 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
         <div className="footer-inner">
           <div className="footer-brand">
             <span className="footer-logo">
-              <img
-                className="footer-logo__mark"
-                src={withBasePath("/images/logo.png")}
-                alt=""
-                width={200}
-                height={200}
-              />
-              OpenSustain.Tech
+              Open Sustainable
+              <br />
+              Technology
             </span>
-            <p className="footer-copyright">
-              Data snapshot of{" "}
-              <time dateTime={snapshot.iso}>{snapshot.label}</time>. Project
-              metrics from{" "}
-              <a href="https://ecosyste.ms/" target="_blank" rel="noreferrer">
-                Ecosyste.ms
-              </a>
-              .
+            <p className="footer-about">
+              A community project mapping the open-source ecosystem for climate and
+              sustainability.
             </p>
-            {/* The year comes from the data, not the visitor's clock. */}
-            <p className="footer-copyright">
-              © {snapshot.year} Open Sustainable Technology, published under{" "}
-              <a
-                href="https://creativecommons.org/licenses/by/4.0/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                CC BY 4.0
-              </a>
-              .
-            </p>
+            <a
+              className="pill footer-discord"
+              href={communityDiscordUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Join the Discord
+            </a>
           </div>
           {footerNavigation.map((column) => (
             <nav
@@ -71,6 +56,27 @@ export function SiteFooter({ snapshot }: { snapshot: Snapshot }) {
               </a>
             ))}
           </nav>
+        </div>
+        <div className="footer-bottom">
+          {/* The year comes from the data, not the visitor's clock. */}
+          <p className="footer-copyright">
+            © {snapshot.year} Open Sustainable Technology · Content under{" "}
+            <a
+              href="https://creativecommons.org/licenses/by/4.0/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              CC BY 4.0
+            </a>
+          </p>
+          <p className="footer-copyright">
+            Data snapshot of <time dateTime={snapshot.iso}>{snapshot.label}</time>. Project
+            metrics from{" "}
+            <a href="https://ecosyste.ms/" target="_blank" rel="noreferrer">
+              Ecosyste.ms
+            </a>
+            .
+          </p>
         </div>
       </div>
     </footer>

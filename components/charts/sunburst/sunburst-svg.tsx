@@ -40,6 +40,11 @@ type Props = {
   /** Ids of nodes matching the search; empty means "no active search". */
   matches: Set<string> | null;
   selectedId: string | null;
+  /**
+   * A node to outline in ink, with everything outside it dimmed, while nothing
+   * is hovered or searched. The home ring uses it for the picked category.
+   */
+  emphasisId?: string | null;
   focusedIndex: number;
   /** All three sunbursts share this renderer, so each names itself. */
   label: string;
@@ -63,6 +68,7 @@ export function SunburstSvg({
   centreFill,
   matches,
   selectedId,
+  emphasisId = null,
   focusedIndex,
   label,
   selectsOnClick = false,
@@ -78,6 +84,7 @@ export function SunburstSvg({
   /** The rects the tween last actually painted, so an interrupted zoom resumes from screen. */
   const liveRects = useRef<Rect[] | null>(null);
   const labelGroup = useRef<SVGGElement | null>(null);
+  const outlineRef = useRef<SVGPathElement | null>(null);
   /** Bumped whenever the layout changes, to invalidate clicks that straddle a zoom. */
   const generation = useRef(0);
   const tweenRef = useRef<{ cancel: () => void } | null>(null);
@@ -124,6 +131,12 @@ export function SunburstSvg({
     [],
   );
 
+  // Drawn as its own path above the arcs: a stroke on the arc itself would be
+  // half covered by the neighbours painted after it.
+  const emphasisIndex = emphasisId
+    ? laid.findIndex((item) => item.visible && item.node.id === emphasisId)
+    : -1;
+
   const labels = useMemo(
     () =>
       laid
@@ -150,12 +163,19 @@ export function SunburstSvg({
       }
     }
 
+    // Hover and search say more about what is under the pointer than the
+    // standing emphasis does, so it steps aside for either.
+    const emphasis =
+      !hoveredNode && !matches && emphasisIndex >= 0 ? laid[emphasisIndex].node : null;
+    if (outlineRef.current) outlineRef.current.style.opacity = emphasis ? "" : "0";
+
     for (let i = 0; i < laid.length; i += 1) {
       const element = pathRefs.current[i];
       if (!element) continue;
       const node = laid[i].node;
 
       let opacity = 1;
+      if (emphasis && !isWithin(node, emphasis.id)) opacity = 0.6;
       if (matches) {
         opacity = matches.has(node.id) ? 1 : 0.12;
       }
@@ -181,7 +201,7 @@ export function SunburstSvg({
         element.style.paintOrder = "";
       }
     }
-  }, [laid, matches, selectedId, strokes]);
+  }, [laid, matches, selectedId, strokes, emphasisIndex]);
 
   /** Zoom / filter transitions: interpolate rects, write `d` per frame. */
   useLayoutEffect(() => {
@@ -422,6 +442,10 @@ export function SunburstSvg({
       </g>
 
       <g className="viz-labels" ref={labelGroup} aria-hidden="true">
+        {/* In the label group so it hides with the labels while arcs move. */}
+        {emphasisIndex >= 0 ? (
+          <path ref={outlineRef} className="viz-emphasis" d={paths[emphasisIndex]} />
+        ) : null}
         {labels.map(({ index, label }) => {
           if (!label) return null;
           const degrees = (label.angle * 180) / Math.PI - 90;
@@ -451,6 +475,13 @@ export function SunburstSvg({
       </g>
     </svg>
   );
+}
+
+function isWithin(node: SunburstNode, id: string): boolean {
+  for (let cursor: SunburstNode | null = node; cursor; cursor = cursor.parent) {
+    if (cursor.id === id) return true;
+  }
+  return false;
 }
 
 function ariaLabelFor(node: SunburstNode): string {

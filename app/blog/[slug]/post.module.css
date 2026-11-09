@@ -21,9 +21,12 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+/* Article titles run to a dozen words, too long to read in the capitals the
+   site gives its short page and section titles. */
 .title {
   font-size: var(--text-3xl);
   margin-bottom: 16px;
+  text-transform: none;
 }
 
 .meta {

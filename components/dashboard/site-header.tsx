@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { withBasePath } from "@/lib/base-path";
-import { ostGithubUrl, primaryNavigation, routes } from "@/lib/navigation";
+import { contributeLink, ostGithubUrl, primaryNavigation, routes } from "@/lib/navigation";
 
 // A section stays highlighted on its sub-pages: Media on /blog/talks and on
 // every post, Analytics on each of its dashboards. trailingSlash: true means the
@@ -233,12 +233,16 @@ export function SiteHeader() {
             width={200}
             height={200}
           />
-          <span className="site-mark__word">OpenSustain.Tech</span>
+          <span className="site-mark__word">
+            Open Sustainable
+            <br />
+            Technology
+          </span>
         </Link>
 
         <div className="header-right">
           <nav className="site-nav" aria-label="Primary">
-            {primaryNavigation.map((item) =>
+            {primaryNavigation.filter((item) => !("mobileOnly" in item)).map((item) =>
               "children" in item ? (
                 <NavDropdown
                   key={item.href}
@@ -258,6 +262,15 @@ export function SiteHeader() {
               ),
             )}
           </nav>
+
+          <a
+            className="pill pill--mint header-cta"
+            href={contributeLink.href}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Add a project
+          </a>
 
           <a
             href={ostGithubUrl}

@@ -30,10 +30,11 @@ export function CommunityBanner() {
       <p className="community-bar__message">
         {/* One span, so the sentence keeps real word spaces and wraps inside
             itself; as bare text nodes each run becomes its own flex item. */}
+        <span className="community-bar__tag">Community project</span>
         <span>
-          Open Sustainable Technology is a community project.{" "}
+          Built in the open by contributors worldwide.{" "}
           <a href={communityDiscordUrl} target="_blank" rel="noreferrer">
-            Join us on Discord
+            Join us on Discord <span aria-hidden="true">→</span>
           </a>
         </span>
       </p>

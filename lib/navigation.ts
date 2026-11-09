@@ -103,14 +103,21 @@ export const getInvolvedNavigation = [
 /**
  * Header navigation, in display order. An item with `children` is a dropdown;
  * its own `href` is only a key, since the toggle is a button, not a link.
+ * `mobileOnly` items sit in the menu only: on a wide screen the header's
+ * "Add a project" button and the page itself carry those links.
  */
 export const primaryNavigation = [
   { href: routes.projects, label: "Directory" },
-  { href: routes.education, label: "Learning resources" },
-  { href: routes.analytics, label: "Analytics", children: analyticsNavigation },
+  { href: routes.education, label: "Learning" },
   { href: routes.blog, label: "Articles & talks" },
+  { href: routes.analytics, label: "Analytics", children: analyticsNavigation },
   { href: routes.about, label: "About" },
-  { href: contributeLink.href, label: "Get involved", children: getInvolvedNavigation },
+  {
+    href: contributeLink.href,
+    label: "Get involved",
+    children: getInvolvedNavigation,
+    mobileOnly: true,
+  },
 ] as const;
 
 /** Footer link columns. */

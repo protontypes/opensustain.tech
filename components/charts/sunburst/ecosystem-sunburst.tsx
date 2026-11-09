@@ -33,9 +33,11 @@ import {
   applyFilters,
   ancestors,
   buildTree,
+  categoryId,
   flatten,
   matchesQuery,
 } from "@/lib/sunburst/tree";
+import { setPickedCategory, usePickedCategory } from "@/lib/home/picked-category";
 import {
   downloadBlob,
   exportFilename,
@@ -206,6 +208,15 @@ export function EcosystemSunburst({ variant = "full", selectionSlot }: Props) {
     }
     return node;
   }, [filtered, view.zoomPath]);
+
+  // Home only: the category picked in the explorer below the hero is outlined
+  // in ink on the whole ring, and zooming into a category picks it there.
+  const pickedCategory = usePickedCategory();
+  const emphasisId =
+    hero && pickedCategory && focusNode?.kind === "root" ? categoryId(pickedCategory) : null;
+  useEffect(() => {
+    if (hero && focusNode && focusNode.kind !== "root") setPickedCategory(focusNode.category);
+  }, [hero, focusNode]);
 
   /** Stable, tree-order list. Never changes identity, so path refs survive zooms. */
   const allNodes = useMemo(
@@ -599,6 +610,7 @@ export function EcosystemSunburst({ variant = "full", selectionSlot }: Props) {
               }
               matches={matches}
               selectedId={view.selectedId}
+              emphasisId={emphasisId}
               focusedIndex={focusedIndex}
               reducedMotion={reducedMotion}
               handleRef={svgHandle}

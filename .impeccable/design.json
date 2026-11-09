@@ -1,0 +1,882 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T04:39:39+00:00",
+  "title": "Design System: Open Sustainable Technology",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#13262b",
+        "purpose": "Text, every outline and rule; flips to dark-ink in dark theme.",
+        "tonalRamp": [
+          "#060b0d",
+          "#0a1316",
+          "#0d1b1e",
+          "#112126",
+          "#4e5c60",
+          "#899295",
+          "#b8bebf",
+          "#e3e5e6"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "#ffffff",
+        "purpose": "Page ground.",
+        "tonalRamp": [
+          "#4d4d4d",
+          "#808080",
+          "#b2b2b2",
+          "#e0e0e0",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff"
+        ]
+      },
+      "ground-alt": {
+        "role": "neutral",
+        "displayName": "Ground Alt",
+        "canonical": "#f3f6f5",
+        "purpose": "Opened category panel.",
+        "tonalRamp": [
+          "#494a4a",
+          "#7a7b7a",
+          "#aaacac",
+          "#d6d8d8",
+          "#f6f8f8",
+          "#f9fafa",
+          "#fbfcfc",
+          "#fefefe"
+        ]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Secondary Text",
+        "canonical": "#4d6166",
+        "purpose": "Labels, placeholders, counts.",
+        "tonalRamp": [
+          "#171d1f",
+          "#263033",
+          "#364447",
+          "#44555a",
+          "#7a888c",
+          "#a6b0b2",
+          "#cad0d1",
+          "#eaeced"
+        ]
+      },
+      "silver": {
+        "role": "neutral",
+        "displayName": "Silver",
+        "canonical": "#e3eae8",
+        "purpose": "Pressed category card, hovered subcategory pill.",
+        "tonalRamp": [
+          "#444646",
+          "#727574",
+          "#9fa4a2",
+          "#c8cecc",
+          "#eaefee",
+          "#f1f4f4",
+          "#f7f9f8",
+          "#fcfcfc"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Border",
+        "canonical": "#dbe3e1",
+        "purpose": "Hairlines on pre-redesign surfaces.",
+        "tonalRamp": [
+          "#424444",
+          "#6e7270",
+          "#999f9e",
+          "#c1c8c6",
+          "#e4eae8",
+          "#edf1f0",
+          "#f4f7f6",
+          "#fbfcfb"
+        ]
+      },
+      "brand-blue": {
+        "role": "primary",
+        "displayName": "Brand Blue",
+        "canonical": "#1878cf",
+        "purpose": "Search and contributing-guide pills; default focus ring; active-nav underline.",
+        "tonalRamp": [
+          "#07243e",
+          "#0c3c68",
+          "#115491",
+          "#156ab6",
+          "#529adb",
+          "#8cbce7",
+          "#bad6f1",
+          "#e3eff9"
+        ]
+      },
+      "link": {
+        "role": "primary",
+        "displayName": "Deep Link Blue",
+        "canonical": "#145e9c",
+        "purpose": "Links, footer heads, blue pill hover.",
+        "tonalRamp": [
+          "#061c2f",
+          "#0a2f4e",
+          "#0e426d",
+          "#125389",
+          "#4f86b5",
+          "#8aaece",
+          "#b8cfe1",
+          "#e3ecf3"
+        ]
+      },
+      "mint": {
+        "role": "secondary",
+        "displayName": "Signal Mint",
+        "canonical": "#47f6ad",
+        "purpose": "Add a project and the callout pill; labels and focus on dark ink.",
+        "tonalRamp": [
+          "#154a34",
+          "#247b56",
+          "#32ac79",
+          "#3ed898",
+          "#75f8c2",
+          "#a3fad6",
+          "#c8fce6",
+          "#e9fef5"
+        ]
+      },
+      "wash-sky": {
+        "role": "neutral",
+        "displayName": "Sky Wash",
+        "canonical": "#d6f1ff",
+        "purpose": "Hero gradient end.",
+        "tonalRamp": [
+          "#40484d",
+          "#6b7880",
+          "#96a9b2",
+          "#bcd4e0",
+          "#e0f4ff",
+          "#eaf8ff",
+          "#f3fbff",
+          "#fafdff"
+        ]
+      },
+      "wash-mint": {
+        "role": "neutral",
+        "displayName": "Mint Wash",
+        "canonical": "#c8fbe4",
+        "purpose": "Contribute band gradient end.",
+        "tonalRamp": [
+          "#3c4b44",
+          "#647e72",
+          "#8cb0a0",
+          "#b0ddc9",
+          "#d6fceb",
+          "#e4fdf2",
+          "#eefef7",
+          "#f8fffc"
+        ]
+      },
+      "scrim": {
+        "role": "neutral",
+        "displayName": "Scrim",
+        "canonical": "#13262b",
+        "purpose": "Community strip and callout in both themes.",
+        "tonalRamp": [
+          "#060b0d",
+          "#0a1316",
+          "#0d1b1e",
+          "#112126",
+          "#4e5c60",
+          "#899295",
+          "#b8bebf",
+          "#e3e5e6"
+        ]
+      },
+      "on-scrim-muted": {
+        "role": "neutral",
+        "displayName": "Muted on Scrim",
+        "canonical": "#e3eae8",
+        "purpose": "Callout body copy.",
+        "tonalRamp": [
+          "#444646",
+          "#727574",
+          "#9fa4a2",
+          "#c8cecc",
+          "#eaefee",
+          "#f1f4f4",
+          "#f7f9f8",
+          "#fcfcfc"
+        ]
+      },
+      "dark-ground": {
+        "role": "neutral",
+        "displayName": "Graphite Ground",
+        "canonical": "#1f2629",
+        "purpose": "Dark theme page.",
+        "tonalRamp": [
+          "#090b0c",
+          "#101314",
+          "#161b1d",
+          "#1b2124",
+          "#575c5e",
+          "#8f9294",
+          "#bcbebf",
+          "#e4e5e5"
+        ]
+      },
+      "dark-ground-alt": {
+        "role": "neutral",
+        "displayName": "Graphite Alt",
+        "canonical": "#252d30",
+        "purpose": "Dark theme panel.",
+        "tonalRamp": [
+          "#0b0e0e",
+          "#121618",
+          "#1a1f22",
+          "#21282a",
+          "#5c6264",
+          "#929698",
+          "#bec0c1",
+          "#e5e6e6"
+        ]
+      },
+      "dark-card": {
+        "role": "neutral",
+        "displayName": "Graphite Card",
+        "canonical": "#283236",
+        "purpose": "Dark theme card surface (pre-redesign surfaces).",
+        "tonalRamp": [
+          "#0c0f10",
+          "#14191b",
+          "#1c2326",
+          "#232c30",
+          "#5e6568",
+          "#94989a",
+          "#bec2c3",
+          "#e5e6e7"
+        ]
+      },
+      "dark-ink": {
+        "role": "neutral",
+        "displayName": "Light Ink",
+        "canonical": "#ebefec",
+        "purpose": "Dark theme ink: outlines, rules, ink pill fill.",
+        "tonalRamp": [
+          "#474847",
+          "#767876",
+          "#a4a7a5",
+          "#cfd2d0",
+          "#f0f3f1",
+          "#f5f7f6",
+          "#f9faf9",
+          "#fdfdfd"
+        ]
+      },
+      "dark-text": {
+        "role": "neutral",
+        "displayName": "Dark Theme Text",
+        "canonical": "#dce2df",
+        "purpose": "Dark theme body text.",
+        "tonalRamp": [
+          "#424443",
+          "#6e7170",
+          "#9a9e9c",
+          "#c2c7c4",
+          "#e5e9e7",
+          "#eef0ef",
+          "#f4f6f5",
+          "#fbfcfb"
+        ]
+      },
+      "dark-text-secondary": {
+        "role": "neutral",
+        "displayName": "Dark Theme Secondary",
+        "canonical": "#a3afae",
+        "purpose": "Dark theme labels and counts.",
+        "tonalRamp": [
+          "#313534",
+          "#525857",
+          "#727a7a",
+          "#8f9a99",
+          "#bac3c2",
+          "#d1d7d6",
+          "#e3e7e7",
+          "#f4f5f5"
+        ]
+      },
+      "dark-silver": {
+        "role": "neutral",
+        "displayName": "Dark Silver",
+        "canonical": "#38444a",
+        "purpose": "Dark theme pressed card and pill hover.",
+        "tonalRamp": [
+          "#111416",
+          "#1c2225",
+          "#273034",
+          "#313c41",
+          "#6a7377",
+          "#9ca2a4",
+          "#c3c7c9",
+          "#e7e9e9"
+        ]
+      },
+      "dark-link": {
+        "role": "primary",
+        "displayName": "Dark Link Blue",
+        "canonical": "#93c3ea",
+        "purpose": "Dark theme links and focus ring.",
+        "tonalRamp": [
+          "#2c3b46",
+          "#4a6275",
+          "#6788a4",
+          "#81acce",
+          "#aed2ef",
+          "#c9e1f4",
+          "#dfedf9",
+          "#f2f8fc"
+        ]
+      },
+      "dark-wash-sky": {
+        "role": "neutral",
+        "displayName": "Dark Sky Wash",
+        "canonical": "#1d3846",
+        "purpose": "Dark hero gradient end.",
+        "tonalRamp": [
+          "#091115",
+          "#0e1c23",
+          "#142731",
+          "#1a313e",
+          "#566a74",
+          "#8e9ca2",
+          "#bbc3c8",
+          "#e4e7e9"
+        ]
+      },
+      "dark-wash-mint": {
+        "role": "neutral",
+        "displayName": "Dark Mint Wash",
+        "canonical": "#183d35",
+        "purpose": "Dark band gradient end.",
+        "tonalRamp": [
+          "#071210",
+          "#0c1e1a",
+          "#112b25",
+          "#15362f",
+          "#526e68",
+          "#8c9e9a",
+          "#bac5c2",
+          "#e3e8e7"
+        ]
+      },
+      "cat-atmosphere": {
+        "role": "tertiary",
+        "displayName": "Atmosphere",
+        "canonical": "#008fc1",
+        "cssVar": "--viz-cat-atmosphere",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#002b3a",
+          "#004860",
+          "#006487",
+          "#007eaa",
+          "#40abd0",
+          "#80c7e0",
+          "#b2ddec",
+          "#e0f2f8"
+        ]
+      },
+      "cat-biosphere": {
+        "role": "tertiary",
+        "displayName": "Biosphere",
+        "canonical": "#51a362",
+        "cssVar": "--viz-cat-biosphere",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#18311d",
+          "#285231",
+          "#397245",
+          "#478f56",
+          "#7cba89",
+          "#a8d1b0",
+          "#cbe3d0",
+          "#eaf4ec"
+        ]
+      },
+      "cat-climate-change": {
+        "role": "tertiary",
+        "displayName": "Climate Change",
+        "canonical": "#e47667",
+        "cssVar": "--viz-cat-climate-change",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#44231f",
+          "#723b34",
+          "#a05348",
+          "#c9685b",
+          "#eb988d",
+          "#f2bab3",
+          "#f7d6d1",
+          "#fcefed"
+        ]
+      },
+      "cat-consumption": {
+        "role": "tertiary",
+        "displayName": "Consumption",
+        "canonical": "#ef69a9",
+        "cssVar": "--viz-cat-consumption",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#482033",
+          "#783454",
+          "#a74a76",
+          "#d25c95",
+          "#f38ebe",
+          "#f7b4d4",
+          "#fad2e5",
+          "#fdedf5"
+        ]
+      },
+      "cat-cryosphere": {
+        "role": "tertiary",
+        "displayName": "Cryosphere",
+        "canonical": "#9fd8e6",
+        "cssVar": "--viz-cat-cryosphere",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#304145",
+          "#506c73",
+          "#6f97a1",
+          "#8cbeca",
+          "#b7e2ec",
+          "#cfecf2",
+          "#e2f3f8",
+          "#f3fafc"
+        ]
+      },
+      "cat-emissions": {
+        "role": "tertiary",
+        "displayName": "Emissions",
+        "canonical": "#de9e58",
+        "cssVar": "--viz-cat-emissions",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#432f1a",
+          "#6f4f2c",
+          "#9b6f3e",
+          "#c38b4d",
+          "#e6b682",
+          "#eeceac",
+          "#f5e2cd",
+          "#fbf3eb"
+        ]
+      },
+      "cat-energy-storage": {
+        "role": "tertiary",
+        "displayName": "Energy Storage",
+        "canonical": "#9b8ff0",
+        "cssVar": "--viz-cat-energy-storage",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#2f2b48",
+          "#4e4878",
+          "#6c64a8",
+          "#887ed3",
+          "#b4abf4",
+          "#cdc7f8",
+          "#e1ddfa",
+          "#f3f2fd"
+        ]
+      },
+      "cat-energy-systems": {
+        "role": "tertiary",
+        "displayName": "Energy Systems",
+        "canonical": "#7facff",
+        "cssVar": "--viz-cat-energy-systems",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#26344d",
+          "#405680",
+          "#5978b2",
+          "#7097e0",
+          "#9fc1ff",
+          "#bfd6ff",
+          "#d9e6ff",
+          "#f0f5ff"
+        ]
+      },
+      "cat-hydrosphere": {
+        "role": "tertiary",
+        "displayName": "Hydrosphere",
+        "canonical": "#2aa3a5",
+        "cssVar": "--viz-cat-hydrosphere",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#0d3132",
+          "#155252",
+          "#1d7273",
+          "#258f91",
+          "#5fbabc",
+          "#94d1d2",
+          "#bfe3e4",
+          "#e5f4f4"
+        ]
+      },
+      "cat-industrial-ecology": {
+        "role": "tertiary",
+        "displayName": "Industrial Ecology",
+        "canonical": "#b47144",
+        "cssVar": "--viz-cat-industrial-ecology",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#362214",
+          "#5a3822",
+          "#7e4f30",
+          "#9e633c",
+          "#c79473",
+          "#dab8a2",
+          "#e8d4c7",
+          "#f6eee9"
+        ]
+      },
+      "cat-natural-resources": {
+        "role": "tertiary",
+        "displayName": "Natural Resources",
+        "canonical": "#8f9130",
+        "cssVar": "--viz-cat-natural-resources",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#2b2c0e",
+          "#484818",
+          "#646622",
+          "#7e802a",
+          "#abac64",
+          "#c7c898",
+          "#dddec1",
+          "#f2f2e6"
+        ]
+      },
+      "cat-renewable-energy": {
+        "role": "tertiary",
+        "displayName": "Renewable Energy",
+        "canonical": "#d9a400",
+        "cssVar": "--viz-cat-renewable-energy",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#413100",
+          "#6c5200",
+          "#987300",
+          "#bf9000",
+          "#e2bb40",
+          "#ecd280",
+          "#f4e4b2",
+          "#faf4e0"
+        ]
+      },
+      "cat-sustainable-development": {
+        "role": "tertiary",
+        "displayName": "Sustainable Development",
+        "canonical": "#b97fc9",
+        "cssVar": "--viz-cat-sustainable-development",
+        "purpose": "Category hue; fixed in both themes; ink labels.",
+        "tonalRamp": [
+          "#38263c",
+          "#5c4064",
+          "#82598d",
+          "#a370b1",
+          "#ca9fd6",
+          "#dcbfe4",
+          "#ead9ef",
+          "#f7f0f9"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home hero title, capitals."
+      },
+      "headline-band": {
+        "displayName": "Headline Band",
+        "purpose": "Contribute band title, capitals."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles, capitals, on a 1px ink rule."
+      },
+      "article-title": {
+        "displayName": "Article Title",
+        "purpose": "Blog post titles, sentence case."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Home statistics, tabular numerals."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Category panel and destination-card titles, capitals."
+      },
+      "title-sm": {
+        "displayName": "Title Small",
+        "purpose": "Category card names, capitals."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Hero description between two ink rules."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All reading text."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Every pill, capitals."
+      },
+      "nav": {
+        "displayName": "Nav",
+        "purpose": "Header links and toggles, capitals."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Mono capitals naming a figure, column, count or group."
+      }
+    },
+    "lines": [
+      {
+        "name": "line-strong",
+        "value": "2px solid var(--color-black)",
+        "purpose": "Outline on pills, inputs, selects, cards, panel."
+      },
+      {
+        "name": "line-chip",
+        "value": "1.5px solid var(--color-black)",
+        "purpose": "Subcategory pills and directory filter chips."
+      },
+      {
+        "name": "rule",
+        "value": "1px solid var(--color-black)",
+        "purpose": "Between bands; header and footer rules; lede rules; statistic dividers."
+      },
+      {
+        "name": "ring-emphasis",
+        "value": "stroke 3 var(--viz-arc-stroke-emphasis)",
+        "purpose": "Picked category on the home ring; others dim to 0.6 opacity."
+      }
+    ],
+    "washes": [
+      {
+        "name": "hero",
+        "value": "linear-gradient(115deg, var(--color-bg) 45%, var(--wash-sky) 100%)"
+      },
+      {
+        "name": "band",
+        "value": "linear-gradient(115deg, var(--color-bg) 40%, var(--wash-mint) 100%)"
+      }
+    ],
+    "shadows": [
+      {
+        "name": "chart-tooltip",
+        "value": "0 14px 40px rgba(19, 38, 43, 0.14)",
+        "purpose": "Chart tooltip only (dark: 0 14px 40px rgba(0,0,0,0.35)). No shadows on redesigned surfaces."
+      }
+    ],
+    "motion": [
+      {
+        "name": "lift",
+        "value": "transform 0.15s ease",
+        "purpose": "Pills lift 1px, cards 2px on hover."
+      },
+      {
+        "name": "theme",
+        "value": "background-color, border-color, color 0.3s ease",
+        "purpose": "Global theme transition."
+      },
+      {
+        "name": "ring-zoom",
+        "value": "750ms",
+        "purpose": "Sunburst zoom (--viz-zoom-duration)."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion: reduce",
+        "purpose": "Animations and transitions cut to 0.01ms; smooth scroll off."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "nav",
+        "value": "1180px",
+        "purpose": "max-width: nav collapses to menu."
+      },
+      {
+        "name": "tablet",
+        "value": "1024px",
+        "purpose": "max-width: hero stacks, grids go two across. min-width 1025px: picked project replaces the lede beside the ring."
+      },
+      {
+        "name": "phone",
+        "value": "600px",
+        "purpose": "max-width: single column, titles step down, ring wordmark 10px."
+      },
+      {
+        "name": "small",
+        "value": "560px",
+        "purpose": "max-width: header Add a project pill hides, mark shrinks."
+      }
+    ],
+    "focus": {
+      "value": "2px solid var(--viz-focus-color, var(--color-primary)); outline-offset 2px",
+      "light": "#1878cf",
+      "dark": "#93c3ea",
+      "onScrim": "#47f6ad"
+    }
+  },
+  "components": [
+    {
+      "name": "Outline Pill",
+      "kind": "button",
+      "refersTo": "pill",
+      "description": "Default secondary action.",
+      "html": "<a class=\"ds-pill\" href=\"#\">View as a list</a>",
+      "css": ".ds-pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border:2px solid var(--color-black,#13262b);border-radius:999px;background:var(--color-bg,#fff);color:var(--color-black,#13262b);font-family:var(--font-body,'Helvetica Neue',Arial,sans-serif);font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:transform .15s ease,background-color .15s ease}.ds-pill:hover{transform:translateY(-1px)}.ds-pill:focus-visible{outline:2px solid #1878cf;outline-offset:2px}"
+    },
+    {
+      "name": "Ink Pill",
+      "kind": "button",
+      "refersTo": "pill-ink",
+      "description": "Strong navigational action: Browse the directory, See all N projects.",
+      "html": "<a class=\"ds-pill-ink\" href=\"#\">Browse the directory</a>",
+      "css": ".ds-pill-ink{display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border:2px solid var(--color-black,#13262b);border-radius:999px;background:var(--color-black,#13262b);color:var(--color-bg,#fff);font-family:var(--font-body,'Helvetica Neue',Arial,sans-serif);font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;text-decoration:none;transition:transform .15s ease}.ds-pill-ink:hover{transform:translateY(-1px)}.ds-pill-ink:focus-visible{outline:2px solid #1878cf;outline-offset:2px}"
+    },
+    {
+      "name": "Blue Pill",
+      "kind": "button",
+      "refersTo": "pill-blue",
+      "description": "The search submit and the contributing-guide action.",
+      "html": "<button class=\"ds-pill-blue\" type=\"button\">Search</button>",
+      "css": ".ds-pill-blue{display:inline-flex;align-items:center;min-height:52px;padding:0 24px;border:2px solid #1878cf;border-radius:999px;background:#1878cf;color:#fff;font-family:var(--font-body,'Helvetica Neue',Arial,sans-serif);font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:transform .15s ease,background-color .15s ease}.ds-pill-blue:hover{transform:translateY(-1px);background:#145e9c;border-color:#145e9c}.ds-pill-blue:focus-visible{outline:2px solid #1878cf;outline-offset:2px}"
+    },
+    {
+      "name": "Mint Pill",
+      "kind": "button",
+      "refersTo": "pill-mint",
+      "description": "Reserved for the contribute invitation: Add a project, Find an issue.",
+      "html": "<a class=\"ds-pill-mint\" href=\"#\">Add a project</a>",
+      "css": ".ds-pill-mint{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border:2px solid var(--color-black,#13262b);border-radius:999px;background:#47f6ad;color:#13262b;font-family:var(--font-body,'Helvetica Neue',Arial,sans-serif);font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;text-decoration:none;transition:transform .15s ease}.ds-pill-mint:hover{transform:translateY(-1px)}.ds-pill-mint:focus-visible{outline:2px solid #1878cf;outline-offset:2px}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "search-input",
+      "description": "Pill search; GET form to /projects?q=.",
+      "html": "<form class=\"ds-search\" role=\"search\"><label class=\"ds-vh\" for=\"ds-q\">Search projects</label><input id=\"ds-q\" class=\"ds-search__input\" type=\"search\" placeholder=\"Search 2,762 projects, e.g. PyPSA, solar, wildfire\"><button class=\"ds-search__btn\" type=\"submit\">Search</button></form>",
+      "css": ".ds-search{display:flex;flex-wrap:wrap;gap:12px}.ds-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.ds-search__input{flex:1 1 300px;min-height:52px;padding:0 20px;border:2px solid var(--color-black,#13262b);border-radius:999px;background:var(--color-bg,#fff);color:var(--color-text,#13262b);font-family:var(--font-body,'Helvetica Neue',Arial,sans-serif);font-size:16px}.ds-search__input::placeholder{color:#4d6166}.ds-search__input:focus-visible{outline:2px solid #1878cf;outline-offset:2px}.ds-search__btn{min-height:52px;padding:0 24px;border:2px solid #1878cf;border-radius:999px;background:#1878cf;color:#fff;font-family:var(--font-body,'Helvetica Neue',Arial,sans-serif);font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;cursor:pointer}.ds-search__btn:hover{background:#145e9c;border-color:#145e9c}"
+    },
+    {
+      "name": "Subcategory Pill",
+      "kind": "chip",
+      "refersTo": "sub-pill",
+      "description": "Links into the directory filtered to a subcategory.",
+      "html": "<a class=\"ds-sub-pill\" href=\"#\"><span class=\"ds-sub-pill__dot\" style=\"background:#51a362\"></span>Marine Life and Fishery<span class=\"ds-sub-pill__count\">69</span></a>",
+      "css": ".ds-sub-pill{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;border:1.5px solid var(--color-black,#13262b);border-radius:999px;background:var(--color-bg,#fff);color:var(--color-black,#13262b);font-family:var(--font-body,'Helvetica Neue',Arial,sans-serif);font-size:15px;text-decoration:none}.ds-sub-pill:hover{background:#e3eae8}.ds-sub-pill:focus-visible{outline:2px solid #1878cf;outline-offset:2px}.ds-sub-pill__dot{width:8px;height:8px;border-radius:50%}.ds-sub-pill__count{font-family:var(--font-mono,'IBM Plex Mono',monospace);font-size:12px;color:#4d6166}"
+    },
+    {
+      "name": "Category Card",
+      "kind": "card",
+      "refersTo": "category-card",
+      "description": "Toggle button in the explorer; pressed state fills silver and is mirrored on the ring.",
+      "html": "<button class=\"ds-cat-card\" type=\"button\" aria-pressed=\"true\"><span class=\"ds-cat-card__top\"><span class=\"ds-cat-card__dot\" style=\"background:#51a362\"></span><span class=\"ds-label\">07</span></span><span class=\"ds-cat-card__name\">Biosphere</span><span class=\"ds-cat-card__meta\"><span>18 subcategories<br>443 projects</span></span></button>",
+      "css": ".ds-cat-card{display:flex;flex-direction:column;gap:12px;width:240px;min-height:160px;padding:20px;border:2px solid var(--color-black,#13262b);border-radius:20px;background:var(--color-bg,#fff);color:var(--color-black,#13262b);font-family:var(--font-body,'Helvetica Neue',Arial,sans-serif);text-align:left;cursor:pointer;transition:transform .15s ease,background-color .15s ease}.ds-cat-card:hover{transform:translateY(-2px)}.ds-cat-card[aria-pressed=\"true\"]{background:#e3eae8}.ds-cat-card:focus-visible{outline:2px solid #1878cf;outline-offset:2px}.ds-cat-card__top{display:flex;align-items:center;gap:8px}.ds-cat-card__dot{width:14px;height:14px;border:2px solid var(--color-black,#13262b);border-radius:50%}.ds-label{font-family:var(--font-mono,'IBM Plex Mono',monospace);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#4d6166}.ds-cat-card__name{font-family:var(--font-heading,'Space Grotesk',Arial,sans-serif);font-size:21px;font-weight:600;line-height:1.15;text-transform:uppercase}.ds-cat-card__meta{font-size:14px;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Category Panel",
+      "kind": "card",
+      "refersTo": "category-panel",
+      "description": "The picked category's subcategories, under a bar in its hue.",
+      "html": "<div class=\"ds-panel\"><div class=\"ds-panel__bar\" style=\"background:#51a362\"></div><div class=\"ds-panel__body\"><h3 class=\"ds-panel__title\">Biosphere</h3></div></div>",
+      "css": ".ds-panel{overflow:hidden;border:2px solid var(--color-black,#13262b);border-radius:24px;background:#f3f6f5}.ds-panel__bar{height:6px}.ds-panel__body{padding:28px}.ds-panel__title{margin:0;font-family:var(--font-heading,'Space Grotesk',Arial,sans-serif);font-size:26px;font-weight:600;text-transform:uppercase;color:#13262b}"
+    },
+    {
+      "name": "Callout",
+      "kind": "custom",
+      "refersTo": "callout",
+      "description": "Dark ink invitation in both themes, mint action and mint focus.",
+      "html": "<div class=\"ds-callout\"><h2 class=\"ds-callout__title\">Start on ClimateTriage</h2><p class=\"ds-callout__body\">Open issues from projects on this map, ready for your first pull request.</p><a class=\"ds-callout__pill\" href=\"#\">Find an issue</a></div>",
+      "css": ".ds-callout{display:flex;flex-wrap:wrap;align-items:center;gap:24px 32px;padding:48px;border-radius:28px;background:#13262b;color:#fff}.ds-callout__title{margin:0;font-family:var(--font-heading,'Space Grotesk',Arial,sans-serif);font-size:38px;font-weight:600;line-height:1.1;text-transform:uppercase;color:#fff}.ds-callout__body{max-width:520px;font-size:18px;color:#e3eae8}.ds-callout__pill{display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border-radius:999px;border:2px solid #13262b;background:#47f6ad;color:#13262b;font-weight:700;font-size:15px;letter-spacing:.03em;text-transform:uppercase;text-decoration:none}.ds-callout__pill:focus-visible{outline:2px solid #47f6ad;outline-offset:2px}"
+    },
+    {
+      "name": "Header Nav",
+      "kind": "nav",
+      "refersTo": "",
+      "description": "Capitals nav; current page underlined 2px in brand blue at 8px offset.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">Directory</a><a href=\"#\">Learning</a><a href=\"#\">About</a></nav>",
+      "css": ".ds-nav{display:flex;gap:22px;padding:10px 0;border-bottom:1px solid #13262b}.ds-nav a{font-family:var(--font-body,'Helvetica Neue',Arial,sans-serif);font-size:14px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:#13262b;text-decoration:none}.ds-nav a:hover{color:#145e9c}.ds-nav a[aria-current=\"page\"]{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:8px;text-decoration-color:#1878cf}.ds-nav a:focus-visible{outline:2px solid #1878cf;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Campaign Map",
+    "overview": "The ecosystem ring, sized by project count and coloured by category, is the most colourful thing on any screen; everything around it is ink on a white ground: 2px outlines, 1px rules, short titles in grotesk capitals and a single mint signal for contributing. Depth comes from lines and washes, not shadows. Dark theme is the same map on graphite, with the community strip and callout fixed in dark ink.",
+    "keyCharacteristics": [
+      "2px ink outlines on controls and cards; 1px ink rules between bands",
+      "Space Grotesk capitals for short titles; sentence case for long ones",
+      "Pills for every button and filter; 20px-radius cards; ringed category dots",
+      "Brand blue for search, mint for contributing, category hues only for data",
+      "Light by default; dark is opt-in"
+    ],
+    "rules": [
+      {
+        "name": "The Data Owns the Colour Rule",
+        "body": "Category hues appear only where they stand for a category: ring, dots, the panel bar.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Mint Rule",
+        "body": "Mint marks the invitation to contribute and nothing else; never text on white.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fixed Ink Rule",
+        "body": "The community strip and callout are dark ink in both themes.",
+        "section": "colors"
+      },
+      {
+        "name": "The Short Capitals Rule",
+        "body": "Capitals for short titles, buttons, nav and labels; article titles and reading text in sentence case.",
+        "section": "typography"
+      },
+      {
+        "name": "The Label Names a Thing Rule",
+        "body": "The mono label names a figure, column, count or group; it does not introduce a heading.",
+        "section": "typography"
+      },
+      {
+        "name": "The Line, Not Shadow Rule",
+        "body": "Separation is a 2px outline or 1px rule; hover lifts 1-2px.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Ringed Dot Rule",
+        "body": "A standalone category dot is ringed in 2px ink.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do draw controls and cards with the 2px ink line and separate bands with 1px ink rules.",
+      "Do set short titles in Space Grotesk capitals and keep article titles in sentence case.",
+      "Do keep category hues on data only, with ink labels.",
+      "Do give every chart a reachable list alternative.",
+      "Do keep the page search as the one primary action in the first viewport.",
+      "Do take every figure from the data snapshot."
+    ],
+    "donts": [
+      "Don't use shadows to separate surfaces.",
+      "Don't use mint as text on white or outside the contribute invitation.",
+      "Don't let the community strip or callout invert with the theme.",
+      "Don't follow the OS colour scheme.",
+      "Don't set long titles in capitals."
+    ]
+  }
+}

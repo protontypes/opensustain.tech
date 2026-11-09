@@ -3742,18 +3742,6 @@ h1 {
   color: #ffffff;
 }
 
-.community-bar__tag {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-mint);
-}
-
-.community-bar__tag::before {
-  content: "● ";
-}
-
 .community-bar__message a {
   color: #ffffff;
   font-weight: 700;

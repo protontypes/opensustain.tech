@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 
 import { formatNumber } from "@/lib/format";
-import {
-  getPickedCategory,
-  setPickedCategory,
-  usePickedCategory,
-} from "@/lib/home/picked-category";
+import { setPickedCategory, usePickedCategory } from "@/lib/home/picked-category";
 import { routes } from "@/lib/navigation";
 import { categoryToken } from "@/lib/sunburst/color";
 
@@ -24,80 +19,77 @@ function directoryHref(category: string, subcategory?: string): string {
   return `${routes.projects}?${params.toString()}`;
 }
 
+function slug(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
 /**
- * The thirteen categories as buttons, in README order, with the chosen one's
- * subcategories opened below them. Every subcategory links into the directory
- * already filtered, so this is a way in, not a second copy of the list. The
- * pick is shared with the ring in the hero, which outlines it.
+ * The thirteen categories as a map key, in README order: swatch, name, a bar
+ * for its share of projects, and its count. One opens at a time onto its
+ * subcategories, largest first, each linking into the directory already
+ * filtered. The open one is shared with the ring in the hero, which outlines
+ * it; all closed, the ring shows no outline.
  */
 export function CategoryExplorer({ categories }: { categories: ExplorerCategory[] }) {
-  // Opens on the biggest category, so the panel shows the most to pick from.
-  const opening = categories.reduce(
-    (best, c, i) => (c.projects > categories[best].projects ? i : best),
-    0,
-  );
-  const pickedName = usePickedCategory();
-  const found = categories.findIndex((c) => c.name === pickedName);
-  const picked = found >= 0 ? found : opening;
-  const current = categories[picked];
-
-  // Names the opening pick so the ring can outline it before any click.
-  useEffect(() => {
-    if (getPickedCategory() === null) setPickedCategory(categories[opening].name);
-  }, [categories, opening]);
+  const picked = usePickedCategory();
+  const largest = Math.max(...categories.map((c) => c.projects));
   const hue = (name: string) => `var(${categoryToken(name)})`;
 
   return (
-    <>
-      <ul className="category-grid">
-        {categories.map((category, i) => (
-          <li key={category.name}>
+    <ul className="category-key">
+      {categories.map((category) => {
+        const open = category.name === picked;
+        const panelId = `category-key-${slug(category.name)}`;
+        const subcategories = [...category.subcategories].sort((a, b) => b.projects - a.projects);
+        return (
+          <li key={category.name} className="category-key__item">
             <button
               type="button"
-              className="category-card"
-              aria-pressed={i === picked}
-              aria-controls="category-panel"
-              onClick={() => setPickedCategory(category.name)}
+              className="category-key__toggle"
+              aria-expanded={open}
+              aria-controls={panelId}
+              onClick={() => setPickedCategory(open ? null : category.name)}
             >
-              <span className="category-card__top">
-                <span className="category-card__dot" style={{ background: hue(category.name) }} />
-                <span className="kicker">{String(i + 1).padStart(2, "0")}</span>
-              </span>
-              <span className="category-card__name">{category.name}</span>
-              <span className="category-card__meta">
-                <span className="category-card__counts">
-                  <span>{category.subcategories.length} subcategories</span>
-                  <span>{formatNumber(category.projects)} projects</span>
+              <span className="category-key__swatch" style={{ background: hue(category.name) }} />
+              <span>
+                <span className="category-key__name">{category.name}</span>
+                <span className="category-key__share" aria-hidden="true">
+                  <span
+                    style={{
+                      width: `${(category.projects / largest) * 100}%`,
+                      background: hue(category.name),
+                    }}
+                  />
                 </span>
-                <span aria-hidden="true">→</span>
+              </span>
+              <span className="category-key__count">
+                {formatNumber(category.projects)}
+                <span className="visually-hidden"> projects</span>
               </span>
             </button>
+            <div id={panelId} hidden={!open}>
+              <ul className="category-key__subs">
+                {subcategories.map((sub) => (
+                  <li key={sub.name}>
+                    <Link
+                      className="category-key__sub"
+                      href={directoryHref(category.name, sub.name)}
+                    >
+                      <span>{sub.name}</span>
+                      <span className="category-key__sub-count">
+                        {formatNumber(sub.projects)}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <Link className="category-key__all" href={directoryHref(category.name)}>
+                See all {formatNumber(category.projects)} projects in {category.name}
+              </Link>
+            </div>
           </li>
-        ))}
-      </ul>
-
-      <div id="category-panel" className="category-panel" aria-live="polite">
-        <div className="category-panel__bar" style={{ background: hue(current.name) }} />
-        <div className="category-panel__body">
-          <div className="category-panel__head">
-            <h3 className="category-panel__title">{current.name}</h3>
-            <Link className="pill pill--ink" href={directoryHref(current.name)}>
-              See all {formatNumber(current.projects)} projects
-            </Link>
-          </div>
-          <ul className="category-panel__subs">
-            {current.subcategories.map((sub) => (
-              <li key={sub.name}>
-                <Link className="sub-pill" href={directoryHref(current.name, sub.name)}>
-                  <span className="sub-pill__dot" style={{ background: hue(current.name) }} />
-                  {sub.name}
-                  <span className="sub-pill__count">{formatNumber(sub.projects)}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </>
+        );
+      })}
+    </ul>
   );
 }

@@ -4,8 +4,8 @@ import { useSyncExternalStore } from "react";
 
 /**
  * The category picked on the home page, shared by the ring in the hero and the
- * category explorer below it, which are separate client islands. Null until
- * the explorer mounts and names its opening category.
+ * category key below it, which are separate client islands. Null while every
+ * category in the key is closed.
  */
 let picked: string | null = null;
 const listeners = new Set<() => void>();

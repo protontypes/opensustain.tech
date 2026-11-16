@@ -264,7 +264,7 @@ export function SiteHeader() {
           </nav>
 
           <a
-            className="pill pill--mint header-cta"
+            className="pill header-cta"
             href={contributeLink.href}
             target="_blank"
             rel="noreferrer"

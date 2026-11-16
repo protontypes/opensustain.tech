@@ -45,18 +45,18 @@ const TOKEN_MAP: Record<keyof ChartTokens, string> = {
 };
 
 const FALLBACK: ChartTokens = {
-  ink: "#13262b",
-  inkStrong: "#13262b",
-  muted: "#4d6166",
-  grid: "rgba(219, 227, 225, 0.7)",
-  border: "#dbe3e1",
-  primary: "#1878cf",
-  surface: "#ffffff",
-  tooltipBg: "rgba(255, 255, 255, 0.96)",
-  tooltipBorder: "rgba(219, 227, 225, 0.95)",
-  tooltipShadow: "0 14px 40px rgba(19, 38, 43, 0.14)",
-  nullFill: "#cbd5e1",
-  highlight: "#47f6ad",
+  ink: "#24211c",
+  inkStrong: "#24211c",
+  muted: "#6a5f4c",
+  grid: "rgba(36, 33, 28, 0.1)",
+  border: "#ddd2bc",
+  primary: "#1d6164",
+  surface: "#fbf8f1",
+  tooltipBg: "rgba(251, 248, 241, 0.97)",
+  tooltipBorder: "rgba(36, 33, 28, 0.18)",
+  tooltipShadow: "0 14px 40px rgba(36, 33, 28, 0.14)",
+  nullFill: "#d8cfbd",
+  highlight: "#5f6b2c",
 };
 
 function read(): ChartTokens {

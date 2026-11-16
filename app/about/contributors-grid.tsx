@@ -1,39 +1,32 @@
 import type { Contributor } from "@/lib/data/contributors";
+import { formatNumber } from "@/lib/format";
 
 import styles from "./about.module.css";
 
+/**
+ * Contributors as an atlas index: login, a dotted leader, and the number of
+ * contributions, most first, set in columns.
+ */
 export function ContributorsGrid({ contributors }: { contributors: Contributor[] }) {
+  const ordered = [...contributors].sort((a, b) => b.contributions - a.contributions);
   return (
-    <ul className={styles.contributorsGrid}>
-      {contributors.map((contributor) => (
-        <li key={contributor.id} className={styles.contributorCard}>
+    <ol className={styles.contributorsIndex}>
+      {ordered.map((contributor) => (
+        <li key={contributor.id}>
           <a
             href={contributor.html_url}
             target="_blank"
             rel="noreferrer"
-            title={`${contributor.login} — ${contributor.contributions} contributions`}
-          >
-            {/* Static export has no image optimizer to route this through. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className={styles.contributorAvatar}
-              src={contributor.avatar_url}
-              alt=""
-              width={48}
-              height={48}
-              loading="lazy"
-            />
-          </a>
-          <a
-            className={styles.contributorLogin}
-            href={contributor.html_url}
-            target="_blank"
-            rel="noreferrer"
+            title={contributor.login}
           >
             {contributor.login}
           </a>
+          <span>
+            {formatNumber(contributor.contributions)}
+            <span className="visually-hidden"> contributions</span>
+          </span>
         </li>
       ))}
-    </ul>
+    </ol>
   );
 }

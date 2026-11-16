@@ -12,7 +12,6 @@ import { formatNumber } from "@/lib/format";
 import {
   climateTriageLink,
   contributeLink,
-  ostGithubUrl,
   routes,
 } from "@/lib/navigation";
 
@@ -125,21 +124,25 @@ export default async function HomePage() {
                 name="q"
                 placeholder={`Search ${formatNumber(totals.projects)} projects, e.g. PyPSA, solar, wildfire`}
               />
-              <button type="submit" className="pill pill--blue">
+              <button type="submit" className="pill pill--primary">
                 Search
               </button>
             </form>
             <div className="home-actions">
-              <Link className="pill pill--ink" href={routes.projects}>
-                Browse the directory
-              </Link>
               <a className="pill" href="#categories">
-                View as a list
+                Browse by category
               </a>
+              <Link className="pill" href={routes.projects}>
+                Open the directory
+              </Link>
             </div>
           </div>
           <div className="home-hero__chart">
             <EcosystemSunburst variant="hero" selectionSlot="hero-selection" />
+            <p className="home-hero__caption">
+              Inner ring: categories. Middle ring: subcategories. Outer ring: projects. The
+              scale round the edge marks each 1% of the projects shown.
+            </p>
           </div>
         </div>
       </section>
@@ -173,36 +176,15 @@ export default async function HomePage() {
         <div className="container">
           <div className="home-section__head">
             <h2 id="categories-title" className="home-section__title">
-              Explore by category
+              Browse by category
             </h2>
             <p className="home-section__intro">
               {totals.categories} categories and {totals.subcategories} subcategories, each in
-              its colour on the map above. Pick one to see its subcategories.
+              its colour on the map above. Open one to see its subcategories and how many
+              projects each holds.
             </p>
           </div>
           <CategoryExplorer categories={categories} />
-        </div>
-      </section>
-
-      <section className="home-band" aria-labelledby="home-band-title">
-        <div className="container home-band__inner">
-          <h2 id="home-band-title" className="home-band__title">
-            Know a project
-            <br />
-            we’re missing?
-          </h2>
-          <p className="home-band__text">
-            The list is maintained in the open on GitHub. Anyone can add a project or
-            correct an entry with a pull request.
-          </p>
-          <div className="home-actions">
-            <a className="pill pill--blue" href={contributeLink.href} target="_blank" rel="noreferrer">
-              Read the contributing guide
-            </a>
-            <a className="pill" href={ostGithubUrl} target="_blank" rel="noreferrer">
-              Open on GitHub
-            </a>
-          </div>
         </div>
       </section>
 
@@ -212,7 +194,9 @@ export default async function HomePage() {
             <h2 id="beyond-title" className="home-section__title">
               Beyond the map
             </h2>
-            <p className="kicker">Data · Learning · Community</p>
+            <p className="home-section__intro">
+              The directory, the analytics and the reading behind the list.
+            </p>
           </div>
           <ul className="beyond-grid">
             {beyond.map((item) => {
@@ -244,25 +228,29 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-callout-section" aria-labelledby="triage-title">
-        <div className="container">
-          <div className="home-callout">
-            <div className="home-callout__text">
-              <p className="kicker home-callout__kicker">First contribution?</p>
-              <h2 id="triage-title" className="home-callout__title">
-                Start on ClimateTriage
-              </h2>
-              <p className="home-callout__body">
-                Open issues from projects on this map, ready for your first pull request.
-              </p>
-            </div>
+      <section className="home-band" aria-labelledby="home-band-title">
+        <div className="container home-band__inner">
+          <div className="home-band__text">
+            <p className="kicker">Curated in the open</p>
+            <h2 id="home-band-title" className="home-band__title">
+              Know a project the list is missing?
+            </h2>
+            <p className="home-band__body">
+              The list is a README on GitHub. Anyone can add a project or correct an entry
+              with a pull request, and this site rebuilds from it every week.
+            </p>
+          </div>
+          <div className="home-band__actions">
             <a
-              className="pill pill--mint"
-              href={climateTriageLink.href}
+              className="pill pill--accent"
+              href={contributeLink.href}
               target="_blank"
               rel="noreferrer"
             >
-              Find an issue <span aria-hidden="true">↗</span>
+              Add a project
+            </a>
+            <a className="pill" href={climateTriageLink.href} target="_blank" rel="noreferrer">
+              Find an issue on ClimateTriage <span aria-hidden="true">↗</span>
             </a>
           </div>
         </div>

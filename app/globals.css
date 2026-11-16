@@ -4,34 +4,36 @@
 
 /* --- Design Tokens (Light Theme — Default) --- */
 :root {
-  --color-primary: #1878cf;
-  --color-green: #47f6ad;
-  --color-black: #13262b;
-  --color-silver: #e3eae8;
-  --color-azure: #61d0ff;
-  --color-text: #13262b;
-  --color-text-secondary: #4d6166;
-  --color-bg: #ffffff;
-  --color-bg-alt: #f3f6f5;
-  --color-card-bg: #ffffff;
-  --color-border: #dbe3e1;
+  /* Earth atlas: paper and ink from EarthPV, ocean, sand and the globe's navy
+     frame from earth.png. Ocean is the action colour, rust the invitation. */
+  --color-primary: #1d6164;
+  --color-green: #5f6b2c;
+  --color-black: #24211c;
+  --color-silver: #e6dcc6;
+  --color-azure: #7fa4aa;
+  --color-text: #24211c;
+  --color-text-secondary: #6a5f4c;
+  --color-bg: #f6f0e3;
+  --color-bg-alt: #efe7d6;
+  --color-card-bg: #fbf8f1;
+  --color-border: #ddd2bc;
   /* Loading skeleton bars: a grey a step under the border, and the lighter band that moves across it. */
-  --color-skeleton: #e1e8e6;
-  --color-skeleton-shine: #f2f5f4;
-  --color-header-bg: rgba(255, 255, 255, 0.98);
+  --color-skeleton: #e6dcc8;
+  --color-skeleton-shine: #f1eadb;
+  --color-header-bg: rgba(246, 240, 227, 0.96);
   /* A shade off the page so the community strip reads as a band, not a panel. */
-  --color-banner-bg: #eef3f2;
+  --color-banner-bg: #ede3cd;
   /*
    * Primary as *ink*. --color-primary is tuned as a fill and stays put across
    * themes, so on the dark ground it drops to 3.3:1 — under AA for body text.
    * This one lightens instead: 8.6:1 on white, 6.8:1 on the dark page.
    */
-  --color-link: #145e9c;
+  --color-link: #1d6164;
   /*
    * The wordmark's own blue, matching the OpenSustain.tech lockup; the
    * primary fill uses the same value. 4.54:1 on the light header.
    */
-  --color-wordmark: #1878cf;
+  --color-wordmark: #24211c;
   /*
    * A fixed dark scrim for overlays on arbitrary photographic thumbnails
    * (e.g. the presentations play-button backdrop). Deliberately not
@@ -39,7 +41,7 @@
    * above: it sits on a photo, not the page background, so it must read the
    * same dark regardless of theme rather than flipping like --color-black.
    */
-  --color-scrim: #13262b;
+  --color-scrim: #10112d;
   /*
    * Attention/TODO badges (e.g. the About page's placeholder-data marker).
    * Amber on both themes for a consistent "unfinished" signal; contrast
@@ -52,17 +54,17 @@
    * page or section), the system sans for reading, and a mono for short
    * labels: kickers, column heads, tags.
    */
-  --font-heading: 'Space Grotesk', Arial, sans-serif;
-  --font-body: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  --font-heading: 'Zen Old Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-body: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-  --stretch-label: 87.5%;
-  --stretch-display: 115%;
+  --stretch-label: 100%;
+  --stretch-display: 100%;
   /*
    * Two corner radii, by what a thing is: a control you press or type into,
    * or a surface that holds content. Circles and hairline bars keep their own.
    */
-  --radius-control: 6px;
-  --radius-surface: 8px;
+  --radius-control: 3px;
+  --radius-surface: 4px;
   /*
    * The type scale. Every role takes one of these; neighbouring roles used to
    * land 1-2px apart (22, 23, 24) and children outranked their parents.
@@ -85,58 +87,67 @@
    * The one filled button style (Contribute, Browse the directory, primary
    * chart actions). Brand blue on paper; inverted ink on the dark ground.
    */
-  --color-action-bg: #1878cf;
-  --color-action-ink: #ffffff;
-  --color-action-hover-bg: #145e9c;
+  --color-action-bg: #1d6164;
+  --color-action-ink: #fbf8f1;
+  --color-action-hover-bg: #15494b;
   --container-max-width: 1100px;
   /*
    * The outlined look: 2px ink rules around controls and cards, pill-shaped
    * buttons, and two washes that bands fade into from the page ground. The
    * mint fill keeps ink text in both themes.
    */
-  --line-strong: 2px solid var(--color-black);
-  --radius-pill: 999px;
-  --radius-card: 20px;
-  --color-mint: #47f6ad;
-  --color-on-mint: #13262b;
-  --wash-sky: #d6f1ff;
-  --wash-mint: #c8fbe4;
+  --line-strong: 1.5px solid var(--color-black);
+  --radius-pill: 3px;
+  --radius-card: 4px;
+  /* Rust: the invitation to contribute, and nothing else. */
+  --color-accent: #9a3b1e;
+  --color-on-accent: #fbf8f1;
+  /* The band at the foot of the home page: the navy of the globe's frame. */
+  --color-band: #10112d;
+  --color-on-band: #ece4d2;
+  --color-on-band-muted: #b9b09c;
+  --wash-sand: #ede3cd;
 }
 
 /*
  * --- Dark Theme ---
- * The same atlas printed on dark stock, not a separate look: a graphite
- * ground well clear of black, off-white ink a notch under full contrast,
- * lighter heading weights, and the category colors as the brightest thing on
- * the page. Surfaces step up in tone instead of leaning on borders, and the
- * filled button is inverted ink rather than a saturated blue.
+ * The same atlas printed on dark stock, not a separate look: the navy of the
+ * globe's frame in earth.png as the ground, paper-coloured ink a notch under
+ * full contrast, and the category colors as the brightest thing on the page.
+ * Surfaces step up in tone instead of leaning on borders, and the filled
+ * button is a lighter ocean with navy ink.
  */
 [data-theme="dark"] {
   color-scheme: dark;
-  --color-black: #ebefec;
-  --color-bg: #1f2629;
-  --color-bg-alt: #252d30;
-  --color-card-bg: #283236;
-  --color-border: #38444a;
-  --color-skeleton: #313c40;
-  --color-skeleton-shine: #3d494e;
-  --color-text: #dce2df;
-  --color-text-secondary: #a3afae;
-  --color-silver: #38444a;
-  --color-header-bg: rgba(31, 38, 41, 0.94);
-  --color-banner-bg: #252d30;
+  --color-black: #ece4d2;
+  --color-bg: #12142a;
+  --color-bg-alt: #181b33;
+  --color-card-bg: #1d2038;
+  --color-border: #2e3150;
+  --color-skeleton: #24274a;
+  --color-skeleton-shine: #2e3156;
+  --color-text: #e4dcc9;
+  --color-text-secondary: #b3aa96;
+  --color-silver: #2a2d48;
+  --color-header-bg: rgba(18, 20, 42, 0.94);
+  --color-banner-bg: #181b33;
   --color-warning: #f0b860;
   --color-warning-bg: rgba(240, 184, 96, 0.1);
-  --color-link: #93c3ea;
-  --color-wordmark: #6fb0ec;
-  --weight-heading: 560;
-  /* Blue in both themes, so the one primary action reads as the same thing;
-     dark ink on a lighter blue clears 7:1. */
-  --color-action-bg: #4b9be6;
-  --color-action-ink: #0b1620;
-  --color-action-hover-bg: #73b3ee;
-  --wash-sky: #1d3846;
-  --wash-mint: #183d35;
+  --color-link: #8cc6c2;
+  --color-wordmark: #ece4d2;
+  --weight-heading: 600;
+  /* Ocean in both themes, so the one primary action reads as the same thing;
+     navy ink on the lighter ocean clears 7:1. */
+  --color-action-bg: #6fb3b0;
+  --color-action-ink: #10112d;
+  --color-action-hover-bg: #8cc6c2;
+  --color-accent: #e0855e;
+  --color-on-accent: #10112d;
+  /* The page is already the frame navy, so the band drops to deep ocean. */
+  --color-band: #0d3739;
+  --color-on-band: #ece4d2;
+  --color-on-band-muted: #b7c2b8;
+  --wash-sand: #1d2038;
 }
 
 /* --- Global Theme Transition --- */
@@ -195,7 +206,7 @@ h1 {
   font-size: var(--text-3xl);
   font-weight: var(--weight-heading);
   font-stretch: var(--stretch-display);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.01em;
 }
 
 h2 {
@@ -1516,91 +1527,87 @@ a.panel:hover .panel-title {
    grounds. The payload stays the source of truth for the data
    pipeline; these tokens are the presentation layer, and any
    category name not listed here falls back to the payload value.
-   Five re-spaced (2026-11): four teals and three salmon-pinks sat within
-   ~30 degrees of hue, the closest pair at CIEDE2000 9.7. Now ice
-   cryosphere, mid teal hydrosphere, gold renewable energy, orchid
-   sustainable development and periwinkle energy storage lift the closest
-   pair to 11.7, each still >= 5:1 under the dark swatch label. Under
-   deuteranopia industrial ecology / natural resources and energy systems /
-   energy storage stay close (~4); legends and labels carry those.
+   Earth tones (2026-11), sampled from earth.png and grouped by theme:
+   energy in ochres and coppers, life in olives and moss, water and air in
+   teals, ice pale, people and policy in slate. Each is lifted from the
+   image's deeper value until the fixed ink label on it clears 5:1.
    ============================================================ */
 :root {
-  --viz-cat-atmosphere: #008fc1;
-  --viz-cat-biosphere: #51a362;
-  --viz-cat-climate-change: #e47667;
-  --viz-cat-consumption: #ef69a9;
-  --viz-cat-cryosphere: #9fd8e6;
-  --viz-cat-emissions: #de9e58;
-  --viz-cat-energy-storage: #9b8ff0;
-  --viz-cat-energy-systems: #7facff;
-  --viz-cat-hydrosphere: #2aa3a5;
-  --viz-cat-industrial-ecology: #b47144;
-  --viz-cat-natural-resources: #8f9130;
-  --viz-cat-renewable-energy: #d9a400;
-  --viz-cat-sustainable-development: #b97fc9;
+  --viz-cat-atmosphere: #9dbcc0;
+  --viz-cat-biosphere: #99a45f;
+  --viz-cat-climate-change: #cf7a62;
+  --viz-cat-consumption: #cf9e8e;
+  --viz-cat-cryosphere: #ddd8c8;
+  --viz-cat-emissions: #ab917c;
+  --viz-cat-energy-storage: #b8956a;
+  --viz-cat-energy-systems: #d08c55;
+  --viz-cat-hydrosphere: #6aa5a5;
+  --viz-cat-industrial-ecology: #bdb49c;
+  --viz-cat-natural-resources: #b3ae64;
+  --viz-cat-renewable-energy: #d6aa52;
+  --viz-cat-sustainable-development: #8fa0b8;
 
   /* Sequential ramp — replaces the Streamlit red→green rainbow, which
      converges at both ends under deuteranopia and is non-monotone in
-     lightness. This one runs along the brand's own primary→azure axis. */
-  --viz-seq-0: #7ecfcd;
-  --viz-seq-1: #36bcc9;
-  --viz-seq-2: #00a4bf;
-  --viz-seq-3: #0089c6;
-  --viz-seq-4: #2563eb;
-  --viz-seq-5: #264fc6;
-  --viz-seq-6: #223da2;
+     lightness. This one runs from sand down into the ocean of earth.png. */
+  --viz-seq-0: #e3cf9c;
+  --viz-seq-1: #c9c08a;
+  --viz-seq-2: #9fb08a;
+  --viz-seq-3: #6f9c8f;
+  --viz-seq-4: #3f8285;
+  --viz-seq-5: #1d6164;
+  --viz-seq-6: #14434a;
 
   --viz-arc-stroke: var(--color-card-bg);
-  --viz-arc-stroke-emphasis: #13262b;
-  --viz-select-stroke: var(--color-primary);
-  --viz-null: #cbd5e1;
+  --viz-arc-stroke-emphasis: #24211c;
+  --viz-select-stroke: var(--color-accent);
+  --viz-null: #d8cfbd;
 
   /* Ink for text sitting ON a category swatch. Fixed in both themes: the
      swatch colour does not change with the theme, so the label on it must not
      either — keying it to --color-black turned every category label white in
      dark mode, on the same mid-tone fill. */
-  --viz-label-on-swatch: #13262b;
+  --viz-label-on-swatch: #24211c;
   /* Ink for the project ring, whose fill is tinted toward the panel ground —
      lighter in light theme, darker in dark — so this one does flip. */
-  --viz-label-on-tint: #13262b;
-  --viz-label-halo: rgba(255, 255, 255, 0.75);
+  --viz-label-on-tint: #24211c;
+  --viz-label-halo: rgba(251, 248, 241, 0.75);
 
   /* Read by useChartTokens for every ECharts axis. It was referenced there and
      never defined here, so the charts fell back to a light literal in both
      themes and the dark gridlines stayed pale. */
-  --viz-grid-line: rgba(230, 237, 243, 0.7);
-  --viz-tooltip-bg: rgba(255, 255, 255, 0.96);
-  --viz-tooltip-border: rgba(230, 237, 243, 0.95);
-  --viz-tooltip-shadow: 0 14px 40px rgba(19, 38, 43, 0.14);
+  --viz-grid-line: rgba(36, 33, 28, 0.1);
+  --viz-tooltip-bg: rgba(251, 248, 241, 0.97);
+  --viz-tooltip-border: rgba(36, 33, 28, 0.18);
+  --viz-tooltip-shadow: 0 14px 40px rgba(36, 33, 28, 0.14);
 
-  --viz-focus-color: #1878cf;
+  --viz-focus-color: #9a3b1e;
   --viz-zoom-duration: 750ms;
   /* The centre plate at the root, where there is no category to borrow from. */
-  --viz-centre-root: #f3f6f5;
-  --viz-centre-on: #13262b;
+  --viz-centre-root: #fbf8f1;
+  --viz-centre-on: #24211c;
 }
 
-/* Low values sit back in deep blue; high values rise toward pale teal. */
+/* Low values sit back in deep ocean; high values rise toward sand. */
 [data-theme="dark"] {
-  /* Was #2b4a8a, near-invisible on the #283236 card. */
-  --viz-seq-0: #3a6fb0;
-  --viz-seq-1: #2f63a8;
-  --viz-seq-2: #2f7fc0;
-  --viz-seq-3: #3399c9;
-  --viz-seq-4: #4fb1cc;
-  --viz-seq-5: #77c8cf;
-  --viz-seq-6: #a9ddd6;
+  --viz-seq-0: #24596a;
+  --viz-seq-1: #2f6f78;
+  --viz-seq-2: #3f8a87;
+  --viz-seq-3: #63a092;
+  --viz-seq-4: #93b391;
+  --viz-seq-5: #c2c497;
+  --viz-seq-6: #e3d3a4;
 
-  --viz-arc-stroke-emphasis: #ebefec;
-  --viz-null: #3d494e;
-  --viz-label-on-tint: #ebefec;
-  --viz-label-halo: rgba(31, 38, 41, 0.75);
-  --viz-grid-line: rgba(56, 68, 74, 0.9);
-  --viz-tooltip-bg: rgba(40, 50, 54, 0.97);
-  --viz-tooltip-border: rgba(56, 68, 74, 0.95);
+  --viz-arc-stroke-emphasis: #ece4d2;
+  --viz-null: #2e3150;
+  --viz-label-on-tint: #ece4d2;
+  --viz-label-halo: rgba(18, 20, 42, 0.75);
+  --viz-grid-line: rgba(236, 228, 210, 0.12);
+  --viz-tooltip-bg: rgba(29, 32, 56, 0.97);
+  --viz-tooltip-border: rgba(236, 228, 210, 0.16);
   --viz-tooltip-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
-  --viz-focus-color: #93c3ea;
-  --viz-centre-root: #283236;
+  --viz-focus-color: #e0855e;
+  --viz-centre-root: #1d2038;
 }
 
 /* ============================================================
@@ -3658,18 +3665,16 @@ input:focus-visible,
 }
 
 /* ============================================================
-   Outlined look
-   Ink outlines, pill buttons, capitals in the grotesk for page
-   and section titles, mono kickers, and two washes that bands
-   fade into. Shared pieces first, then the chrome, the home
-   page and the directory. Later in the file on purpose: these
-   override the earlier rules for the same elements.
+   Earth atlas
+   Paper and ink, a serif for titles in sentence case, square
+   outlined buttons, mono labels, and the ring as the one
+   coloured object on the page. Ocean marks the primary action,
+   rust the invitation to contribute, and the navy of the
+   globe's frame carries the band at the foot of the home page.
+   Shared pieces first, then the chrome, the home page and the
+   directory. Later in the file on purpose: these override the
+   earlier rules for the same elements.
    ============================================================ */
-h1 {
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-}
-
 .kicker {
   margin: 0;
   font-family: var(--font-mono);
@@ -3686,24 +3691,24 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
-  padding: 0 24px;
+  min-height: 46px;
+  padding: 0 20px;
   border: var(--line-strong);
   border-radius: var(--radius-pill);
-  background: var(--color-bg);
+  background: transparent;
   color: var(--color-black);
   font-family: var(--font-body);
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   white-space: nowrap;
   cursor: pointer;
-  transition: transform 0.15s ease, background-color 0.15s ease;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
 .pill:hover {
-  transform: translateY(-1px);
+  background: var(--color-black);
+  color: var(--color-bg);
 }
 
 .pill--ink {
@@ -3711,27 +3716,34 @@ h1 {
   color: var(--color-bg);
 }
 
-.pill--blue {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #ffffff;
+.pill--ink:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
-/* Darker in both themes: the dark theme's action hover is a light blue,
-   which white text cannot sit on. */
-.pill--blue:hover {
-  background: #145e9c;
-  border-color: #145e9c;
+.pill--primary {
+  background: var(--color-action-bg);
+  border-color: var(--color-action-bg);
+  color: var(--color-action-ink);
 }
 
-.pill--mint {
-  background: var(--color-mint);
-  color: var(--color-on-mint);
+.pill--accent {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
-/* --- Community strip: ink in both themes --- */
+.pill--primary:hover,
+.pill--accent:hover {
+  background: var(--color-black);
+  border-color: var(--color-black);
+  color: var(--color-bg);
+}
+
+/* --- Community strip: the band colour in both themes --- */
 .community-bar {
-  background: var(--color-scrim);
+  background: var(--color-band);
   border-bottom: 0;
 }
 
@@ -3739,26 +3751,28 @@ h1 {
   flex-wrap: wrap;
   gap: 6px 12px;
   font-family: var(--font-body);
-  color: #ffffff;
+  color: var(--color-on-band);
 }
 
 .community-bar__message a {
-  color: #ffffff;
+  color: var(--color-on-band);
   font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .community-bar__close {
-  color: #c9d4d1;
+  color: var(--color-on-band-muted);
 }
 
 .community-bar__close:hover {
-  color: #ffffff;
+  color: var(--color-on-band);
 }
 
 /* --- Header --- */
 .site-header {
   padding: 10px 0;
-  border-bottom: 1px solid var(--color-black);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .header-inner {
@@ -3767,17 +3781,16 @@ h1 {
 
 .site-mark {
   gap: 12px;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  color: var(--color-black);
+  line-height: 1.1;
+  letter-spacing: 0;
+  color: var(--color-wordmark);
 }
 
 .site-mark__logo {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
 }
 
 /* Two lines, as set: the break is in the markup, so nothing else may wrap. */
@@ -3798,23 +3811,22 @@ h1 {
 .site-nav-link,
 .site-nav-dropdown__toggle {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 15px;
   white-space: nowrap;
   font-weight: 500;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
   color: var(--color-black);
 }
 
 .site-nav-link:hover,
 .site-nav-dropdown__toggle:hover {
-  color: var(--color-link);
+  color: var(--color-accent);
 }
 
 .header-cta {
-  min-height: 44px;
+  min-height: 40px;
   margin-left: 24px;
-  padding: 0 20px;
+  padding: 0 16px;
+  font-size: 14px;
 }
 
 .header-github {
@@ -3822,8 +3834,6 @@ h1 {
   color: var(--color-black);
 }
 
-/* Capitals take more room than the old row did, so the menu takes over
-   while the links would still crowd the wordmark. */
 @media (max-width: 1180px) {
   .site-nav {
     display: none;
@@ -3844,19 +3854,19 @@ h1 {
   }
 
   .site-mark {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .site-mark__logo {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
   }
 }
 
 /* --- Footer --- */
 .site-footer {
   padding: 64px 0 32px;
-  border-top: 1px solid var(--color-black);
+  border-top: 1px solid var(--color-border);
 }
 
 .footer-inner {
@@ -3870,10 +3880,10 @@ h1 {
 
 .footer-logo {
   margin: 0;
+  font-family: var(--font-heading);
   font-size: 22px;
   font-weight: 600;
-  line-height: 1.1;
-  text-transform: uppercase;
+  line-height: 1.2;
   color: var(--color-black);
 }
 
@@ -3885,14 +3895,9 @@ h1 {
 
 .site-footer .footer-discord {
   align-self: flex-start;
-  min-height: 44px;
+  min-height: 42px;
   font-family: var(--font-body);
-  font-size: 15px;
-  color: var(--color-black);
-}
-
-.site-footer .footer-discord:hover {
-  color: var(--color-black);
+  font-size: 14px;
 }
 
 .footer-column__heading {
@@ -3902,7 +3907,7 @@ h1 {
   font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-link);
+  color: var(--color-text-secondary);
 }
 
 .site-footer .footer-column a {
@@ -3912,8 +3917,7 @@ h1 {
 }
 
 .site-footer .footer-column a:hover {
-  color: var(--color-black);
-  text-decoration: underline;
+  color: var(--color-accent);
 }
 
 .footer-bottom {
@@ -3923,11 +3927,12 @@ h1 {
   gap: 12px;
   margin-top: 48px;
   padding-top: 20px;
-  border-top: 1px solid var(--color-black);
+  border-top: 1px solid var(--color-border);
 }
 
 .footer-bottom .footer-copyright {
   font-size: 14px;
+  color: var(--color-text-secondary);
 }
 
 .site-footer .footer-bottom a {
@@ -3942,15 +3947,13 @@ h1 {
 }
 
 .home-hero {
-  padding: 88px 0 96px;
-  background: linear-gradient(115deg, var(--color-bg) 45%, var(--wash-sky) 100%);
-  border-bottom: 1px solid var(--color-black);
+  padding: 64px 0 48px;
 }
 
 .home-hero__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-  gap: 48px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  gap: 56px;
   align-items: center;
 }
 
@@ -3963,17 +3966,17 @@ h1 {
 
 .home-title {
   margin: 0;
-  font-size: clamp(44px, 4.6vw, 64px);
+  font-size: clamp(40px, 5vw, 66px);
   font-weight: 600;
-  line-height: 1.02;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
 }
 
 .home-lede {
-  max-width: 560px;
-  padding: 18px 0;
-  border-block: 1px solid var(--color-black);
-  font-size: 20px;
+  max-width: 34em;
+  font-size: 19px;
   line-height: 1.6;
+  color: var(--color-text-secondary);
 }
 
 /* A project chosen on the ring takes the description's place beside it. */
@@ -3983,20 +3986,21 @@ h1 {
   }
 }
 
+/* The field and its button share one outline. */
 .home-search {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  max-width: 540px;
 }
 
 .home-search input {
-  flex: 1 1 300px;
+  flex: 1;
   min-width: 0;
-  min-height: 52px;
-  padding: 0 20px;
+  min-height: 50px;
+  padding: 0 16px;
   border: var(--line-strong);
-  border-radius: var(--radius-pill);
-  background: var(--color-bg);
+  border-right: 0;
+  border-radius: var(--radius-control) 0 0 var(--radius-control);
+  background: var(--color-card-bg);
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: 16px;
@@ -4007,7 +4011,8 @@ h1 {
 }
 
 .home-search .pill {
-  min-height: 52px;
+  min-height: 50px;
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
 }
 
 .home-actions {
@@ -4028,34 +4033,92 @@ h1 {
 
 .home-hero__chart .viz-centre-plate {
   stroke: var(--color-black);
-  stroke-width: 2px;
+  stroke-width: 1px;
 }
 
-/* Space Grotesk runs wider than the old face, so the wordmark the smallest
-   centre falls back to needs a step under the 11px floor to fit. */
+/* A scale round the ring, like the bezel of an atlas plate: one tick per 1%
+   of the projects shown, a long one every 10%. The ring measures its width
+   inside this padding, so the scale has room outside it. */
+.home-hero__chart .viz-body {
+  padding-inline: 24px;
+}
+
+.home-hero__chart .viz-chart__stage {
+  margin-block: 24px;
+}
+
+.home-hero__chart .viz-chart__stage::before,
+.home-hero__chart .viz-chart__stage::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: calc(100% + 40px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.home-hero__chart .viz-chart__stage::before {
+  background: repeating-conic-gradient(var(--color-black) 0 0.35deg, transparent 0.35deg 3.6deg);
+  mask: radial-gradient(closest-side, transparent calc(100% - 7px), #000 calc(100% - 6.5px));
+  opacity: 0.7;
+}
+
+.home-hero__chart .viz-chart__stage::after {
+  background: repeating-conic-gradient(var(--color-black) 0 0.5deg, transparent 0.5deg 36deg);
+  mask: radial-gradient(closest-side, transparent calc(100% - 14px), #000 calc(100% - 13.5px));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-black) 25%, transparent);
+}
+
+.home-hero__caption {
+  max-width: 34em;
+  margin: 8px auto 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+.home-hero__chart .viz-hole__title,
+.home-hero__chart .viz-hole__eyebrow,
+.home-hero__chart .viz-hole__meta {
+  font-weight: 600;
+}
+
+/* The serif runs wide, so the wordmark the smallest centre falls back to
+   needs a step under the 11px floor and tighter spacing to fit. */
 @media (max-width: 600px) {
   .home-hero__chart .viz-hole__title {
-    font-size: 10px;
+    font-size: 9.5px;
     letter-spacing: -0.03em;
   }
 }
 
 .home-hero__chart .viz-chart__caption {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-black);
+  max-width: 34em;
+  margin-inline: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
+  line-height: 1.55;
+  text-align: left;
+  color: var(--color-text-secondary);
 }
 
-.home-stats {
-  border-bottom: 1px solid var(--color-black);
+.home-stats .container {
+  padding-top: 16px;
 }
 
 .home-stats__grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 24px;
   margin: 0;
+  padding-top: 18px;
+  border-top: var(--line-strong);
 }
 
 /* The label is the term and comes first in the markup; the figure leads on
@@ -4064,249 +4127,169 @@ h1 {
   display: flex;
   flex-direction: column-reverse;
   justify-content: flex-end;
-  gap: 10px;
-  padding: 28px 24px 32px;
-  border-left: 1px solid var(--color-black);
-}
-
-.home-stat:first-child {
-  padding-left: 0;
-  border-left: 0;
+  gap: 6px;
 }
 
 .home-stat__value {
   margin: 0;
   font-family: var(--font-heading);
-  font-size: 44px;
+  font-size: clamp(28px, 3.2vw, 40px);
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.05;
   font-variant-numeric: tabular-nums;
   color: var(--color-black);
-}
-
-.home-stats__source {
-  border-top: 1px solid var(--color-black);
 }
 
 .page-provenance--home {
   margin: 0;
-  padding: 14px 0;
+  padding: 18px 0 0;
 }
 
 .home-section {
-  padding: 96px 0;
+  padding: 72px 0;
+}
+
+.home-section + .home-section > .container {
+  padding-top: 72px;
+  border-top: 1px solid var(--color-border);
+}
+
+.home-section + .home-section {
+  padding-top: 0;
 }
 
 .home-section__head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 16px;
-  margin-bottom: 32px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--color-black);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: end;
+  gap: 32px;
+  margin-bottom: 40px;
 }
 
 .home-section__title {
   margin: 0;
-  font-size: 44px;
+  font-size: clamp(30px, 3.4vw, 42px);
   font-weight: 600;
-  text-transform: uppercase;
+  line-height: 1.1;
 }
 
 .home-section__intro {
-  max-width: 420px;
-  font-size: 17px;
-  line-height: 1.5;
+  max-width: 36em;
+  font-size: 16px;
+  color: var(--color-text-secondary);
 }
 
-.category-grid {
+/* The categories as a map key: swatch, name, share bar, count; each opens
+   onto its subcategories. Same order as the ring. */
+.category-key {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin: 0 0 32px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 48px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.category-grid > li {
-  display: flex;
+.category-key__item {
+  border-bottom: 1px solid var(--color-border);
 }
 
-.category-card {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 12px;
-  min-height: 160px;
-  padding: 20px;
-  border: var(--line-strong);
-  border-radius: var(--radius-card);
-  background: var(--color-bg);
+.category-key__toggle {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 0;
+  border: 0;
+  background: none;
   color: var(--color-black);
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
-.category-card:hover {
-  transform: translateY(-2px);
-}
-
-.category-card[aria-pressed="true"] {
-  background: var(--color-silver);
-}
-
-.category-card__top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.category-card__dot,
-.category-panel .sub-pill__dot {
-  flex: none;
+.category-key__swatch {
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-black) 35%, transparent);
 }
 
-.category-card__dot {
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--color-black);
-}
-
-.category-card__name {
-  flex-grow: 1;
+.category-key__name {
+  display: block;
   font-family: var(--font-heading);
-  font-size: 21px;
-  font-weight: 600;
-  line-height: 1.15;
-  text-transform: uppercase;
-}
-
-.category-card__meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
-}
-
-.category-card__meta > span:last-child {
   font-size: 20px;
-}
-
-.category-card__counts {
-  display: flex;
-  flex-direction: column;
-}
-
-.category-panel {
-  overflow: hidden;
-  border: var(--line-strong);
-  border-radius: 24px;
-  background: var(--color-bg-alt);
-}
-
-.category-panel__bar {
-  height: 6px;
-}
-
-.category-panel__body {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 28px;
-}
-
-.category-panel__head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.category-panel__title {
-  margin: 0;
-  font-size: 26px;
   font-weight: 600;
-  text-transform: uppercase;
+  line-height: 1.25;
 }
 
-.category-panel__head .pill {
-  min-height: 44px;
+.category-key__toggle:hover .category-key__name,
+.category-key__toggle[aria-expanded="true"] .category-key__name {
+  color: var(--color-accent);
 }
 
-.category-panel__subs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.category-key__share {
+  display: block;
+  height: 3px;
+  margin-top: 6px;
+  border-radius: 2px;
+  background: var(--color-border);
+  overflow: hidden;
 }
 
-.sub-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  padding: 0 16px;
-  border: 1.5px solid var(--color-black);
-  border-radius: var(--radius-pill);
-  background: var(--color-bg);
-  color: var(--color-black);
-  font-size: 15px;
+.category-key__share > span {
+  display: block;
+  height: 100%;
 }
 
-.sub-pill:hover {
-  background: var(--color-silver);
-}
-
-.sub-pill__dot {
-  width: 8px;
-  height: 8px;
-}
-
-.sub-pill__count {
+.category-key__count {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
   color: var(--color-text-secondary);
 }
 
-.home-band {
-  padding: 88px 0;
-  background: linear-gradient(115deg, var(--color-bg) 40%, var(--wash-mint) 100%);
-  border-block: 1px solid var(--color-black);
-}
-
-.home-band__inner {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.home-band__title {
+.category-key__subs {
+  display: grid;
+  gap: 2px;
   margin: 0;
-  font-size: 52px;
-  font-weight: 600;
-  line-height: 1.05;
-  text-transform: uppercase;
+  padding: 0 0 12px 36px;
+  list-style: none;
 }
 
-.home-band__text {
-  max-width: 600px;
-  font-size: 19px;
+.category-key__sub {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.category-key__sub:hover {
+  color: var(--color-accent);
+}
+
+.category-key__sub-count {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+}
+
+.category-key__all {
+  display: inline-block;
+  margin: 0 0 18px 36px;
+  font-size: 14px;
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .beyond-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  gap: 40px 48px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -4320,130 +4303,132 @@ h1 {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 14px;
-  min-height: 240px;
-  padding: 28px;
-  border: var(--line-strong);
-  border-radius: 22px;
-  background: var(--color-bg);
+  gap: 8px;
   color: var(--color-black);
-  transition: transform 0.15s ease;
-}
-
-.beyond-card:hover {
-  transform: translateY(-2px);
-}
-
-.beyond-card__tag {
-  align-self: flex-start;
-  color: var(--color-link);
 }
 
 .beyond-card__title {
   font-family: var(--font-heading);
-  font-size: 26px;
+  font-size: 23px;
   font-weight: 600;
-  line-height: 1.1;
-  text-transform: uppercase;
+  line-height: 1.2;
 }
 
 .beyond-card__body {
-  max-width: 320px;
-  font-size: 16px;
-  line-height: 1.55;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
 }
 
 .beyond-card__cta {
-  margin-top: auto;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.home-callout-section {
-  padding: 0 0 96px;
+.beyond-card:hover .beyond-card__title,
+.beyond-card:hover .beyond-card__cta {
+  color: var(--color-accent);
 }
 
-/* Ink in both themes, like the community strip. */
-.home-callout {
-  display: flex;
-  flex-wrap: wrap;
+/* The navy of the globe's frame; deep ocean on the dark page. */
+.home-band {
+  padding: 72px 0;
+  background: var(--color-band);
+  color: var(--color-on-band);
+}
+
+.home-band__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  padding: 48px;
-  border-radius: 28px;
-  background: var(--color-scrim);
-  color: #ffffff;
+  gap: 48px;
 }
 
-.home-callout__text {
+.home-band__text {
   display: flex;
-  flex: 1 1 420px;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
-.home-callout__kicker {
-  color: var(--color-mint);
+.home-band .kicker {
+  color: var(--color-on-band-muted);
 }
 
-.home-callout__title {
+.home-band__title {
   margin: 0;
-  font-size: 38px;
+  font-size: clamp(32px, 3.8vw, 48px);
   font-weight: 600;
   line-height: 1.1;
-  text-transform: uppercase;
-  color: #ffffff;
+  color: var(--color-on-band);
 }
 
-.home-callout__body {
-  max-width: 520px;
-  font-size: 18px;
-  color: #e3eae8;
+.home-band__body {
+  max-width: 34em;
+  font-size: 17px;
+  color: var(--color-on-band-muted);
 }
 
-.home-callout :focus-visible {
-  outline-color: var(--color-mint);
+.home-band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-[data-theme="dark"] .pill--mint,
-[data-theme="dark"] .home-callout .pill--mint {
-  border-color: var(--color-mint);
+.home-band .pill {
+  border-color: var(--color-on-band);
+  color: var(--color-on-band);
+}
+
+.home-band .pill:hover {
+  background: var(--color-on-band);
+  color: var(--color-band);
+}
+
+.home-band .pill--accent {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.home-band :focus-visible {
+  outline-color: var(--color-on-band);
 }
 
 @media (max-width: 1024px) {
   .home-hero {
-    padding: 56px 0 64px;
+    padding: 40px 0 32px;
   }
 
   .home-hero__grid {
     grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
   }
 
   .home-stats__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 20px;
   }
 
-  .home-stat,
-  .home-stat:first-child {
-    padding-left: 0;
-    border-left: 0;
-    border-top: 1px solid var(--color-black);
+  .home-section__head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 
-  .home-stat:nth-child(-n + 2) {
-    border-top: 0;
-  }
-
-  .category-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .category-key {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .beyond-grid,
   .footer-inner {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-band__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
   }
 
   .footer-brand {
@@ -4452,42 +4437,29 @@ h1 {
 }
 
 @media (max-width: 600px) {
-  .home-title,
-  .home-band__title {
-    font-size: 40px;
+  .home-section,
+  .home-band {
+    padding-block: 52px;
   }
 
-  .home-section {
-    padding: 64px 0;
+  .home-section + .home-section > .container {
+    padding-top: 52px;
   }
 
-  .home-section__title {
-    font-size: 32px;
+  .home-stats__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .home-stats__grid,
-  .category-grid,
   .beyond-grid,
   .footer-inner {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .home-stat:nth-child(2) {
-    border-top: 1px solid var(--color-black);
-  }
-
-  .home-callout {
-    padding: 32px 24px;
-  }
-
-  .home-callout__title {
-    font-size: 30px;
+    gap: 28px;
   }
 }
 
 /* --- Directory --- */
 .directory-controls {
-  border-bottom: 1px solid var(--color-black);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .directory-controls .viz-field__label {
@@ -4500,11 +4472,11 @@ h1 {
 
 .directory-controls .viz-field input,
 .directory-controls .viz-field select {
-  min-height: 48px;
-  padding-inline: 18px;
+  min-height: 46px;
+  padding-inline: 16px;
   border: var(--line-strong);
-  border-radius: var(--radius-pill);
-  background-color: var(--color-bg);
+  border-radius: var(--radius-control);
+  background-color: var(--color-card-bg);
 }
 
 .directory-controls .viz-field select {
@@ -4517,19 +4489,19 @@ h1 {
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  line-height: 48px;
+  line-height: 46px;
 }
 
 .directory-filter {
-  border: 1.5px solid var(--color-black);
-  border-radius: var(--radius-pill);
-  background: var(--color-bg);
+  border: 1px solid var(--color-black);
+  border-radius: var(--radius-control);
+  background: var(--color-card-bg);
   font-family: var(--font-body);
-  padding-inline: 14px;
+  padding-inline: 12px;
 }
 
 .directory-columns {
-  border-bottom-width: 2px;
+  border-bottom-width: 1.5px;
 }
 
 .directory-columns__label,
@@ -4544,14 +4516,13 @@ h1 {
 .directory-group__swatch {
   width: 14px;
   height: 14px;
-  border: 2px solid var(--color-black);
   border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-black) 35%, transparent);
 }
 
 .directory-group__title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
-  text-transform: uppercase;
 }
 
 .directory-open {
@@ -4560,5 +4531,5 @@ h1 {
 }
 
 .directory-row:hover .directory-open {
-  color: var(--color-link);
+  color: var(--color-accent);
 }

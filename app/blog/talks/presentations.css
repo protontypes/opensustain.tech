@@ -88,9 +88,9 @@ a.presentation-card:hover .presentation-card__thumb img {
 
 /* The site's label style: semi-condensed, sentence case, no tracking. */
 .presentation-card__meta {
-  font-family: var(--font-heading);
+  font-family: var(--font-ui);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 700;
   font-stretch: var(--stretch-label);
   color: var(--color-text-secondary);
   margin-bottom: 8px;

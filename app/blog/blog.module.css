@@ -80,9 +80,9 @@
 }
 
 .coverYear {
-  font-family: var(--font-heading);
+  font-family: var(--font-ui);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 700;
   font-stretch: var(--stretch-label);
   color: var(--color-text-secondary);
 }
@@ -151,7 +151,7 @@
 .cardMeta {
   margin-top: auto;
   padding-top: 8px;
-  font-family: var(--font-heading);
+  font-family: var(--font-ui);
   font-size: 12px;
   color: var(--color-text-secondary);
 }
@@ -207,7 +207,7 @@
 /* Under the byline: old posts quote old counts. */
 .datedNote {
   margin: 12px 0 0;
-  font-family: var(--font-heading);
+  font-family: var(--font-ui);
   font-size: 13px;
   color: var(--color-text-secondary);
 }

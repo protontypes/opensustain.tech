@@ -65,9 +65,9 @@ import {
 } from "./sunburst-rail";
 
 const MAX_CHART = 1040;
-const MAX_HERO_CHART = 760;
-/** Header, community bar, the hero's top padding and the chart's search row. */
-const HERO_CHROME = 220;
+const MAX_HERO_CHART = MAX_CHART;
+/** The sticky header, the margins the ring's scale sits in, and some air. */
+const HERO_CHROME = 140;
 const ROOT_HINT = "Click a category to see its projects";
 /* One ring at a time once a category is open, so the first click shows
    subcategories by name rather than a fan of unlabelled project slivers. */
@@ -137,9 +137,9 @@ export function EcosystemSunburst({ variant = "full", selectionSlot }: Props) {
   const reducedMotion = useReducedMotion();
   const theme = useTheme();
 
-  // Beside the home page's text column the whole ring has to fit on the first
-  // screen, or the thing to play with starts below the fold. Stacked under the
-  // text on a narrow screen it is already a scroll away, so width alone rules.
+  // The home page's ring runs the page's width under its introduction. On a
+  // wide screen it is capped so the whole circle, centre and Back button
+  // included, fits one screen once scrolled to. On a narrow one width rules.
   const [heroHeightCap, setHeroHeightCap] = useState(Infinity);
   useEffect(() => {
     if (!hero) return;

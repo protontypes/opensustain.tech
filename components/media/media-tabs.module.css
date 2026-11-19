@@ -13,9 +13,9 @@
   margin-bottom: -1px;
   padding: 12px 0;
   border-bottom: 2px solid transparent;
-  font-family: var(--font-heading);
+  font-family: var(--font-ui);
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text-secondary);
   transition: color 0.15s ease, border-color 0.15s ease;
 }

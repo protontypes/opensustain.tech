@@ -38,10 +38,10 @@ export const HOLE_RADII: Record<number, number> = {
  * do, and costs 1,667 arcs of rasterisation for nothing.
  */
 const RING_GAP = 0.005;
-/** The outermost ring carries the longest names, so it gets a little more depth. */
+/** The outermost ring carries the longest names, so it gets more of the depth. */
 const RING_WEIGHTS: Record<number, number[]> = {
   1: [1],
-  2: [1, 1.15],
+  2: [1, 1.3],
 };
 
 /**
@@ -333,6 +333,17 @@ export function buildHitIndex(
     bucket.ends.push(item.rect.x1);
     bucket.indices.push(index);
   });
+  // `laid` is in tree order, but a ring drawn in metric order is not: the
+  // binary search in hitTest needs each ring sorted by angle, or most of its
+  // arcs can be neither hovered nor clicked.
+  for (const bucket of rings.values()) {
+    const order = bucket.starts
+      .map((_, i) => i)
+      .sort((a, b) => bucket.starts[a] - bucket.starts[b]);
+    bucket.starts = order.map((i) => bucket.starts[i]);
+    bucket.ends = order.map((i) => bucket.ends[i]);
+    bucket.indices = order.map((i) => bucket.indices[i]);
+  }
   return { rings, bands };
 }
 
@@ -506,27 +517,34 @@ export function labelFor(
     // Names like "Atmospheric Chemistry and Aerosol" only fit on two lines.
     if (width >= 26 && node.name.length > budget(11)) {
       const lines = wrap(node.name, budget(11));
-      if (lines) return { ...base, lines, fontSize: 11, weight: 600 };
+      if (lines) return { ...base, lines, fontSize: 11, weight: 500 };
     }
     if (width >= 22 && node.name.length > budget(10)) {
       const lines = wrap(node.name, budget(10));
-      if (lines) return { ...base, lines, fontSize: 10, weight: 600 };
+      if (lines) return { ...base, lines, fontSize: 10, weight: 500 };
     }
     for (const size of [11, 10, 9]) {
       if (node.name.length <= budget(size)) {
-        return { ...base, lines: [node.name], fontSize: size, weight: 600 };
+        return { ...base, lines: [node.name], fontSize: size, weight: 500 };
       }
+    }
+    // Last step before cutting the name short: two lines at the smallest size.
+    if (width >= 22) {
+      const lines = wrap(node.name, budget(9));
+      if (lines) return { ...base, lines, fontSize: 9, weight: 500 };
     }
     return {
       ...base,
       lines: [truncate(node.name, budget(10))],
       fontSize: 10,
-      weight: 600,
+      weight: 500,
     };
   }
 
   if (width < 9) return null;
-  const fontSize = width >= 11 ? 10 : 9;
+  // As large as the slice allows: a project name at 9px is only for the
+  // slices that leave no choice.
+  const fontSize = width >= 17 ? 12 : width >= 14 ? 11 : width >= 11 ? 10 : 9;
   const maxChars = Math.floor((depth - 10) / (fontSize * ADVANCE));
   if (maxChars < 3) return null;
   return {

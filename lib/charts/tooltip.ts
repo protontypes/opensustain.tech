@@ -45,7 +45,7 @@ export function buildTooltip(
   const root = document.createElement("div");
   // ECharts sets `white-space: nowrap` on the container it puts this in, so
   // prose has to opt back out or it runs off the right edge of the box.
-  root.style.cssText = `font-family:var(--font-heading);max-width:300px;white-space:normal;color:${tokens.ink}`;
+  root.style.cssText = `font-family:var(--font-ui);max-width:300px;white-space:normal;color:${tokens.ink}`;
 
   const heading = document.createElement("p");
   heading.textContent = title;
